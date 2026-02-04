@@ -1,0 +1,204 @@
+[
+  {
+    "id": "CVE-2024-21887",
+    "title": "Ivanti Connect Secure Authentication Bypass",
+    "description": "A critical authentication bypass vulnerability in Ivanti Connect Secure allows remote attackers to gain unauthorized access to restricted resources without authentication. This vulnerability has been actively exploited in the wild by advanced persistent threat groups.",
+    "severity": "CRITICAL",
+    "cvss_score": 9.1,
+    "published_date": "2024-01-10",
+    "affected_products": [
+      "Ivanti Connect Secure 9.x",
+      "Ivanti Policy Secure 9.x"
+    ],
+    "cwe": "CWE-287: Improper Authentication",
+    "references": [
+      "https://forums.ivanti.com/s/article/CVE-2024-21887",
+      "https://www.cisa.gov/news-events/alerts/2024/01/12/ivanti-releases-security-updates-connect-secure-and-policy-secure"
+    ],
+    "mitigations": [
+      "Upgrade to patched versions immediately",
+      "Apply vendor-provided mitigation steps",
+      "Monitor for indicators of compromise",
+      "Implement network segmentation"
+    ],
+    "mitre_attack": ["T1190: Exploit Public-Facing Application"]
+  },
+  {
+    "id": "CVE-2024-3094",
+    "title": "XZ Utils Backdoor Supply Chain Attack",
+    "description": "A sophisticated backdoor was discovered in XZ Utils (liblzma) versions 5.6.0 and 5.6.1. The malicious code was intentionally inserted by a compromised maintainer and affects SSH authentication on systems using systemd. This represents a significant supply chain attack targeting critical Linux infrastructure.",
+    "severity": "CRITICAL",
+    "cvss_score": 10.0,
+    "published_date": "2024-03-29",
+    "affected_products": [
+      "XZ Utils 5.6.0",
+      "XZ Utils 5.6.1",
+      "Various Linux distributions (Fedora, Debian testing, etc.)"
+    ],
+    "cwe": "CWE-506: Embedded Malicious Code",
+    "references": [
+      "https://www.openwall.com/lists/oss-security/2024/03/29/4",
+      "https://nvd.nist.gov/vuln/detail/CVE-2024-3094"
+    ],
+    "mitigations": [
+      "Immediately downgrade to XZ Utils 5.4.x",
+      "Check for affected systems using package managers",
+      "Audit SSH authentication logs",
+      "Review supply chain security practices"
+    ],
+    "mitre_attack": ["T1195.002: Compromise Software Supply Chain"]
+  },
+  {
+    "id": "CVE-2023-46747",
+    "title": "F5 BIG-IP Configuration Utility RCE",
+    "description": "Remote code execution vulnerability in F5 BIG-IP Configuration utility allows authenticated attackers with network access to execute arbitrary system commands. This vulnerability affects multiple versions of BIG-IP and has been observed in active exploitation.",
+    "severity": "HIGH",
+    "cvss_score": 8.8,
+    "published_date": "2023-10-26",
+    "affected_products": [
+      "F5 BIG-IP 17.1.0 - 17.1.1",
+      "F5 BIG-IP 16.1.0 - 16.1.4",
+      "F5 BIG-IP 15.1.0 - 15.1.10"
+    ],
+    "cwe": "CWE-94: Improper Control of Generation of Code",
+    "references": [
+      "https://support.f5.com/csp/article/K000137353",
+      "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+    ],
+    "mitigations": [
+      "Apply vendor patches immediately",
+      "Restrict network access to Configuration utility",
+      "Enable multi-factor authentication",
+      "Monitor for unauthorized configuration changes"
+    ],
+    "mitre_attack": ["T1190: Exploit Public-Facing Application", "T1059: Command and Scripting Interpreter"]
+  },
+  {
+    "id": "CVE-2023-4966",
+    "title": "Citrix Bleed - Session Hijacking Vulnerability",
+    "description": "Buffer overflow vulnerability in NetScaler ADC and Gateway allows unauthenticated attackers to leak sensitive session information from device memory. This vulnerability, dubbed 'Citrix Bleed', has been exploited by ransomware groups to hijack authenticated sessions and gain initial access to enterprise networks.",
+    "severity": "CRITICAL",
+    "cvss_score": 9.4,
+    "published_date": "2023-10-10",
+    "affected_products": [
+      "Citrix NetScaler ADC 14.1",
+      "Citrix NetScaler ADC 13.1",
+      "Citrix NetScaler Gateway 14.1",
+      "Citrix NetScaler Gateway 13.1"
+    ],
+    "cwe": "CWE-119: Buffer Overflow",
+    "references": [
+      "https://support.citrix.com/article/CTX579459",
+      "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-325a"
+    ],
+    "mitigations": [
+      "Apply patches immediately for all versions",
+      "Reset all active sessions after patching",
+      "Review logs for indicators of exploitation",
+      "Implement session timeout policies",
+      "Monitor for unusual authentication patterns"
+    ],
+    "mitre_attack": ["T1539: Steal Web Session Cookie", "T1190: Exploit Public-Facing Application"]
+  },
+  {
+    "id": "CVE-2024-37051",
+    "title": "GitHub Enterprise Server Authentication Bypass",
+    "description": "Path traversal vulnerability in GitHub Enterprise Server SAML authentication allows attackers to forge SAML responses and impersonate arbitrary users. This critical vulnerability affects the authentication mechanism and could lead to complete compromise of GitHub Enterprise Server instances.",
+    "severity": "CRITICAL",
+    "cvss_score": 10.0,
+    "published_date": "2024-07-02",
+    "affected_products": [
+      "GitHub Enterprise Server 3.13.0 - 3.13.2",
+      "GitHub Enterprise Server 3.12.0 - 3.12.7",
+      "GitHub Enterprise Server 3.11.0 - 3.11.13"
+    ],
+    "cwe": "CWE-22: Path Traversal",
+    "references": [
+      "https://github.blog/2024-07-02-security-alert-ghes-authentication-bypass/",
+      "https://nvd.nist.gov/vuln/detail/CVE-2024-37051"
+    ],
+    "mitigations": [
+      "Upgrade to patched versions immediately",
+      "Review all user accounts for suspicious activity",
+      "Audit repository access logs",
+      "Reset all user sessions",
+      "Review and rotate SSH keys and tokens"
+    ],
+    "mitre_attack": ["T1078: Valid Accounts", "T1550.001: Application Access Token"]
+  },
+  {
+    "id": "CVE-2024-23897",
+    "title": "Jenkins Arbitrary File Read Vulnerability",
+    "description": "A vulnerability in Jenkins CLI allows attackers to read arbitrary files from the Jenkins controller file system. This can lead to exposure of sensitive information including credentials, configuration files, and secrets stored on the Jenkins server.",
+    "severity": "HIGH",
+    "cvss_score": 8.1,
+    "published_date": "2024-01-24",
+    "affected_products": [
+      "Jenkins 2.441 and earlier",
+      "Jenkins LTS 2.426.2 and earlier"
+    ],
+    "cwe": "CWE-22: Path Traversal",
+    "references": [
+      "https://www.jenkins.io/security/advisory/2024-01-24/",
+      "https://nvd.nist.gov/vuln/detail/CVE-2024-23897"
+    ],
+    "mitigations": [
+      "Update to Jenkins 2.442 or LTS 2.426.3",
+      "Disable CLI if not required",
+      "Restrict network access to Jenkins",
+      "Rotate exposed credentials",
+      "Review access logs for exploitation attempts"
+    ],
+    "mitre_attack": ["T1005: Data from Local System", "T1552.001: Credentials In Files"]
+  },
+  {
+    "id": "CVE-2024-21410",
+    "title": "Microsoft Exchange Server Privilege Escalation",
+    "description": "Privilege escalation vulnerability in Microsoft Exchange Server allows authenticated attackers to elevate privileges and potentially gain SYSTEM level access on Exchange servers. This vulnerability can be chained with NTLM relay attacks to compromise Active Directory environments.",
+    "severity": "HIGH",
+    "cvss_score": 8.8,
+    "published_date": "2024-02-13",
+    "affected_products": [
+      "Microsoft Exchange Server 2019",
+      "Microsoft Exchange Server 2016"
+    ],
+    "cwe": "CWE-269: Improper Privilege Management",
+    "references": [
+      "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2024-21410",
+      "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+    ],
+    "mitigations": [
+      "Apply February 2024 security updates",
+      "Enable Extended Protection for Authentication",
+      "Monitor for unusual privilege escalation attempts",
+      "Review Exchange server logs",
+      "Implement network segmentation"
+    ],
+    "mitre_attack": ["T1068: Exploitation for Privilege Escalation", "T1557: Adversary-in-the-Middle"]
+  },
+  {
+    "id": "CVE-2023-48788",
+    "title": "Fortinet FortiClient EMS SQL Injection",
+    "description": "SQL injection vulnerability in Fortinet FortiClient EMS allows unauthenticated attackers to execute arbitrary SQL commands on the underlying database. This can lead to unauthorized access to sensitive data, including user credentials and configuration information.",
+    "severity": "CRITICAL",
+    "cvss_score": 9.3,
+    "published_date": "2024-03-12",
+    "affected_products": [
+      "FortiClient EMS 7.2.0 - 7.2.2",
+      "FortiClient EMS 7.0.0 - 7.0.10"
+    ],
+    "cwe": "CWE-89: SQL Injection",
+    "references": [
+      "https://www.fortiguard.com/psirt/FG-IR-24-029",
+      "https://nvd.nist.gov/vuln/detail/CVE-2023-48788"
+    ],
+    "mitigations": [
+      "Upgrade to FortiClient EMS 7.2.3 or 7.0.11",
+      "Restrict network access to EMS",
+      "Review database logs for unauthorized queries",
+      "Reset administrator credentials",
+      "Implement database activity monitoring"
+    ],
+    "mitre_attack": ["T1190: Exploit Public-Facing Application", "T1505.003: Web Shell"]
+  }
+]

@@ -1,0 +1,240 @@
+[
+  {
+    "id": "THREAT-2024-001",
+    "title": "APT29 (Cozy Bear) Targeting Cloud Infrastructure",
+    "date": "2024-01-15",
+    "threat_actor": "APT29 (Cozy Bear)",
+    "attribution": "Russian Foreign Intelligence Service (SVR)",
+    "description": "APT29 has been observed targeting cloud infrastructure of government and technology sectors using sophisticated spear-phishing campaigns and exploiting cloud misconfigurations. The group is leveraging legitimate cloud services for command and control to evade detection.",
+    "tactics": [
+      "Initial Access via spear-phishing",
+      "Credential harvesting through phishing pages",
+      "Abuse of cloud service provider APIs",
+      "Use of residential proxy networks"
+    ],
+    "iocs": {
+      "domains": [
+        "microsoftonline-sso[.]com",
+        "office365-update[.]com",
+        "azurecloud-auth[.]net"
+      ],
+      "ips": [
+        "185.220.101.42",
+        "45.142.214.123"
+      ],
+      "file_hashes": [
+        "sha256:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6"
+      ]
+    },
+    "mitre_techniques": [
+      "T1566.002: Spear-phishing Link",
+      "T1078.004: Cloud Accounts",
+      "T1213.003: Code Repositories",
+      "T1567.002: Exfiltration to Cloud Storage"
+    ],
+    "recommendations": [
+      "Implement multi-factor authentication for all cloud accounts",
+      "Monitor for unusual API activity patterns",
+      "Review and restrict cloud service permissions",
+      "Block known IOCs at network perimeter",
+      "Conduct phishing awareness training"
+    ],
+    "severity": "HIGH",
+    "confidence": "High"
+  },
+  {
+    "id": "THREAT-2024-002",
+    "title": "LockBit 3.0 Ransomware Campaign Intensifies",
+    "date": "2024-01-20",
+    "threat_actor": "LockBit 3.0",
+    "attribution": "Cybercriminal - Ransomware-as-a-Service (RaaS)",
+    "description": "LockBit 3.0 ransomware group has intensified operations targeting healthcare, manufacturing, and financial sectors. The group is exploiting Citrix Bleed vulnerability (CVE-2023-4966) as primary initial access vector, followed by rapid lateral movement and deployment of ransomware payloads.",
+    "tactics": [
+      "Exploitation of public-facing applications (Citrix)",
+      "Credential theft and session hijacking",
+      "Disabling security tools and logging",
+      "Data exfiltration prior to encryption",
+      "Double extortion tactics"
+    ],
+    "iocs": {
+      "domains": [
+        "lockbitsupp[.]com",
+        "lockbit3o6yx[.]onion"
+      ],
+      "ips": [
+        "104.21.94.174",
+        "172.67.195.227"
+      ],
+      "file_hashes": [
+        "sha256:3f4a2b5c8d9e1f0a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a"
+      ],
+      "tools_used": [
+        "Mimikatz",
+        "PsExec",
+        "Advanced IP Scanner",
+        "AnyDesk"
+      ]
+    },
+    "mitre_techniques": [
+      "T1190: Exploit Public-Facing Application",
+      "T1539: Steal Web Session Cookie",
+      "T1486: Data Encrypted for Impact",
+      "T1567: Exfiltration Over Web Service",
+      "T1562.001: Disable Security Tools"
+    ],
+    "recommendations": [
+      "Patch all Citrix NetScaler instances immediately",
+      "Implement offline immutable backups",
+      "Enable EDR on all endpoints",
+      "Segment networks to limit lateral movement",
+      "Monitor for rapid file modifications",
+      "Implement application whitelisting"
+    ],
+    "severity": "CRITICAL",
+    "confidence": "High"
+  },
+  {
+    "id": "THREAT-2024-003",
+    "title": "Volt Typhoon Infrastructure Pre-Positioning in US Critical Infrastructure",
+    "date": "2024-02-01",
+    "threat_actor": "Volt Typhoon",
+    "attribution": "People's Republic of China",
+    "description": "Chinese state-sponsored APT group Volt Typhoon continues to maintain persistent access in U.S. critical infrastructure networks including energy, water, and telecommunications sectors. The group focuses on living-off-the-land techniques and avoiding detection while pre-positioning for potential disruptive operations.",
+    "tactics": [
+      "Exploitation of edge devices and network appliances",
+      "Use of built-in OS tools for persistence",
+      "Credential harvesting from network devices",
+      "Minimal use of malware to avoid detection",
+      "Long-term persistent access maintenance"
+    ],
+    "iocs": {
+      "domains": [
+        "update-service[.]net",
+        "device-management[.]org"
+      ],
+      "ips": [
+        "45.76.21.144",
+        "103.59.144.89",
+        "198.23.198.106"
+      ],
+      "compromised_devices": [
+        "Cisco routers",
+        "SOHO routers",
+        "Fortinet appliances"
+      ]
+    },
+    "mitre_techniques": [
+      "T1190: Exploit Public-Facing Application",
+      "T1133: External Remote Services",
+      "T1078: Valid Accounts",
+      "T1027: Obfuscated Files or Information",
+      "T1070.004: File Deletion"
+    ],
+    "recommendations": [
+      "Audit and patch all edge network devices",
+      "Implement robust logging for network devices",
+      "Monitor for unusual administrative access",
+      "Conduct regular device configuration audits",
+      "Implement out-of-band management networks",
+      "Deploy threat hunting in OT/ICS environments"
+    ],
+    "severity": "CRITICAL",
+    "confidence": "High"
+  },
+  {
+    "id": "THREAT-2024-004",
+    "title": "TA505 Group Deploying FlawedGrace RAT via Malicious Email Campaigns",
+    "date": "2024-02-10",
+    "threat_actor": "TA505 (aka Hive0065)",
+    "attribution": "Cybercriminal - Financially motivated",
+    "description": "TA505 cybercrime group has launched widespread email campaigns distributing FlawedGrace RAT targeting financial institutions and retail organizations. Campaigns use convincing invoice-themed emails with malicious Excel documents leveraging macro-enabled spreadsheets.",
+    "tactics": [
+      "Spear-phishing with invoice lures",
+      "Malicious Office macros",
+      "Multi-stage payload delivery",
+      "Process injection techniques",
+      "Banking trojan deployment"
+    ],
+    "iocs": {
+      "domains": [
+        "invoice-tracking[.]site",
+        "payment-processor[.]online",
+        "billing-update[.]info"
+      ],
+      "ips": [
+        "192.3.147.221",
+        "23.106.223.97"
+      ],
+      "file_hashes": [
+        "sha256:1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+        "sha256:9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e"
+      ],
+      "email_subjects": [
+        "Outstanding Invoice #[random]",
+        "Payment Confirmation Required",
+        "Billing Statement - Action Required"
+      ]
+    },
+    "mitre_techniques": [
+      "T1566.001: Spear-phishing Attachment",
+      "T1204.002: Malicious File",
+      "T1055: Process Injection",
+      "T1027.002: Software Packing",
+      "T1071.001: Web Protocols for C2"
+    ],
+    "recommendations": [
+      "Block macros in Office documents from untrusted sources",
+      "Implement email filtering and sandboxing",
+      "User awareness training on phishing recognition",
+      "Deploy endpoint detection with behavioral monitoring",
+      "Monitor for unusual Office process spawning"
+    ],
+    "severity": "HIGH",
+    "confidence": "High"
+  },
+  {
+    "id": "THREAT-2024-005",
+    "title": "Kimsuky APT Targeting South Korean Entities with AppleSeed Backdoor",
+    "date": "2024-02-15",
+    "threat_actor": "Kimsuky (APT43)",
+    "attribution": "North Korean Reconnaissance General Bureau",
+    "description": "North Korean APT group Kimsuky has been observed targeting South Korean government, defense contractors, and think tanks using spear-phishing emails with malicious HWP documents. The campaign deploys the AppleSeed backdoor for intelligence collection and credential harvesting.",
+    "tactics": [
+      "Targeted spear-phishing campaigns",
+      "Exploitation of HWP document format",
+      "Keylogging and credential theft",
+      "Browser credential extraction",
+      "Long-term intelligence gathering"
+    ],
+    "iocs": {
+      "domains": [
+        "naver-mail[.]com",
+        "daum-login[.]net",
+        "korea-gov[.]org"
+      ],
+      "ips": [
+        "121.254.173.89",
+        "175.45.178.24"
+      ],
+      "file_hashes": [
+        "sha256:7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e"
+      ]
+    },
+    "mitre_techniques": [
+      "T1566.001: Spear-phishing Attachment",
+      "T1203: Exploitation for Client Execution",
+      "T1056.001: Keylogging",
+      "T1555.003: Credentials from Web Browsers",
+      "T1020: Automated Exfiltration"
+    ],
+    "recommendations": [
+      "Block HWP files at email gateway",
+      "Implement application whitelisting",
+      "Monitor for unusual browser data access",
+      "Deploy deception technologies",
+      "Conduct Korean geopolitical threat briefings"
+    ],
+    "severity": "HIGH",
+    "confidence": "Medium"
+  }
+]
