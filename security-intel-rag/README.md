@@ -322,8 +322,8 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ## 📧 Contact
 
-- **GitHub**: [@YOUR_USERNAME](https://github.com/YOUR_USERNAME)
-- **LinkedIn**: [Your LinkedIn](https://linkedin.com/in/YOUR_PROFILE)
+- **GitHub**: [@Griff-Reaper](https://github.com/Griff-Reaper)
+- **LinkedIn**: [Jace Griffith](https://linkedin.com/in/jace-griffith-jg11
 - **Email**: joygriff1@yahoo.com
 
 ## 🙏 Acknowledgments
