@@ -29,6 +29,8 @@ for _path in (PROJECT_ROOT / "src", PROJECT_ROOT / "config"):
         sys.path.insert(0, str(_path))
 
 DEFAULT_PERSIST_DIRECTORY = str(PROJECT_ROOT / "chroma_db")
+# The NVD corpus built by src/ingest_nvd.py. Overridable via COLLECTION_NAME.
+DEFAULT_COLLECTION_NAME = "nvd_cve"
 
 from embeddings import EmbeddingService
 from prompts import (
@@ -49,7 +51,7 @@ class SecurityRAG:
     def __init__(
         self,
         persist_directory: str = DEFAULT_PERSIST_DIRECTORY,
-        collection_name: str = "security_intel"
+        collection_name: Optional[str] = None
     ):
         """
         Initialize the RAG system.
@@ -60,7 +62,13 @@ class SecurityRAG:
         """
         # Load environment variables (API keys)
         load_dotenv()
-        
+
+        collection_name = (
+            collection_name
+            or os.getenv("COLLECTION_NAME")
+            or DEFAULT_COLLECTION_NAME
+        )
+
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY not found in environment!")
@@ -220,24 +228,33 @@ class SecurityRAG:
             }
         
         # Step 5: Prepare response
-        # Extract source information for citations
+        # Citations are built from stored metadata, never from the generated
+        # text: a model asked to name its sources will invent plausible CVE IDs.
         sources = []
-        for meta in context_results["metadatas"]:
+        for meta, distance in zip(
+            context_results["metadatas"], context_results["distances"]
+        ):
             if meta.get("type") == "cve":
                 sources.append({
                     "type": "CVE",
                     "id": meta.get("cve_id"),
-                    "title": meta.get("title"),
-                    "severity": meta.get("severity")
+                    "severity": meta.get("severity") or None,
+                    "cvss_base_score": meta.get("cvss_base_score"),
+                    "published": meta.get("published") or None,
+                    "vendors": meta.get("vendors") or None,
+                    "products": meta.get("products") or None,
+                    "distance": round(float(distance), 4),
                 })
             elif meta.get("type") == "threat_intel":
                 sources.append({
                     "type": "Threat Intelligence",
                     "id": meta.get("threat_id"),
                     "title": meta.get("title"),
-                    "threat_actor": meta.get("threat_actor")
+                    "threat_actor": meta.get("threat_actor"),
+                    "severity": meta.get("severity") or None,
+                    "distance": round(float(distance), 4),
                 })
-        
+
         result = {
             "answer": answer,
             "sources": sources,
@@ -337,11 +354,20 @@ def main():
             print(f"SOURCES ({result['n_sources']} documents used):")
             print("=" * 70)
             for i, source in enumerate(result["sources"], 1):
-                print(f"{i}. [{source['type']}] {source.get('id', 'N/A')}: {source.get('title', 'N/A')}")
-                if 'severity' in source:
-                    print(f"Severity: {source['severity']}")
-                if 'threat_actor' in source:
-                    print(f"Actor: {source['threat_actor']}")
+                header = f"{i}. [{source['type']}] {source.get('id') or 'N/A'}"
+                if source.get("title"):
+                    header += f": {source['title']}"
+                print(header)
+                if source.get("severity"):
+                    score = source.get("cvss_base_score")
+                    score_text = f" (CVSS {score})" if score is not None else ""
+                    print(f"   Severity: {source['severity']}{score_text}")
+                if source.get("products"):
+                    print(f"   Products: {source['products'].replace('|', ', ')}")
+                if source.get("threat_actor"):
+                    print(f"   Actor: {source['threat_actor']}")
+                if source.get("distance") is not None:
+                    print(f"   Distance: {source['distance']}")
             
         except KeyboardInterrupt:
             print("\n\n Goodbye!")

@@ -7,13 +7,13 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green.svg)](https://fastapi.tiangolo.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Project status.** This is an early build running against a small sample
-> corpus (8 CVEs and 5 threat intelligence reports, both committed under
-> [data/](data/)). Retrieval is dense-vector only, and **retrieval quality has
-> not been measured yet** — there are no accuracy numbers in this README because
-> none have been produced. A real NVD corpus, hybrid retrieval, exploitation
-> enrichment, and a measured evaluation harness are the planned next steps; see
-> [Roadmap](#-roadmap).
+> **Project status.** The corpus is the full NVD CVE dataset — see
+> [Corpus](#-corpus) for exact counts, source and pull date, all recorded in the
+> committed [provenance manifest](data/manifest.json). Retrieval is
+> dense-vector only, and **retrieval quality has not been measured yet** — there
+> are no accuracy numbers in this README because none have been produced.
+> Hybrid retrieval, exploitation enrichment, and a measured evaluation harness
+> are the next steps; see [Roadmap](#-roadmap).
 
 ## 🎯 Problem Statement
 
@@ -48,6 +48,25 @@ yet — retrieval is currently dense-vector similarity only.
 
 ## 🏗️ Architecture
 
+**Ingestion** (offline, run once then refreshed incrementally):
+
+```text
+fkie-cad bulk feeds          NVD API 2.0
+(CVE-<year>.json.xz)         (lastMod window)
+      │  sha256-verified           │  only changed records
+      └──────────────┬─────────────┘
+                     ▼
+        nvd_normalize.py  ──  one document per CVE
+                     │        embedded: ID, severity, vendor/product, CWE, description
+                     │        metadata: CVSS score+vector, dates, CWE, CPE counts
+                     ▼
+        ingest_nvd.py  ──  batched embeddings, resumable checkpoint
+                     ▼
+              ChromaDB (cosine)  +  data/manifest.json
+```
+
+**Query** (online):
+
 ```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    User Query                                │
@@ -63,8 +82,7 @@ yet — retrieval is currently dense-vector similarity only.
                         ▼
 ┌─────────────────────────────────────────────────────────────┐
 │              ChromaDB Vector Database                        │
-│              Finds most similar documents                    │
-│              (CVEs, Threat Intel)                            │
+│              Cosine similarity over the NVD CVE corpus       │
 └───────────────────────┬─────────────────────────────────────┘
                         │
                         ▼
@@ -135,15 +153,53 @@ cp .env.example .env
 # Edit .env and add your ANTHROPIC_API_KEY
 ```
 
-5. **Ingest data**
+5. **Download the corpus**
 ```bash
-python src/ingest.py
+python src/nvd_feeds.py --dest data/raw
 ```
 
-This loads the committed sample data (8 CVEs and 5 threat intelligence reports)
-into a local ChromaDB store under `chroma_db/`. The first run also downloads the
-embedding model. Ingestion is idempotent — re-running it upserts rather than
-failing on duplicate IDs.
+Downloads one compressed archive per CVE year and verifies each against the
+sha256 in its `.meta` sidecar. Already-verified files are reused, so re-running
+is cheap and an interrupted download is safe to repeat.
+
+6. **Ingest**
+```bash
+python src/ingest_nvd.py
+```
+
+Normalizes, embeds and indexes every CVE into a local ChromaDB store under
+`chroma_db/`. The first run also downloads the embedding model. See
+[Corpus](#-corpus) for measured throughput and runtime.
+
+Ingestion is **resumable**: progress is checkpointed after every committed
+batch, so a run interrupted at 80% continues from where it stopped rather than
+starting over. It is also idempotent — records are upserted, so re-running never
+duplicates. To rebuild from scratch, pass `--reset`.
+
+Optional flags:
+
+```bash
+python src/ingest_nvd.py --years 2024 2025   # a subset, for a quick trial
+python src/ingest_nvd.py --reset             # drop the collection and rebuild
+```
+
+**Keeping the corpus current**
+
+```bash
+python src/nvd_api.py --days 7                  # preview what changed
+python src/ingest_nvd.py --refresh --days 7     # apply those changes
+```
+
+Refreshes use the NVD API 2.0 `lastModStartDate` / `lastModEndDate` window, so
+they pull only records that actually changed — a few hundred a day rather than
+the whole corpus. Changed records are upserted; records that have since been
+**Rejected are deleted** from the index, because a CVE can be withdrawn after
+publication and a stale copy would keep presenting it as a real vulnerability.
+
+NVD allows 5 requests per 30 seconds anonymously and 50 with a free
+[API key](https://nvd.nist.gov/developers/request-an-api-key); set `NVD_API_KEY`
+in `.env` to get the higher limit. The key is read from the environment and
+never stored in the repository.
 
 ## 🚀 Usage
 
@@ -246,22 +302,35 @@ security-intel-rag/
 │
 ├── src/                         # Source code
 │   ├── embeddings.py            # Embedding generation service
-│   ├── ingest.py                # Data ingestion pipeline
+│   ├── nvd_feeds.py             # Bulk corpus download + sha256 verification
+│   ├── nvd_api.py               # NVD API 2.0 incremental updates
+│   ├── nvd_normalize.py         # CVE record -> document + metadata
+│   ├── ingest_nvd.py            # Resumable corpus ingestion (main pipeline)
+│   ├── ingest.py                # Legacy sample-data loader (demo only)
 │   ├── query.py                 # RAG query engine
 │   └── api.py                   # FastAPI REST service
 │
 ├── config/                      # Configuration
 │   └── prompts.py               # Claude system prompts
 │
-├── data/                        # Sample security data
-│   ├── sample_cves.json         # 8 CVE records
-│   └── threat_intel.json        # 5 threat intelligence reports
+├── data/
+│   ├── manifest.json            # Provenance: source, pull date, counts
+│   ├── sample_cves.json         # Legacy demo data (not the corpus)
+│   ├── threat_intel.json        # Legacy demo data (not the corpus)
+│   └── raw/                     # Downloaded feeds (generated, gitignored)
 │
 ├── tests/                       # Unit tests
-│   └── test_rag.py              # RAG system tests
+│   ├── test_rag.py              # Embedding + formatting tests
+│   ├── test_nvd_normalize.py    # Normalization, CVSS, CPE, filtering
+│   └── test_nvd_sources.py      # Feed verification + API windowing
 │
 └── chroma_db/                   # Vector database (generated, gitignored)
 ```
+
+The vector index is **not** committed. A collection of this size cannot be
+meaningfully reviewed in a repository, so the ingestion scripts plus
+[data/manifest.json](data/manifest.json) are the committed artifacts — they let
+anyone rebuild the exact corpus and check the numbers.
 
 ## 🧪 Testing
 

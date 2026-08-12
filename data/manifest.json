@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-08-12T19:55:02+00:00",
+  "corpus": {
+    "source": "fkie-cad/nvd-json-data-feeds",
+    "source_url": "https://github.com/fkie-cad/nvd-json-data-feeds",
+    "upstream": "National Vulnerability Database (NVD), NIST",
+    "license": "NVD and CVE Terms of Use",
+    "years": [
+      "2002"
+    ],
+    "records_raw": 2393,
+    "records_indexable": 2357,
+    "records_filtered_out": 36,
+    "filters": {
+      "rejected": 36
+    },
+    "filter_definitions": {
+      "rejected": "vulnStatus == 'Rejected' (CVE withdrawn by its assigner)",
+      "no_english_description": "no descriptions[] entry with lang == 'en'"
+    },
+    "release_tag": "v2026.08.12-000016",
+    "release_published_at": "2026-08-12T00:20:37Z",
+    "pulled_at": "2026-08-12T19:52:47+00:00"
+  },
+  "index": {
+    "collection": "nvd_resume",
+    "documents_in_collection": 2357,
+    "embedding_model": "all-MiniLM-L6-v2",
+    "embedding_dimension": 384,
+    "distance": "cosine",
+    "documents_written_this_run": 1757,
+    "wall_clock_seconds": 16.1,
+    "docs_per_second": 109.1
+  }
+}

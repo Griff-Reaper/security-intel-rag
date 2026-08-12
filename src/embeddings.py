@@ -60,39 +60,56 @@ class EmbeddingService:
         """
         if not text or text.strip() == "":
             # Return zero vector for empty text
-            return [0.0] * 384
-            
-        # The model handles all the ML magic internally
-        embedding = self.model.encode(text, convert_to_numpy=True)
-        
+            return [0.0] * self.get_embedding_dimension()
+
+        # The model handles all the ML magic internally. Normalized to match
+        # get_embeddings() so query and document vectors live on the same scale.
+        embedding = self.model.encode(
+            text, convert_to_numpy=True, normalize_embeddings=True
+        )
+
         # Convert numpy array to Python list (for JSON serialization)
         return embedding.tolist()
     
-    def get_embeddings(self, texts: List[str], show_progress: bool = True) -> List[List[float]]:
+    def get_embeddings(
+        self,
+        texts: List[str],
+        show_progress: bool = True,
+        batch_size: int = 256,
+    ) -> List[List[float]]:
         """
         Convert multiple texts into embeddings efficiently (batched processing).
-        
+
         Args:
             texts: List of texts to embed
             show_progress: Whether to show a progress bar
-            
+            batch_size: Texts encoded per forward pass. Larger batches raise
+                throughput up to the point where memory becomes the constraint;
+                256 is a reasonable CPU default.
+
         Returns:
             List of embedding vectors, one per input text
-            
+
         This is much faster than calling get_embedding() in a loop because:
         1. The model can process multiple texts simultaneously (batching)
         2. GPU acceleration is utilized if available
+
+        Vectors are L2-normalized so that cosine similarity and Euclidean
+        distance rank identically, which keeps distance scores comparable
+        across collections and makes a relevance threshold meaningful.
         """
         if not texts:
             return []
-            
-        # Batch encoding is ~10x faster than one-by-one
+
+        # Batch encoding is far faster than one-by-one
         embeddings = self.model.encode(
-            texts, 
+            texts,
             convert_to_numpy=True,
-            show_progress_bar=show_progress
+            show_progress_bar=show_progress,
+            batch_size=batch_size,
+            normalize_embeddings=True,
         )
-        
+
         # Convert to list of lists
         return embeddings.tolist()
     
@@ -102,8 +119,14 @@ class EmbeddingService:
         
         Returns:
             The number of dimensions (384 for all-MiniLM-L6-v2)
+
+        sentence-transformers 5.x renamed this method; fall back to the old name
+        so the service works on either major version.
         """
-        return self.model.get_sentence_embedding_dimension()
+        getter = getattr(self.model, "get_embedding_dimension", None)
+        if getter is None:
+            getter = self.model.get_sentence_embedding_dimension
+        return getter()
 
 
 # Quick test function (run this file directly to test)

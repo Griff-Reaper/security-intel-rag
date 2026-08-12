@@ -47,12 +47,23 @@ class QueryRequest(BaseModel):
 
 
 class Source(BaseModel):
-    """Model for source citation."""
+    """
+    A citation, built from stored metadata rather than generated text.
+
+    Fields are optional because coverage varies across the corpus: a recent CVE
+    may have no CVSS score yet, and one that NVD has not analysed may have no
+    vendor or product data.
+    """
     type: str
-    id: Optional[str]
-    title: Optional[str]
-    severity: Optional[str]
-    threat_actor: Optional[str]
+    id: Optional[str] = None
+    title: Optional[str] = None
+    severity: Optional[str] = None
+    cvss_base_score: Optional[float] = None
+    published: Optional[str] = None
+    vendors: Optional[str] = None
+    products: Optional[str] = None
+    threat_actor: Optional[str] = None
+    distance: Optional[float] = None
 
 
 class QueryResponse(BaseModel):

@@ -31,7 +31,13 @@ When answering questions:
 
 Never make up information. If the context doesn't contain the answer, say so."""
 
-# Prompt template for CVE analysis queries
+# Prompt template for CVE analysis queries.
+#
+# Note what this deliberately does NOT ask for. The corpus is NVD CVE data,
+# which carries descriptions, CVSS scores, CPE product data and CWE mappings -
+# but no MITRE ATT&CK mappings, no exploitation status, and no vendor patch
+# advice. Asking for those invites the model to supply them from memory, which
+# is exactly the failure mode a grounded system exists to prevent.
 CVE_ANALYSIS_TEMPLATE = """Based on the following security documents, please answer the user's question.
 
 RETRIEVED CONTEXT:
@@ -40,13 +46,22 @@ RETRIEVED CONTEXT:
 USER QUESTION:
 {query}
 
-Please provide a detailed analysis including:
-- Relevant vulnerabilities and their severity
-- Affected systems or products
-- Recommended mitigations
-- MITRE ATT&CK techniques if applicable
+Ground every claim in the retrieved context above. Where the context supports it, cover:
+- The relevant vulnerabilities, by CVE ID
+- Their severity and CVSS base score
+- The affected vendors and products
+- The weakness type (CWE) involved
 
-If the context doesn't contain relevant information, state that clearly."""
+Rules:
+- Cite CVE IDs only if they appear verbatim in the retrieved context. Never
+  construct or recall a CVE ID from memory.
+- The context is NVD vulnerability data. It does not include exploitation
+  status, MITRE ATT&CK mappings, or vendor patch instructions. If asked for
+  those, say the corpus does not carry them rather than answering from
+  background knowledge.
+- If the retrieved context does not answer the question, say so plainly. A
+  clear "the indexed data does not cover this" is more useful to an analyst
+  than a plausible guess."""
 
 # Prompt template for threat intelligence queries  
 THREAT_INTEL_TEMPLATE = """Based on the following threat intelligence, please answer the user's question.
@@ -165,7 +180,15 @@ def format_context_documents(documents: list, metadatas: list) -> str:
         
         if meta.get('type') == 'cve':
             formatted_context.append(f"CVE: {meta.get('cve_id', 'N/A')}")
-            formatted_context.append(f"Severity: {meta.get('severity', 'N/A')}")
+            severity = meta.get('severity') or 'not scored'
+            score = meta.get('cvss_base_score')
+            if score is not None:
+                severity += f" (CVSS {meta.get('cvss_version', '')} base {score})"
+            formatted_context.append(f"Severity: {severity}")
+            if meta.get('published'):
+                formatted_context.append(f"Published: {meta['published']}")
+            if meta.get('cwe_ids'):
+                formatted_context.append(f"CWE: {meta['cwe_ids'].replace('|', ', ')}")
         elif meta.get('type') == 'threat_intel':
             formatted_context.append(f"Threat: {meta.get('threat_actor', 'N/A')}")
             formatted_context.append(f"Date: {meta.get('date', 'N/A')}")
