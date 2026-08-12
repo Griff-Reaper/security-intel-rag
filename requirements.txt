@@ -1,0 +1,21 @@
+# Core dependencies
+anthropic>=0.121.0              # Claude API
+python-dotenv>=1.0.1            # Environment variable management
+
+# Vector database and embeddings
+chromadb>=1.5.0                 # Local vector database (free!)
+sentence-transformers>=5.0.0    # Free embedding models (no API needed)
+
+# Data processing
+requests>=2.32.0                # HTTP requests for data fetching
+
+# API framework
+fastapi>=0.115.0                # Modern Python web framework
+uvicorn>=0.32.0                 # ASGI server
+pydantic>=2.9.0                 # Data validation
+
+# Utilities
+tqdm>=4.66.5                    # Progress bars
+
+# Development
+pytest>=8.3.0                   # Testing framework
