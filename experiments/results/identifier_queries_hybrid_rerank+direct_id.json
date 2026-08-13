@@ -1,0 +1,103 @@
+{
+  "collection": "nvd_cve",
+  "documents_in_collection": 358170,
+  "sample_size": 200,
+  "sample_source": "experiments\\samples\\identifier_sample.json",
+  "seed": 20260812,
+  "search_depth": 100,
+  "retrieval": "hybrid_rerank+direct_id",
+  "retrieval_description": "RRF(dense, bm25) k=60, ties to lexical + cross-encoder rerank of top 50, + direct CVE-ID routing",
+  "query_types": {
+    "bare CVE ID": {
+      "queries": 200,
+      "recall_at_1": 1.0,
+      "recall_at_10": 1.0,
+      "found_in_top_100": 1.0,
+      "mrr": 1.0
+    },
+    "product + version": {
+      "queries": 196,
+      "recall_at_1": 0.3061,
+      "recall_at_10": 0.6327,
+      "found_in_top_100": 0.7755,
+      "mrr": 0.4161
+    },
+    "description sentence (control)": {
+      "queries": 200,
+      "recall_at_1": 0.855,
+      "recall_at_10": 0.97,
+      "found_in_top_100": 0.995,
+      "mrr": 0.8997
+    }
+  },
+  "latency": {
+    "end_to_end": {
+      "queries": 596,
+      "mean_ms": 832.79,
+      "p50_ms": 745.63,
+      "p95_ms": 1598.96
+    },
+    "inner": {
+      "end_to_end": {
+        "queries": 596,
+        "mean_ms": 832.34,
+        "p50_ms": 745.62,
+        "p95_ms": 1596.39
+      },
+      "dense_arm": {
+        "queries": 596,
+        "mean_ms": 80.67,
+        "p50_ms": 78.13,
+        "p95_ms": 144.94
+      },
+      "lexical_arm": {
+        "queries": 596,
+        "mean_ms": 227.11,
+        "p50_ms": 35.19,
+        "p95_ms": 835.01
+      },
+      "rrf_k": 60,
+      "arm_depth": 200,
+      "tie_break_arm": "lexical",
+      "filters": "none",
+      "rerank": {
+        "queries": 596,
+        "mean_ms": 524.28,
+        "p50_ms": 446.96,
+        "p95_ms": 1060.12
+      },
+      "rerank_depth": 50,
+      "cross_encoder": "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    },
+    "queries_seen": 596,
+    "queries_routed": 202,
+    "routed_share": 0.3389
+  },
+  "examples": [
+    {
+      "cve_id": "CVE-2002-1466",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2003-1190",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2003-1233",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2004-1873",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2006-0489",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    }
+  ]
+}

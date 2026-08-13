@@ -11,7 +11,7 @@
 > [Corpus](#-corpus) for exact counts, source and pull date, all recorded in the
 > committed [provenance manifest](data/manifest.json). Retrieval is hybrid:
 > dense vectors fused with BM25 by reciprocal rank fusion, then reranked by a
-> cross-encoder, with metadata pre-filtering. Every accuracy and latency figure
+> cross-encoder, with metadata pre-filtering and direct CVE-ID routing. Every accuracy and latency figure
 > below comes from a committed result file produced by a script in
 > [experiments/](experiments/) — see [Measured behaviour](#-measured-behaviour).
 > **End-to-end answer quality is still unmeasured**; the retrieval evaluation
@@ -40,6 +40,9 @@ A Retrieval Augmented Generation (RAG) system that:
 
 - 🔍 **Hybrid Search**: Dense vectors for meaning, BM25 for exact identifiers,
   fused by reciprocal rank fusion and reranked by a cross-encoder
+- 🎯 **Direct CVE-ID Routing**: A query containing a CVE identifier is answered
+  by a keyed lookup rather than a ranking, because ranked retrieval measurably
+  fails on exactly the best-known CVEs
 - 🤖 **AI-Powered Analysis**: Claude provides expert security analysis
 - 📊 **Source Citations**: Answers carry the CVE IDs of the retrieved documents,
   taken from stored metadata rather than from generated text
@@ -87,6 +90,10 @@ against each other that are not the same documents.
 ```text
                     "log4j 2.14.1"   +   optional filter
                                           severity / CVSS / date / vendor / CWE
+                             │
+                             ├──▶ contains CVE-\d{4}-\d{4,} ?
+                             │    keyed lookup, prepended at rank 1
+                             │    (0.03 ms; still subject to the filter)
                              │
              ┌───────────────┴───────────────┐
              ▼                               ▼
@@ -396,9 +403,13 @@ Use the RAG system programmatically:
 ```python
 from src.query import SecurityRAG
 
-# Initialize. Defaults to hybrid_rerank, the configuration the ablation
-# measured best; pass retrieval="dense" or "bm25" to compare.
+# Defaults to hybrid_rerank + direct-ID routing, the configuration the ablation
+# measured best. Pass retrieval="dense"/"bm25" or direct_id=False to compare.
 rag = SecurityRAG()
+
+# Routed: fetched by key, not ranked. Returns the Log4Shell record first,
+# which no ranked configuration does.
+result = rag.query("What mitigates CVE-2021-44228?")
 
 # Simple query
 result = rag.query("What are the latest ransomware threats?")
@@ -459,7 +470,7 @@ security-intel-rag/
 │
 ├── experiments/                 # Re-runnable measurements behind design claims
 │   ├── document_layout.py       # Chooses the embedded-document layout
-│   ├── identifier_queries.py    # The four-configuration ablation
+│   ├── identifier_queries.py    # The ablation, --retrieval x --direct-id
 │   ├── fts_tokenizer.py         # Chooses the FTS5 tokenizer
 │   ├── rrf_ties.py              # Chooses the RRF tie-break (dev sample)
 │   ├── lexical_latency.py       # Locates the BM25 latency tail
@@ -553,6 +564,31 @@ the live 358,170-document index, 200 pinned CVEs, three query shapes.
 | hybrid (RRF) | 0.995 | 1.000 | 1.000 | 0.997 |
 | hybrid + rerank | 0.965 | 0.995 | 1.000 | 0.977 |
 
+**Query routing, not retrieval.** Direct CVE-ID routing is reported separately
+because it does not improve a ranking — it recognises that the question has an
+exact answer and fetches it by key, so the ranker is never asked. It is
+orthogonal to the retrieval mode (`--direct-id` composes with any `--retrieval`):
+
+| Configuration | Bare CVE ID | Product + version | Control |
+|---|---:|---:|---:|
+| dense | 0.000 | 0.122 | 0.765 |
+| dense **+ direct ID** | **1.000** | 0.122 *(unchanged)* | 0.760 |
+| hybrid + rerank | 0.965 | 0.306 | 0.860 |
+| hybrid + rerank **+ direct ID** | **1.000** | 0.306 *(unchanged)* | 0.855 |
+
+Routing fired on 202 of 596 queries (33.9%) and costs **0.03 ms at p50**
+(regex plus a primary-key lookup, measured interleaved in
+[experiments/lexical_latency.py](experiments/lexical_latency.py)). It leaves
+product + version untouched, because those queries contain no identifier to
+route.
+
+It is not free of cost, and the cost shows up where you would not look for it:
+the control row drops 0.005. Two of the 200 description sentences quote a
+*different* CVE's identifier, and routing correctly promotes that record — which
+pushes the intended target down. One query lost rank 1 that way. That is the
+honest shape of a routing rule: it answers the question the text actually asks,
+which is not always the question the benchmark meant.
+
 **Description sentence** *(control — see the caveat, this row is not an
 evaluation)*:
 
@@ -597,36 +633,42 @@ an artifact of who is in the sample.
 all 358,170 documents and splits the corpus by whether *another* CVE record
 mentions the ID. **11,001 CVEs — 3.07% — are cross-referenced.**
 
-| Population | dense | bm25 | hybrid | hybrid + rerank |
-|---|---:|---:|---:|---:|
-| Not cross-referenced (96.9%) | 0.000 | **1.000** | 1.000 | 0.967 |
-| Cross-referenced (3.1%) | 0.000 | 0.673 | 0.673 | **0.967** |
-| Widely-known, named not sampled | 0.000 | 0.667 | 0.667 | 0.667 |
+| Population | dense | bm25 | hybrid | hybrid + rerank | **+ direct ID** |
+|---|---:|---:|---:|---:|---:|
+| Not cross-referenced (96.9%) | 0.000 | **1.000** | 1.000 | 0.967 | **1.000** |
+| Cross-referenced (3.1%) | 0.000 | 0.673 | 0.673 | 0.967 | **1.000** |
+| Widely-known, named not sampled | 0.000 | 0.667 | 0.667 | 0.667 | **1.000** |
 
 BM25 is *perfect* on the 97% of CVEs that nothing cites and drops to 0.673 on the
 3% that are cited — and a uniform random sample is almost entirely the former.
 The cause is document-length normalization: a heavily-analysed CVE accumulates
 vendors and products, so its record is the longest of the documents containing
-its ID, and BM25 ranks the longest last. Searching `CVE-2021-44228` returns, in
-order, four CVEs that merely *cite* Log4Shell before the Log4Shell record
-itself.
+its ID, and BM25 ranks the longest last. Searching `CVE-2021-44228` returned, in
+order, four CVEs that merely *cite* Log4Shell before the Log4Shell record itself.
 
-Reranking is what fixes this — 0.673 → 0.967 on the cross-referenced population,
+Reranking recovers most of it — 0.673 → 0.967 on the cross-referenced population,
 because a cross-encoder can tell "the record about Log4Shell" from "a record
-citing Log4Shell". It still is not enough for the best-known CVEs:
+citing Log4Shell". It was still not enough for the best-known CVEs, which is what
+made routing worth building:
 
-| CVE | Docs citing it | dense | bm25 | hybrid | hybrid + rerank |
-|---|---:|---:|---:|---:|---:|
-| CVE-2021-44228 (Log4Shell) | 10 | miss | 5 | 9 | **7** |
-| CVE-2014-0160 (Heartbleed) | 3 | miss | 3 | 5 | 2 |
-| CVE-2014-6271 (Shellshock) | 4 | miss | 3 | 5 | 2 |
-| CVE-2017-0144 (EternalBlue) | 5 | miss | 1 | 1 | 1 |
-| CVE-2019-0708 (BlueKeep) | 1 | miss | 1 | 1 | 1 |
+| CVE | Docs citing it | dense | bm25 | hybrid | hybrid + rerank | **+ direct ID** |
+|---|---:|---:|---:|---:|---:|---:|
+| CVE-2021-44228 (Log4Shell) | 10 | miss | 5 | 9 | 7 | **1** |
+| CVE-2014-0160 (Heartbleed) | 3 | miss | 3 | 5 | 2 | **1** |
+| CVE-2014-6271 (Shellshock) | 4 | miss | 3 | 5 | 2 | **1** |
+| CVE-2021-45046 (Log4j follow-up) | 3 | miss | 3 | 5 | 2 | **1** |
+| CVE-2017-0144 (EternalBlue) | 5 | miss | 1 | 1 | 1 | 1 |
+| CVE-2019-0708 (BlueKeep) | 1 | miss | 1 | 1 | 1 | 1 |
 
-**Typing the most famous CVE identifier in the corpus does not return its record
-first in any configuration this system offers.** Direct ID routing — matching
-`CVE-\d{4}-\d{4,}` and looking the record up by key — would fix it outright and
-is not implemented; see [Roadmap](#-roadmap).
+Before routing, **typing the most famous CVE identifier in the corpus did not
+return its record first in any configuration** — Log4Shell sat at rank 5, 9 and
+7. Ranked retrieval cannot fix this in general: BM25 is structurally biased
+against the longest document containing a term, and the authoritative record is
+usually the longest. A keyed lookup sidesteps the question. All 12 named CVEs
+now return at rank 1.
+
+This is why routing is worth its twenty lines despite BM25's 0.995: the average
+was measuring a population that was never in doubt.
 
 ### The control row is compromised by construction
 
@@ -653,14 +695,14 @@ two candidate causes:
 
 | Query shape | p50 | p95 |
 |---|---:|---:|
-| Bare CVE ID | 1.1 ms | 1.5 ms |
-| Product + version | 14.2 ms | 75.5 ms |
-| Description sentence | 456 ms | 611 ms |
+| Bare CVE ID | 1.0 ms | 1.4 ms |
+| Product + version | 13.0 ms | 66 ms |
+| Description sentence | 467 ms | 618 ms |
 
 The tail is **query length, not term commonality**. Holding the text fixed and
-truncating it, cost rises from 22 ms at one term to 538 ms at 32; whereas the
+truncating it, cost rises from 17 ms at one term to 620 ms at 32; whereas the
 single most common term in the corpus — `vulnerability`, in 168,571 of 358,170
-documents — costs 76 ms on its own. No single term can produce the tail; only a
+documents — costs 81 ms on its own. No single term can produce the tail; only a
 long query can, because terms are combined with `OR` and each one is another
 postings list to walk. `MAX_QUERY_TERMS = 32` in
 [src/lexical_index.py](src/lexical_index.py) is the cap that bounds it.
@@ -668,6 +710,15 @@ postings list to walk. `MAX_QUERY_TERMS = 32` in
 This matters for what comes next: the two shapes a person actually types are the
 fast ones, but the paraphrased natural-language questions of the planned eval set
 are long queries, and they will sit in the tail.
+
+**A caveat on every latency figure here.** These are single-run measurements on a
+developer machine, and the whole distribution moves between runs — in one pair of
+`hybrid_rerank` runs minutes apart, every component was roughly twice as slow,
+including components that the change under test could not touch. Comparisons
+between two numbers measured in *separate* runs are therefore not reliable to
+better than about 2×. Where a latency comparison had to be trustworthy — the
+cost of direct-ID routing — it was measured interleaved in a single process
+instead.
 
 ### Two parameters chosen by measurement
 
@@ -712,13 +763,12 @@ Planned, in order:
 - [x] **Retrieval evaluation** — Recall@k and MRR on a pinned sample, a
       four-configuration ablation with p50/p95 latency, and parameters tuned on
       a disjoint dev sample
-- [ ] **Direct CVE-ID routing** — match `CVE-\d{4}-\d{4,}` and look the record
-      up by key. Deferred once on the grounds that BM25 already reached 0.995 on
+- [x] **Direct CVE-ID routing** — match `CVE-\d{4}-\d{4,}` and look the record up
+      by key. Deferred once on the grounds that BM25 already reached 0.995 on
       identifiers; the [cross-reference
       split](#bm25-solves-cve-id-lookup-is-not-true-and-here-is-the-number)
-      since showed that average hides 0.667 on the best-known CVEs, and Log4Shell
-      does not come back first in any configuration. This is the cheapest
-      remaining accuracy win.
+      showed that average was hiding 0.667 on the best-known CVEs, which
+      un-deferred it. Bare-ID Recall@1 is now 1.000 for 0.03 ms per query.
 - [ ] **Exploitation enrichment** — join CISA KEV and FIRST EPSS by CVE ID so
       results can be prioritised by real-world exploitation, not just CVSS
 - [ ] **Paraphrased eval set** — questions phrased as a person would phrase

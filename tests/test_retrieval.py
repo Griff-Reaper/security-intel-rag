@@ -146,9 +146,21 @@ class StubCollection:
         self.documents = documents or {}
         self.last_n_results = None
 
-    def query(self, query_embeddings, n_results):
+    def query(self, query_embeddings, n_results, where=None, ids=None):
+        """Mirrors the Chroma signature the dense arm calls.
+
+        `ids` is honoured because it is how packed-list filters reach Chroma;
+        `where` is only recorded, since reimplementing Chroma's metadata
+        operators in a stub would test the stub. Filter semantics are covered
+        against a real collection in tests/test_filters.py.
+        """
         self.last_n_results = n_results
-        return {"ids": [self.ranking[:n_results]]}
+        self.last_where = where
+        candidates = self.ranking
+        if ids is not None:
+            allowed = set(ids)
+            candidates = [d for d in candidates if d in allowed]
+        return {"ids": [candidates[:n_results]]}
 
     def get(self, ids, include=None):
         ids = [i for i in ids if i in self.documents]
@@ -173,10 +185,10 @@ def lexical(tmp_path):
     LX.insert_batch(conn, [
         {"id": "CVE-2021-44228",
          "document": "CVE-2021-44228: Apache Log4j2 JNDI remote code execution.",
-         "metadata": {}},
+         "metadata": {"severity": "CRITICAL", "cvss_base_score": 10.0}},
         {"id": "CVE-2014-0160",
          "document": "CVE-2014-0160: OpenSSL heartbeat information disclosure.",
-         "metadata": {}},
+         "metadata": {"severity": "HIGH", "cvss_base_score": 7.5}},
     ])
     conn.commit()
     yield conn
@@ -283,6 +295,91 @@ class TestRerankOrdering:
         stats = r.stats()
         assert stats["rerank"]["queries"] == 1
         assert stats["rerank_depth"] == 3
+
+
+class TestDirectIdRouting:
+    """Query routing: exact CVE IDs are fetched by key, not ranked."""
+
+    def _router(self, lexical, inner_ranking=None, filters=None):
+        collection = StubCollection(inner_ranking or ["noise1", "noise2", "noise3"])
+        return R.build_retriever("dense", collection=collection,
+                                 embedder=StubEmbedder(), lexical_conn=lexical,
+                                 filters=filters, direct_id=True)
+
+    def test_pattern_matches_both_id_generations(self):
+        """Four digits pre-2014, variable length after."""
+        assert R.CVE_ID_PATTERN.findall("CVE-2014-0160 and CVE-2021-44228") == \
+            ["CVE-2014-0160", "CVE-2021-44228"]
+
+    def test_pattern_rejects_short_and_malformed(self):
+        for text in ("CVE-2021-123", "CVE-21-44228", "CVE_2021_44228", "notacve"):
+            assert R.CVE_ID_PATTERN.findall(text) == []
+
+    def test_exact_id_is_promoted_to_rank_one(self, lexical):
+        assert self._router(lexical).search("CVE-2014-0160", 5)[0] == "CVE-2014-0160"
+
+    def test_routing_is_case_insensitive(self, lexical):
+        assert self._router(lexical).search("cve-2014-0160", 5)[0] == "CVE-2014-0160"
+
+    def test_id_embedded_in_a_longer_question_still_routes(self, lexical):
+        hits = self._router(lexical).search("what mitigates CVE-2014-0160 today?", 5)
+        assert hits[0] == "CVE-2014-0160"
+
+    def test_context_is_still_retrieved_alongside_the_routed_hit(self, lexical):
+        """Routing prepends; it does not replace the ranked results."""
+        hits = self._router(lexical).search("CVE-2014-0160", 5)
+        assert hits[1:] == ["noise1", "noise2", "noise3"]
+
+    def test_multiple_ids_are_all_promoted_in_order(self, lexical):
+        hits = self._router(lexical).search("compare CVE-2021-44228 with CVE-2014-0160", 5)
+        assert hits[:2] == ["CVE-2021-44228", "CVE-2014-0160"]
+
+    def test_a_routed_id_is_not_duplicated_in_the_tail(self, lexical):
+        router = self._router(lexical, inner_ranking=["CVE-2014-0160", "noise1"])
+        hits = router.search("CVE-2014-0160", 5)
+        assert hits.count("CVE-2014-0160") == 1
+        assert hits == ["CVE-2014-0160", "noise1"]
+
+    def test_well_formed_but_absent_id_falls_through(self, lexical):
+        """A withdrawn or invented ID must not fabricate a result."""
+        hits = self._router(lexical).search("CVE-1999-99999", 5)
+        assert hits == ["noise1", "noise2", "noise3"]
+
+    def test_query_without_an_id_is_untouched(self, lexical):
+        assert self._router(lexical).search("heartbeat disclosure", 3) == \
+            ["noise1", "noise2", "noise3"]
+
+    def test_depth_is_respected_after_promotion(self, lexical):
+        assert len(self._router(lexical).search("CVE-2014-0160", 2)) == 2
+
+    def test_routing_respects_the_active_filter(self, lexical):
+        """
+        The record is relevant to the query but outside what the caller asked
+        for. Routing must not become a way around the filter.
+        """
+        router = self._router(lexical, filters={"severity": "CRITICAL"})
+        assert "CVE-2014-0160" not in router.search("CVE-2014-0160", 5)
+
+    def test_routing_promotes_a_record_that_passes_the_filter(self, lexical):
+        router = self._router(lexical, filters={"severity": "CRITICAL"})
+        assert router.search("CVE-2021-44228", 5)[0] == "CVE-2021-44228"
+
+    def test_stats_report_how_often_routing_fired(self, lexical):
+        router = self._router(lexical)
+        router.search("CVE-2014-0160", 5)
+        router.search("no identifier here", 5)
+        stats = router.stats()
+        assert stats["queries_seen"] == 2
+        assert stats["queries_routed"] == 1
+        assert stats["routed_share"] == 0.5
+
+    def test_name_marks_routing_separately_from_the_ranking(self, lexical):
+        assert self._router(lexical).name == "dense+direct_id"
+
+    def test_routing_needs_the_lexical_index(self):
+        with pytest.raises(R.RetrievalError, match="keyed lookup"):
+            R.build_retriever("dense", collection=StubCollection([]),
+                              embedder=StubEmbedder(), direct_id=True)
 
 
 class TestRegistry:

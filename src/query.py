@@ -64,6 +64,7 @@ class SecurityRAG:
         collection_name: Optional[str] = None,
         retrieval: Optional[str] = None,
         lexical_db: Optional[str] = None,
+        direct_id: bool = True,
     ):
         """
         Initialize the RAG system.
@@ -74,7 +75,8 @@ class SecurityRAG:
             retrieval: One of retrieval.MODES. Defaults to RETRIEVAL_MODE in the
                 environment, else DEFAULT_RETRIEVAL_MODE.
             lexical_db: Path to the FTS5 index. Required by every mode except
-                `dense`.
+                `dense`, and by direct-ID routing.
+            direct_id: Route exact CVE identifiers to a keyed lookup.
         """
         # Load environment variables (API keys)
         load_dotenv()
@@ -120,8 +122,12 @@ class SecurityRAG:
             retrieval or os.getenv("RETRIEVAL_MODE") or DEFAULT_RETRIEVAL_MODE
         )
         self.lexical_db = lexical_db or os.getenv("LEXICAL_DB") or DEFAULT_LEXICAL_DB
+        # Direct CVE-ID routing is on by default. Ranked retrieval cannot place
+        # the best-known CVEs first for their own identifiers - see the
+        # cross-reference split in the README - and a keyed lookup can.
+        self.direct_id = direct_id
         self.lexical_conn = None
-        if self.retrieval_mode != "dense":
+        if self.retrieval_mode != "dense" or self.direct_id:
             # Fail loudly rather than falling back to dense: a silent downgrade
             # would serve measurably worse results while the README described
             # the better ones.
@@ -133,7 +139,8 @@ class SecurityRAG:
                     f"'{collection_name}' has {count:,}. Rebuild with: "
                     f"python src/build_fts.py"
                 )
-        print(f"[OK] Retrieval: {self.retrieval_mode}")
+        routing = " + direct CVE-ID routing" if self.direct_id else ""
+        print(f"[OK] Retrieval: {self.retrieval_mode}{routing}")
 
     def _retriever(self, filters: Optional[Dict[str, Any]]):
         """Get a retriever for this filter spec, reusing the last one if it matches.
@@ -154,6 +161,7 @@ class SecurityRAG:
                     embedder=self.embedding_service,
                     lexical_conn=self.lexical_conn,
                     filters=filters,
+                    direct_id=self.direct_id,
                 ),
             )
         return self._retriever_cache[1]

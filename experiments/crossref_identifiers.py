@@ -169,43 +169,47 @@ def main() -> None:
         "by_retrieval": {},
     }
 
-    for mode in R.MODES:
+    # Ranked retrieval and the same retrieval with direct-ID routing in front.
+    # Routing is query routing rather than a ranking change, so it is measured
+    # as its own configuration instead of being folded into the mode.
+    configurations = [(mode, routed) for mode in R.MODES for routed in (False, True)]
+    detail: Dict[str, Any] = {}
+
+    for mode, routed in configurations:
+        label = f"{mode}+direct_id" if routed else mode
         retriever = R.build_retriever(
-            mode, collection=collection, embedder=embedder, lexical_conn=conn
+            mode, collection=collection, embedder=embedder,
+            lexical_conn=conn, direct_id=routed,
         )
-        results["by_retrieval"][mode] = {
+        results["by_retrieval"][label] = {
             name: recall_at_1(retriever, ids) for name, ids in populations.items()
         }
-        print(f"{mode}")
-        for name, scored in results["by_retrieval"][mode].items():
+        detail[label] = {}
+        for cve_id in famous_present:
+            hits = retriever.search(cve_id, DEPTH)
+            detail[label][cve_id] = {
+                "rank": hits.index(cve_id) + 1 if cve_id in hits else None,
+                "documents_mentioning_it": counts[cve_id],
+            }
+
+        print(f"{label}")
+        for name, scored in results["by_retrieval"][label].items():
             print(f"  {name:<38} R@1={scored['recall_at_1']:.3f} "
                   f"R@10={scored['recall_at_10']:.3f} MRR={scored['mrr']:.3f} "
                   f"(n={scored['queries']})")
         print()
 
-    # Where each famous CVE actually lands, per configuration.
-    detail: Dict[str, Any] = {}
-    for mode in R.MODES:
-        retriever = R.build_retriever(
-            mode, collection=collection, embedder=embedder, lexical_conn=conn
-        )
-        detail[mode] = {}
-        for cve_id in famous_present:
-            hits = retriever.search(cve_id, DEPTH)
-            detail[mode][cve_id] = {
-                "rank": hits.index(cve_id) + 1 if cve_id in hits else None,
-                "documents_mentioning_it": counts[cve_id],
-            }
     results["widely_known_detail"] = detail
 
+    labels = list(detail)
     print("rank of each widely-known CVE when searched by its own ID")
-    print(f"{'CVE':<18}{'cites':>7}" + "".join(f"{m:>16}" for m in R.MODES))
-    print("-" * (25 + 16 * len(R.MODES)))
+    print(f"{'CVE':<18}{'cites':>7}" + "".join(f"{m:>22}" for m in labels))
+    print("-" * (25 + 22 * len(labels)))
     for cve_id in famous_present:
         row = f"{cve_id:<18}{counts[cve_id]:>7}"
-        for mode in R.MODES:
-            rank = detail[mode][cve_id]["rank"]
-            row += f"{('miss' if rank is None else str(rank)):>16}"
+        for label in labels:
+            rank = detail[label][cve_id]["rank"]
+            row += f"{('miss' if rank is None else str(rank)):>22}"
         print(row)
 
     conn.close()

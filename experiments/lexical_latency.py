@@ -166,6 +166,46 @@ def main() -> None:
         )
     results["by_single_term_frequency"] = by_frequency
 
+    # 4. What direct-ID routing costs.
+    #
+    # Measured here, interleaved in a single process, rather than by comparing
+    # two identifier_queries.py runs. Those runs happen minutes apart on a
+    # developer machine and the whole latency distribution moves between them -
+    # in one pair every component, including ones routing cannot touch, was
+    # about twice as slow. A difference of that size would swamp what is being
+    # measured, so the comparison has to be internally valid.
+    print("\ndirect-ID routing overhead (same process, interleaved)")
+    from embeddings import EmbeddingService  # noqa: E402
+
+    embedder = EmbeddingService()
+    plain = R.build_retriever("dense", collection=collection, embedder=embedder,
+                              lexical_conn=conn)
+    routed = R.build_retriever("dense", collection=collection, embedder=embedder,
+                               lexical_conn=conn, direct_id=True)
+    probe_ids = records["ids"][:100]
+    for cve_id in probe_ids[:10]:      # warm both paths
+        plain.search(cve_id, DEPTH)
+        routed.search(cve_id, DEPTH)
+    plain.latency.samples_ms.clear()
+    routed.latency.samples_ms.clear()
+    for cve_id in probe_ids:
+        plain.search(cve_id, DEPTH)
+        routed.search(cve_id, DEPTH)
+
+    # The routing step alone, with no retrieval underneath it.
+    lookup = []
+    for cve_id in probe_ids:
+        start = time.perf_counter()
+        routed.extract_ids(cve_id)
+        lookup.append((time.perf_counter() - start) * 1000.0)
+
+    routing = {
+        "dense": summarize("dense", plain.latency.samples_ms),
+        "dense+direct_id": summarize("dense+direct_id", routed.latency.samples_ms),
+        "routing_step_only": summarize("routing step only (regex + keyed lookup)", lookup),
+    }
+    results["routing_overhead"] = routing
+
     conn.close()
     RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     RESULTS_PATH.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")

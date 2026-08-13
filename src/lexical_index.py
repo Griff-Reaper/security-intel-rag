@@ -286,6 +286,27 @@ def get_by_id(conn: sqlite3.Connection, cve_id: str) -> Optional[Dict[str, Any]]
     return dict(row) if row else None
 
 
+def exists_matching(
+    conn: sqlite3.Connection,
+    cve_id: str,
+    filters: Optional[Dict[str, Any]] = None,
+) -> bool:
+    """
+    Is this exact CVE ID in the corpus, and does it satisfy `filters`?
+
+    A keyed lookup on the primary key plus the same predicate `search` uses, so
+    a record reached by ID routing is held to the filter that a ranked result
+    would be. Bypassing the filter here would be the one thing filtering must
+    never do, and it would be easy to miss because the record is genuinely
+    relevant to the query - it is just not one the caller asked to see.
+    """
+    where, params = _where_clause(filters)
+    sql = f"SELECT 1 FROM {META_TABLE} m WHERE m.cve_id = ?"
+    if where:
+        sql += f" AND ({where})"
+    return conn.execute(sql, [cve_id, *params]).fetchone() is not None
+
+
 def filter_ids(
     conn: sqlite3.Connection, filters: Dict[str, Any], limit: Optional[int] = None
 ) -> List[str]:

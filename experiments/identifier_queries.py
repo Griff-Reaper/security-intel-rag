@@ -32,6 +32,13 @@ Usage:
     python experiments/identifier_queries.py --retrieval hybrid
     python experiments/identifier_queries.py --retrieval hybrid_rerank
 
+    # Direct CVE-ID routing, orthogonal to the retrieval mode. This is query
+    # routing rather than a ranking change - it answers a different question
+    # instead of answering the same one better - so it composes with any
+    # --retrieval and is written to its own result file.
+    python experiments/identifier_queries.py --retrieval dense --direct-id
+    python experiments/identifier_queries.py --retrieval hybrid_rerank --direct-id
+
     # Print the ablation table across whatever has been measured.
     python experiments/identifier_queries.py --compare
 
@@ -275,8 +282,8 @@ def compare() -> None:
         print(f"\n{query_type}")
         # ASCII only: the Windows console defaults to cp1252 and a stray
         # non-ASCII character in a header aborts the whole report.
-        print(f"{'retrieval':<20}{'R@1':>9}{'R@10':>9}{'MRR':>9}{'R@1 vs dense':>16}")
-        print("-" * 63)
+        print(f"{'retrieval':<26}{'R@1':>9}{'R@10':>9}{'MRR':>9}{'R@1 vs dense':>16}")
+        print("-" * 69)
         baseline = next(
             (r["query_types"][query_type]["recall_at_1"]
              for r in runs if r["retrieval"] == "dense"),
@@ -286,19 +293,19 @@ def compare() -> None:
             s = r["query_types"][query_type]
             delta = "" if baseline is None or r["retrieval"] == "dense" \
                 else f"{s['recall_at_1'] - baseline:+.3f}"
-            print(f"{r['retrieval']:<20}{s['recall_at_1']:>9.3f}"
+            print(f"{r['retrieval']:<26}{s['recall_at_1']:>9.3f}"
                   f"{s['recall_at_10']:>9.3f}{s['mrr']:>9.3f}{delta:>16}")
 
     # Accuracy without cost is half the comparison.
     print("\nend-to-end latency per query")
-    print(f"{'retrieval':<20}{'p50 ms':>9}{'p95 ms':>9}{'mean ms':>9}")
-    print("-" * 47)
+    print(f"{'retrieval':<26}{'p50 ms':>9}{'p95 ms':>9}{'mean ms':>9}")
+    print("-" * 53)
     for r in runs:
         end_to_end = (r.get("latency") or {}).get("end_to_end")
         if not end_to_end:
-            print(f"{r['retrieval']:<20}{'n/a':>9}{'n/a':>9}{'n/a':>9}")
+            print(f"{r['retrieval']:<26}{'n/a':>9}{'n/a':>9}{'n/a':>9}")
             continue
-        print(f"{r['retrieval']:<20}{end_to_end['p50_ms']:>9.1f}"
+        print(f"{r['retrieval']:<26}{end_to_end['p50_ms']:>9.1f}"
               f"{end_to_end['p95_ms']:>9.1f}{end_to_end['mean_ms']:>9.1f}")
 
 
@@ -314,6 +321,10 @@ def main() -> None:
                         choices=list(retrieval.MODES))
     parser.add_argument("--lexical-db", default=str(LEXICAL_DB),
                         help="SQLite FTS5 index, for the bm25 and hybrid modes")
+    parser.add_argument("--direct-id", action="store_true",
+                        help="route exact CVE IDs to a keyed lookup. Orthogonal "
+                             "to --retrieval: this is query routing, not a "
+                             "ranking change, and is reported separately.")
     parser.add_argument("--sample", type=int, default=DEFAULT_SAMPLE,
                         help="sample size, used only when pinning")
     parser.add_argument("--pin-sample", action="store_true",
@@ -348,7 +359,7 @@ def main() -> None:
     # Build only what the mode needs: bm25 should not pay to load a 90 MB
     # embedding model, and dense should not require a lexical index to exist.
     needs_dense = args.retrieval in ("dense", "hybrid", "hybrid_rerank")
-    needs_lexical = args.retrieval in ("bm25", "hybrid", "hybrid_rerank")
+    needs_lexical = args.retrieval in ("bm25", "hybrid", "hybrid_rerank") or args.direct_id
 
     lexical_conn = None
     if needs_lexical:
@@ -369,11 +380,14 @@ def main() -> None:
         collection=collection,
         embedder=EmbeddingService() if needs_dense else None,
         lexical_conn=lexical_conn,
+        direct_id=args.direct_id,
     )
     results = measure(collection, retriever, sample_ids)
     print_table(results)
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    # retriever.name carries the "+direct_id" suffix, so a routed run never
+    # overwrites the un-routed one and the ablation keeps both rows.
     out = RESULTS_DIR / f"identifier_queries_{retriever.name}.json"
     out.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
     print(f"\nwrote {out.relative_to(PROJECT_ROOT)}")

@@ -24,21 +24,44 @@
         "recall_at_1": 0.0,
         "recall_at_10": 0.0133,
         "mrr": 0.0034,
-        "mean_ms": 31.6
+        "mean_ms": 27.8
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 0.0,
         "recall_at_10": 0.0,
         "mrr": 0.0,
-        "mean_ms": 20.9
+        "mean_ms": 22.0
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 0.0,
         "recall_at_10": 0.0,
         "mrr": 0.0,
-        "mean_ms": 21.3
+        "mean_ms": 25.6
+      }
+    },
+    "dense+direct_id": {
+      "cross-referenced": {
+        "queries": 150,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 21.6
+      },
+      "not cross-referenced": {
+        "queries": 150,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 20.5
+      },
+      "widely-known (named, not sampled)": {
+        "queries": 12,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 21.6
       }
     },
     "bm25": {
@@ -54,14 +77,37 @@
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 0.4
+        "mean_ms": 0.3
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 0.6667,
         "recall_at_10": 1.0,
         "mrr": 0.7667,
-        "mean_ms": 0.4
+        "mean_ms": 0.3
+      }
+    },
+    "bm25+direct_id": {
+      "cross-referenced": {
+        "queries": 150,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 0.2
+      },
+      "not cross-referenced": {
+        "queries": 150,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 0.2
+      },
+      "widely-known (named, not sampled)": {
+        "queries": 12,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 0.3
       }
     },
     "hybrid": {
@@ -70,21 +116,44 @@
         "recall_at_1": 0.6733,
         "recall_at_10": 0.9133,
         "mrr": 0.7455,
-        "mean_ms": 34.7
+        "mean_ms": 33.9
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 32.9
+        "mean_ms": 32.7
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 0.6667,
         "recall_at_10": 1.0,
         "mrr": 0.7259,
-        "mean_ms": 30.6
+        "mean_ms": 32.5
+      }
+    },
+    "hybrid+direct_id": {
+      "cross-referenced": {
+        "queries": 150,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 32.2
+      },
+      "not cross-referenced": {
+        "queries": 150,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 31.3
+      },
+      "widely-known (named, not sampled)": {
+        "queries": 12,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 31.5
       }
     },
     "hybrid_rerank": {
@@ -93,21 +162,44 @@
         "recall_at_1": 0.9667,
         "recall_at_10": 1.0,
         "mrr": 0.9802,
-        "mean_ms": 454.8
+        "mean_ms": 458.5
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 0.9667,
         "recall_at_10": 0.9933,
         "mrr": 0.9781,
-        "mean_ms": 418.7
+        "mean_ms": 418.9
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 0.6667,
         "recall_at_10": 1.0,
         "mrr": 0.8036,
-        "mean_ms": 460.7
+        "mean_ms": 506.0
+      }
+    },
+    "hybrid_rerank+direct_id": {
+      "cross-referenced": {
+        "queries": 150,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 478.7
+      },
+      "not cross-referenced": {
+        "queries": 150,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 422.5
+      },
+      "widely-known (named, not sampled)": {
+        "queries": 12,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "mrr": 1.0,
+        "mean_ms": 606.5
       }
     }
   },
@@ -162,6 +254,56 @@
         "documents_mentioning_it": 1
       }
     },
+    "dense+direct_id": {
+      "CVE-2021-44228": {
+        "rank": 1,
+        "documents_mentioning_it": 10
+      },
+      "CVE-2014-0160": {
+        "rank": 1,
+        "documents_mentioning_it": 3
+      },
+      "CVE-2017-0144": {
+        "rank": 1,
+        "documents_mentioning_it": 5
+      },
+      "CVE-2021-45046": {
+        "rank": 1,
+        "documents_mentioning_it": 3
+      },
+      "CVE-2014-6271": {
+        "rank": 1,
+        "documents_mentioning_it": 4
+      },
+      "CVE-2019-0708": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2020-1472": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2021-34527": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2022-30190": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2023-4966": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2021-26855": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2018-13379": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      }
+    },
     "bm25": {
       "CVE-2021-44228": {
         "rank": 5,
@@ -181,6 +323,56 @@
       },
       "CVE-2014-6271": {
         "rank": 3,
+        "documents_mentioning_it": 4
+      },
+      "CVE-2019-0708": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2020-1472": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2021-34527": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2022-30190": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2023-4966": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2021-26855": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2018-13379": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      }
+    },
+    "bm25+direct_id": {
+      "CVE-2021-44228": {
+        "rank": 1,
+        "documents_mentioning_it": 10
+      },
+      "CVE-2014-0160": {
+        "rank": 1,
+        "documents_mentioning_it": 3
+      },
+      "CVE-2017-0144": {
+        "rank": 1,
+        "documents_mentioning_it": 5
+      },
+      "CVE-2021-45046": {
+        "rank": 1,
+        "documents_mentioning_it": 3
+      },
+      "CVE-2014-6271": {
+        "rank": 1,
         "documents_mentioning_it": 4
       },
       "CVE-2019-0708": {
@@ -262,6 +454,56 @@
         "documents_mentioning_it": 1
       }
     },
+    "hybrid+direct_id": {
+      "CVE-2021-44228": {
+        "rank": 1,
+        "documents_mentioning_it": 10
+      },
+      "CVE-2014-0160": {
+        "rank": 1,
+        "documents_mentioning_it": 3
+      },
+      "CVE-2017-0144": {
+        "rank": 1,
+        "documents_mentioning_it": 5
+      },
+      "CVE-2021-45046": {
+        "rank": 1,
+        "documents_mentioning_it": 3
+      },
+      "CVE-2014-6271": {
+        "rank": 1,
+        "documents_mentioning_it": 4
+      },
+      "CVE-2019-0708": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2020-1472": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2021-34527": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2022-30190": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2023-4966": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2021-26855": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2018-13379": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      }
+    },
     "hybrid_rerank": {
       "CVE-2021-44228": {
         "rank": 7,
@@ -281,6 +523,56 @@
       },
       "CVE-2014-6271": {
         "rank": 2,
+        "documents_mentioning_it": 4
+      },
+      "CVE-2019-0708": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2020-1472": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2021-34527": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2022-30190": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2023-4966": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2021-26855": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      },
+      "CVE-2018-13379": {
+        "rank": 1,
+        "documents_mentioning_it": 1
+      }
+    },
+    "hybrid_rerank+direct_id": {
+      "CVE-2021-44228": {
+        "rank": 1,
+        "documents_mentioning_it": 10
+      },
+      "CVE-2014-0160": {
+        "rank": 1,
+        "documents_mentioning_it": 3
+      },
+      "CVE-2017-0144": {
+        "rank": 1,
+        "documents_mentioning_it": 5
+      },
+      "CVE-2021-45046": {
+        "rank": 1,
+        "documents_mentioning_it": 3
+      },
+      "CVE-2014-6271": {
+        "rank": 1,
         "documents_mentioning_it": 4
       },
       "CVE-2019-0708": {

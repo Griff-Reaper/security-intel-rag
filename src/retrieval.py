@@ -28,10 +28,12 @@ arm is certain and the other is guessing. See RRF_K below.
 from __future__ import annotations
 
 import math
+import re
 import time
 from collections import defaultdict
 
 import filters as filters_mod
+import lexical_index as LX
 from typing import Any, Dict, List, Optional, Protocol, Sequence, Tuple
 
 # ── Fusion parameters ────────────────────────────────────────────────────────
@@ -293,8 +295,6 @@ class BM25Retriever(BaseRetriever):
         # lexical_index.search escapes the query and returns (id, score) with
         # larger-is-better; only the order is needed here. Filtering is a join
         # predicate inside that call, so it too is a pre-filter.
-        import lexical_index as LX
-
         if filters_mod.matches_nothing(self.filters):
             return []
         return [
@@ -355,8 +355,6 @@ class HybridRetriever(BaseRetriever):
         Order matters: index 0 is dense, index 1 is lexical, and TIE_BREAK_ARM
         indexes into this list.
         """
-        import lexical_index as LX
-
         start = time.perf_counter()
         dense = self.dense_arm.rank(query, self.arm_depth)
         self.dense_latency.record((time.perf_counter() - start) * 1000.0)
@@ -480,6 +478,83 @@ class HybridRerankRetriever(HybridRetriever):
         return base
 
 
+# ── Query routing ────────────────────────────────────────────────────────────
+# A CVE identifier is exactly as structured as it looks, so a query containing
+# one does not need to be ranked at all - the record can be fetched by key.
+#
+# The four-digit-minimum tail is the CVE specification: identifiers were fixed
+# at four digits until 2014 and are variable-length from CVE-2014 onward, so
+# CVE-2021-44228 and CVE-2014-0160 must both match.
+CVE_ID_PATTERN = re.compile(r"CVE-\d{4}-\d{4,}", re.IGNORECASE)
+
+
+class DirectIdRouter(BaseRetriever):
+    """
+    Wraps any retriever and puts exact CVE-ID matches at the top.
+
+    This is query routing, not retrieval: it changes which question is asked,
+    not how well a ranking answers it. It is measured and reported separately
+    for that reason.
+
+    Why it exists, given that BM25 scores 0.995 on bare identifiers: that average
+    is over a population where 96.9% of CVEs are cited by no other record and
+    BM25 wins trivially. On the 3.1% that *are* cited it scores 0.673, because
+    BM25 normalizes for document length and the authoritative record is the
+    longest of the documents containing its own ID. Searching CVE-2021-44228
+    returns four CVEs that merely cite Log4Shell ahead of Log4Shell itself, in
+    every ranked configuration. See experiments/crossref_identifiers.py.
+
+    Routed hits are *prepended*, not substituted: "CVE-2021-44228 mitigation"
+    wants the record and its context, so the wrapped retriever still runs and
+    fills the remaining depth.
+    """
+
+    def __init__(self, inner, conn, filters: Optional[Dict[str, Any]] = None) -> None:
+        super().__init__()
+        self.inner = inner
+        self.conn = conn
+        self.filters = filters_mod.validate(filters)
+        self.name = f"{inner.name}+direct_id"
+        self.description = f"{inner.description}, + direct CVE-ID routing"
+        self.queries_seen = 0
+        self.queries_routed = 0
+
+    def extract_ids(self, query: str) -> List[str]:
+        """Identifiers present in the corpus and passing the filter, in order."""
+        seen, found = set(), []
+        for match in CVE_ID_PATTERN.findall(query):
+            cve_id = match.upper()
+            if cve_id in seen:
+                continue
+            seen.add(cve_id)
+            # Both checks matter: an ID can be well-formed but absent (withdrawn,
+            # or simply not a real CVE), and present but outside the filter.
+            if LX.exists_matching(self.conn, cve_id, self.filters or None):
+                found.append(cve_id)
+        return found
+
+    def _search(self, query: str, depth: int) -> List[str]:
+        self.queries_seen += 1
+        routed = self.extract_ids(query)
+        ranked = self.inner.search(query, depth)
+        if not routed:
+            return ranked
+        self.queries_routed += 1
+        promoted = set(routed)
+        return (routed + [d for d in ranked if d not in promoted])[:depth]
+
+    def stats(self) -> Dict[str, Any]:
+        return {
+            "end_to_end": self.latency.summary(),
+            "inner": self.inner.stats(),
+            "queries_seen": self.queries_seen,
+            "queries_routed": self.queries_routed,
+            "routed_share": round(
+                self.queries_routed / max(self.queries_seen, 1), 4
+            ),
+        }
+
+
 # ── Registry ─────────────────────────────────────────────────────────────────
 MODES = ("dense", "bm25", "hybrid", "hybrid_rerank")
 
@@ -490,6 +565,7 @@ def build_retriever(
     embedder=None,
     lexical_conn=None,
     filters: Optional[Dict[str, Any]] = None,
+    direct_id: bool = False,
 ) -> Retriever:
     """
     Construct a retrieval backend by name.
@@ -502,6 +578,9 @@ def build_retriever(
             when the filter names a packed-list field, since only the lexical
             index can resolve those into IDs.
         filters: A metadata pre-filter spec. See src/filters.py.
+        direct_id: Wrap the backend in DirectIdRouter. Orthogonal to `mode`,
+            because it is query routing rather than a ranking change and its
+            contribution has to stay separately attributable.
 
     Raises:
         RetrievalError: A dependency the mode needs was not supplied.
@@ -532,13 +611,23 @@ def build_retriever(
         allowlist = filters_mod.resolve_allowlist(lexical_conn, filters)
 
     if mode == "dense":
-        return DenseRetriever(collection, embedder, filters=filters, allowlist=allowlist)
-    if mode == "bm25":
-        return BM25Retriever(lexical_conn, filters=filters)
-    if mode == "hybrid":
-        return HybridRetriever(collection, embedder, lexical_conn,
-                               filters=filters, allowlist=allowlist)
-    if mode == "hybrid_rerank":
-        return HybridRerankRetriever(collection, embedder, lexical_conn,
-                                     filters=filters, allowlist=allowlist)
-    raise ValueError(f"unknown retrieval mode: {mode!r}")
+        inner = DenseRetriever(collection, embedder, filters=filters, allowlist=allowlist)
+    elif mode == "bm25":
+        inner = BM25Retriever(lexical_conn, filters=filters)
+    elif mode == "hybrid":
+        inner = HybridRetriever(collection, embedder, lexical_conn,
+                                filters=filters, allowlist=allowlist)
+    elif mode == "hybrid_rerank":
+        inner = HybridRerankRetriever(collection, embedder, lexical_conn,
+                                      filters=filters, allowlist=allowlist)
+    else:
+        raise ValueError(f"unknown retrieval mode: {mode!r}")
+
+    if not direct_id:
+        return inner
+    if lexical_conn is None:
+        raise RetrievalError(
+            "direct CVE-ID routing needs the lexical index for the keyed lookup. "
+            "Build it with: python src/build_fts.py"
+        )
+    return DirectIdRouter(inner, lexical_conn, filters=filters)
