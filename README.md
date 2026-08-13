@@ -104,6 +104,76 @@ fkie-cad bulk feeds          NVD API 2.0
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## 📊 Corpus
+
+Every figure below comes from [data/manifest.json](data/manifest.json), which is
+written by the ingestion run itself — not typed by hand.
+
+| | |
+|---|---|
+| **Source** | [fkie-cad/nvd-json-data-feeds](https://github.com/fkie-cad/nvd-json-data-feeds) — community reconstruction of the retired NVD JSON feeds, repackaged daily |
+| **Upstream** | National Vulnerability Database (NVD), NIST |
+| **Release** | `v2026.08.12-000016`, published 2026-08-12 |
+| **Pulled** | 2026-08-12 |
+| **Years** | 1999–2026 (28 per-year archives, sha256-verified) |
+| **Raw records** | 376,092 |
+| **Indexed** | 358,170 |
+| **Filtered out** | 17,922 |
+| **Licence** | NVD and CVE Terms of Use |
+
+**What gets filtered.** 17,922 records are excluded because `vulnStatus` is
+`Rejected` — the CVE was withdrawn by its assigner, and surfacing it would
+present a vulnerability that does not exist. A second filter drops records with
+no English description (nothing meaningful to embed); it matched nothing in this
+pull, but incremental updates can introduce such records. Refreshes also
+*delete* previously-indexed CVEs that have since been rejected.
+
+### Document design
+
+Each CVE becomes one document. The split between embedded text and stored
+metadata is deliberate:
+
+- **Embedded** (what retrieval matches against): the description, prefixed with
+  the CVE ID, followed by affected vendors and products from CPE, CWE
+  identifiers, and severity. Prose serves "remote code execution in Java logging
+  libraries"; the product strings serve "log4j 2.14.1".
+- **Stored, not embedded** (what filtering uses): CVSS base score, vector and
+  version, severity, published/modified dates (kept as both ISO text and epoch
+  integers so range queries work), CWE IDs, vendors, products, and CPE counts.
+  Embedding a CVSS vector string would add noise to the vector without helping
+  retrieval.
+
+Two ordering decisions were made by measurement rather than taste, and both are
+reproducible via [experiments/document_layout.py](experiments/document_layout.py):
+
+**Vendor and product names are ordered CNA-first.** The `affected` block comes
+from the party that reported the vulnerability, so it names the software that is
+actually broken; the CPE tree instead enumerates every downstream product that
+bundles it. Log4Shell makes the difference concrete — its CNA entry is *Apache
+Log4j2*, while its 396 CPE entries begin with Siemens firmware part numbers. On
+CPE ordering, `log4j` landed 11th and would be truncated out entirely on a
+record with more vendors.
+
+**The description leads, and product lists are capped at 6 vendors / 8
+products.** Putting metadata first measurably dilutes the description's
+contribution to the vector, and the damage scales with how many products a CVE
+lists:
+
+| Affected products | n | metadata-first | description-first | Δ recall@1 |
+|---|---:|---:|---:|---:|
+| 1–5 | 1,013 | 0.960 | 0.963 | +0.004 |
+| 6–20 | 138 | 0.746 | 0.790 | +0.043 |
+| 21–60 | 26 | 0.769 | 0.962 | **+0.192** |
+| 61+ | 19 | 0.947 | 1.000 | +0.053 |
+
+Description-first was never worse in any bucket. **These numbers are not a
+retrieval evaluation** — the queries are the documents' own opening sentences,
+so they share vocabulary with the target and every absolute figure is inflated.
+Only the comparison between layouts is meaningful, and the 21–60 bucket rests on
+26 samples, so treat that delta's magnitude as indicative rather than precise.
+A real evaluation, with paraphrased questions and a committed eval set, is
+[still to come](#-roadmap).
+
 ## 🛠️ Technology Stack
 
 | Component | Technology | Purpose |
@@ -318,6 +388,11 @@ security-intel-rag/
 │   ├── sample_cves.json         # Legacy demo data (not the corpus)
 │   ├── threat_intel.json        # Legacy demo data (not the corpus)
 │   └── raw/                     # Downloaded feeds (generated, gitignored)
+│
+├── experiments/                 # Re-runnable measurements behind design claims
+│   ├── document_layout.py       # Chooses the embedded-document layout
+│   ├── identifier_queries.py    # Measures dense-only weakness on CVE IDs
+│   └── results/                 # Committed JSON output of the above
 │
 ├── tests/                       # Unit tests
 │   ├── test_rag.py              # Embedding + formatting tests
