@@ -434,12 +434,40 @@ Per-query cost and latency depend on corpus size and how many documents are
 retrieved, and are **not yet measured for this project** — no figures are quoted
 here until they come from a committed, re-runnable benchmark.
 
-## 📈 Performance
+## 📈 Measured behaviour
 
-Not yet measured. A benchmark harness (retrieval accuracy, ablations, latency
-percentiles, refusal behaviour) is planned — see [Roadmap](#-roadmap). No
-performance numbers will appear in this README until they are produced by a
-committed script that anyone can re-run.
+Ingestion throughput, from [data/manifest.json](data/manifest.json): **358,170
+documents in 59.9 minutes — 100 documents/second** embedding and indexing on
+CPU, single process.
+
+### Dense-only retrieval fails on identifiers
+
+The most useful thing measured so far is a weakness. Running
+[experiments/identifier_queries.py](experiments/identifier_queries.py) against
+the live 358,170-document index, over 200 sampled CVEs:
+
+| Query type | Recall@1 | Recall@10 | Found in top 100 | MRR |
+|---|---:|---:|---:|---:|
+| Bare CVE ID (`CVE-2021-44228`) | 0.000 | 0.000 | 0.005 | 0.000 |
+| Product + version | 0.122 | 0.270 | 0.434 | 0.173 |
+| Description sentence *(control)* | 0.765 | 0.860 | 0.895 | 0.803 |
+
+**Searching for a CVE by its own identifier essentially never works** — not once
+at rank 1 across 200 queries, and found anywhere in the top 100 just once. The
+control rules out a broken pipeline: the same index answers semantic queries
+well, so the failure is specific to identifiers. A 384-dimensional embedding of
+`CVE-2021-44228` is near-indistinguishable from one of `CVE-2022-26973`, because
+the strings differ only in digits carrying no semantic weight.
+
+This is precisely what hybrid retrieval and direct CVE-ID lookup exist to fix,
+and it is the next thing to build. Re-running this script after that change is
+what will turn a design choice into a demonstrated result.
+
+Not yet measured: end-to-end answer quality, groundedness, refusal behaviour,
+and latency percentiles. Those need a committed eval set with paraphrased
+questions — see [Roadmap](#-roadmap). The control row above is *not* an
+evaluation: its queries are drawn from the documents themselves and share
+vocabulary with them, so it flatters the system.
 
 ## 🔮 Roadmap
 
