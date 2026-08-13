@@ -1,4 +1,14 @@
 {
+  "generated_at": "2026-08-13T20:23:25+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
   "sample": "dev",
   "sample_path": "experiments\\samples\\dev_sample.json",
   "sample_seed": 20260813,

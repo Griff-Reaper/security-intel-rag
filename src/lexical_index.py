@@ -64,6 +64,21 @@ META_COLUMNS: Tuple[Tuple[str, str], ...] = (
     ("cwe_ids", "TEXT"),
     ("vendors", "TEXT"),
     ("products", "TEXT"),
+    # Exploitation signals, written by src/enrich_index.py rather than by the
+    # build. They are absent (NULL) on a freshly built index, and NULL here
+    # means "not enriched yet", which is not the same as "not exploited" - the
+    # filters below keep those apart.
+    ("kev", "INTEGER"),
+    ("kev_ransomware", "INTEGER"),
+    ("kev_date_added_ts", "INTEGER"),
+    ("epss_score", "REAL"),
+    ("epss_percentile", "REAL"),
+)
+
+# The subset enrichment owns. Kept separate so ensure_enrichment_columns() can
+# add them to an index built before enrichment existed, without a full rebuild.
+ENRICHMENT_COLUMNS: Tuple[str, ...] = (
+    "kev", "kev_ransomware", "kev_date_added_ts", "epss_score", "epss_percentile",
 )
 
 
@@ -133,9 +148,31 @@ def create_schema(conn: sqlite3.Connection, tokenizer: str = TOKENIZER) -> None:
     conn.commit()
 
 
+def ensure_enrichment_columns(conn: sqlite3.Connection) -> List[str]:
+    """
+    Add the exploitation columns to an index built before they existed.
+
+    Returns the columns that were added. An index built by the current
+    create_schema() already has them, so this is a no-op there; it exists so
+    enrichment never requires a full rebuild of a 400 MB index.
+    """
+    existing = {
+        row["name"] for row in conn.execute(f"PRAGMA table_info({META_TABLE})")
+    }
+    added = []
+    for name, decl in META_COLUMNS:
+        if name in ENRICHMENT_COLUMNS and name not in existing:
+            conn.execute(f"ALTER TABLE {META_TABLE} ADD COLUMN {name} {decl}")
+            added.append(name)
+    if added:
+        conn.commit()
+    return added
+
+
 def create_metadata_indexes(conn: sqlite3.Connection) -> None:
     """Index the metadata columns that filtering actually uses."""
-    for column in ("severity", "cvss_base_score", "published_ts", "year"):
+    for column in ("severity", "cvss_base_score", "published_ts", "year",
+                   "kev", "epss_score"):
         conn.execute(
             f"CREATE INDEX IF NOT EXISTS idx_{META_TABLE}_{column} "
             f"ON {META_TABLE}({column})"
@@ -226,6 +263,22 @@ def _where_clause(filters: Optional[Dict[str, Any]]) -> Tuple[str, List[Any]]:
     if "published_before" in filters:
         clauses.append("m.published_ts IS NOT NULL AND m.published_ts <= ?")
         params.append(filters["published_before"])
+    # Exploitation signals. NULL means "not enriched", never "not exploited",
+    # so kev=False must not match a record that was never checked.
+    if "kev" in filters:
+        if filters["kev"]:
+            clauses.append("m.kev = 1")
+        else:
+            clauses.append("m.kev IS NOT NULL AND m.kev = 0")
+    if "kev_ransomware" in filters:
+        clauses.append("m.kev_ransomware = 1" if filters["kev_ransomware"]
+                       else "m.kev_ransomware IS NOT NULL AND m.kev_ransomware = 0")
+    if "min_epss" in filters:
+        clauses.append("m.epss_score IS NOT NULL AND m.epss_score >= ?")
+        params.append(filters["min_epss"])
+    if "min_epss_percentile" in filters:
+        clauses.append("m.epss_percentile IS NOT NULL AND m.epss_percentile >= ?")
+        params.append(filters["min_epss_percentile"])
     # Packed delimited lists: match a whole element, not an arbitrary substring,
     # so "log4j" cannot match "log4j-extras" and "ssl" cannot match "openssl".
     for key, column in (("vendor", "vendors"), ("product", "products"), ("cwe", "cwe_ids")):

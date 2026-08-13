@@ -42,6 +42,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 import lexical_index as LX  # noqa: E402
 import nvd_feeds  # noqa: E402
 import nvd_normalize as N  # noqa: E402
+import provenance  # noqa: E402
 
 RESULTS_PATH = PROJECT_ROOT / "experiments" / "results" / "fts_tokenizer.json"
 SEED = 20260812
@@ -138,6 +139,7 @@ def main() -> None:
     print(f"sample: {len(sample)} CVEs (seed {SEED})\n")
 
     results: Dict[str, Any] = {
+        **provenance.stamp(),
         "years": args.years,
         "sample_size": len(sample),
         "seed": SEED,

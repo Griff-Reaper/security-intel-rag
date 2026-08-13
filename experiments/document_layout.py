@@ -39,6 +39,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import nvd_feeds
 import nvd_normalize as N
+import provenance
 from embeddings import EmbeddingService
 
 DEFAULT_YEARS = ["2016", "2019", "2021", "2024"]
@@ -134,6 +135,12 @@ def main() -> None:
     truth = np.arange(len(parsed))
 
     results: Dict[str, Any] = {
+        # Stamped, but deliberately *not* guarded by provenance.require_layout_match():
+        # this experiment exists to compare layouts against each other, so a
+        # mismatch with the shipped layout is its normal operating condition
+        # rather than an error. The stamp records the layout that is currently
+        # the default, which is the one the "description-first" arm represents.
+        **provenance.stamp(),
         "sample_size": len(parsed),
         "years": args.years,
         "seed": SEED,

@@ -72,5 +72,60 @@
       "chroma_documents": 358170,
       "documents_compared": 300
     }
+  },
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|",
+    "verified_against_index": {
+      "verified_at": "2026-08-13T19:54:43+00:00",
+      "years_sampled": [
+        "2014",
+        "2021",
+        "2025"
+      ],
+      "documents_compared": 1500,
+      "mismatches": 0,
+      "fingerprint": "ffb8c1393e249003"
+    }
+  },
+  "exploitation": {
+    "fetched_at": "2026-08-13T20:28:37+00:00",
+    "kev": {
+      "source": "CISA Known Exploited Vulnerabilities catalog",
+      "source_url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+      "catalog_version": "2026.08.11",
+      "released_at": "2026-08-11T18:59:43.6861Z",
+      "entries": 1665,
+      "entries_claimed": 1665
+    },
+    "epss": {
+      "source": "FIRST Exploit Prediction Scoring System (EPSS)",
+      "source_url": "https://epss.empiricalsecurity.com/epss_scores-current.csv.gz",
+      "model_version": "v2026.06.15",
+      "score_date": "2026-08-13T12:03:51Z",
+      "entries": 358648,
+      "malformed_rows": 0
+    },
+    "cves_with_any_signal": 358648,
+    "cves_in_both_feeds": 1665,
+    "kev_only": 0,
+    "matched_in_corpus": 358167,
+    "feed_entries_not_in_corpus": 481,
+    "apply_seconds": 133.4,
+    "coverage": {
+      "documents": 358170,
+      "with_epss": 358167,
+      "kev_listed": 1665,
+      "kev_ransomware": 339,
+      "epss_over_0_5": 4311,
+      "epss_over_0_9": 781,
+      "not_enriched": 3
+    },
+    "storage": "metadata only; document text and embeddings unchanged"
   }
 }

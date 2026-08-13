@@ -1,4 +1,14 @@
 {
+  "generated_at": "2026-08-13T20:02:38+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
   "collection": "nvd_cve",
   "documents_in_collection": 358170,
   "sample_size": 200,
@@ -33,25 +43,26 @@
   "latency": {
     "end_to_end": {
       "queries": 596,
-      "mean_ms": 221.45,
-      "p50_ms": 72.84,
-      "p95_ms": 700.13
+      "mean_ms": 228.02,
+      "p50_ms": 77.41,
+      "p95_ms": 713.49
     },
     "dense_arm": {
       "queries": 596,
-      "mean_ms": 43.78,
-      "p50_ms": 33.89,
-      "p95_ms": 79.0
+      "mean_ms": 48.84,
+      "p50_ms": 50.19,
+      "p95_ms": 72.99
     },
     "lexical_arm": {
       "queries": 596,
-      "mean_ms": 177.48,
-      "p50_ms": 11.78,
-      "p95_ms": 650.42
+      "mean_ms": 178.99,
+      "p50_ms": 11.25,
+      "p95_ms": 664.45
     },
     "rrf_k": 60,
     "arm_depth": 200,
-    "tie_break_arm": "lexical"
+    "tie_break_arm": "lexical",
+    "filters": "none"
   },
   "examples": [
     {

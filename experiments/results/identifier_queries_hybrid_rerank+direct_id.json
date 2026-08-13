@@ -1,4 +1,14 @@
 {
+  "generated_at": "2026-08-13T20:22:45+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
   "collection": "nvd_cve",
   "documents_in_collection": 358170,
   "sample_size": 200,
@@ -33,28 +43,28 @@
   "latency": {
     "end_to_end": {
       "queries": 596,
-      "mean_ms": 832.79,
-      "p50_ms": 745.63,
-      "p95_ms": 1598.96
+      "mean_ms": 676.51,
+      "p50_ms": 586.63,
+      "p95_ms": 1327.83
     },
     "inner": {
       "end_to_end": {
         "queries": 596,
-        "mean_ms": 832.34,
-        "p50_ms": 745.62,
-        "p95_ms": 1596.39
+        "mean_ms": 676.41,
+        "p50_ms": 586.63,
+        "p95_ms": 1327.82
       },
       "dense_arm": {
         "queries": 596,
-        "mean_ms": 80.67,
-        "p50_ms": 78.13,
-        "p95_ms": 144.94
+        "mean_ms": 35.39,
+        "p50_ms": 35.28,
+        "p95_ms": 40.44
       },
       "lexical_arm": {
         "queries": 596,
-        "mean_ms": 227.11,
-        "p50_ms": 35.19,
-        "p95_ms": 835.01
+        "mean_ms": 190.36,
+        "p50_ms": 11.94,
+        "p95_ms": 700.0
       },
       "rrf_k": 60,
       "arm_depth": 200,
@@ -62,9 +72,9 @@
       "filters": "none",
       "rerank": {
         "queries": 596,
-        "mean_ms": 524.28,
-        "p50_ms": 446.96,
-        "p95_ms": 1060.12
+        "mean_ms": 450.42,
+        "p50_ms": 377.49,
+        "p95_ms": 847.85
       },
       "rerank_depth": 50,
       "cross_encoder": "cross-encoder/ms-marco-MiniLM-L-6-v2"

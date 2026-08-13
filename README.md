@@ -16,8 +16,9 @@
 > [experiments/](experiments/) — see [Measured behaviour](#-measured-behaviour).
 > **End-to-end answer quality is still unmeasured**; the retrieval evaluation
 > uses queries drawn from the indexed documents themselves, which flatters
-> lexical matching. Exploitation enrichment and a paraphrased eval set are next;
-> see [Roadmap](#-roadmap).
+> lexical matching. Exploitation signals from CISA KEV and FIRST EPSS are joined
+> in as filterable metadata. A paraphrased eval set is next; see
+> [Roadmap](#-roadmap).
 
 ## 🎯 Problem Statement
 
@@ -49,6 +50,9 @@ A Retrieval Augmented Generation (RAG) system that:
 - 🎯 **Metadata Pre-filtering**: Narrow by severity, CVSS range, publication
   date, vendor, product or CWE *before* ranking, so asking for 5 results returns
   5 matching ones rather than however many of the top 5 happened to match
+- 🔥 **Exploitation Signals**: CISA KEV and FIRST EPSS joined by CVE ID, so
+  results can be prioritised by observed exploitation rather than CVSS alone —
+  590 of 36,797 CVSS-critical CVEs are actually known-exploited
 - 🚀 **REST API**: Easy integration with SIEM, SOAR, and custom tools
 - 💰 **Cost-Effective**: Local embeddings and lexical index (free) + Claude API
   (pay-per-use)
@@ -90,6 +94,7 @@ against each other that are not the same documents.
 ```text
                     "log4j 2.14.1"   +   optional filter
                                           severity / CVSS / date / vendor / CWE
+                                          KEV / EPSS
                              │
                              ├──▶ contains CVE-\d{4}-\d{4,} ?
                              │    keyed lookup, prepended at rank 1
@@ -189,6 +194,98 @@ Only the comparison between layouts is meaningful, and the 21–60 bucket rests 
 A real evaluation, with paraphrased questions and a committed eval set, is
 [still to come](#-roadmap).
 
+## 🔥 Exploitation signals
+
+CVSS says how bad a vulnerability would be if exploited. It says nothing about
+whether anyone is exploiting it — and that difference is most of the triage
+problem:
+
+| | Count | Share of corpus |
+|---|---:|---:|
+| CVSS base score ≥ 9.0 | 47,057 | 13.1% |
+| Severity CRITICAL | 36,797 | 10.3% |
+| **CRITICAL *and* known exploited** | **590** | **0.16%** |
+| In CISA KEV at all | 1,665 | 0.46% |
+| KEV, linked to ransomware campaigns | 339 | 0.09% |
+| EPSS ≥ 0.5 | 4,311 | 1.2% |
+
+Ranking by CVSS alone puts 36,797 "critical" findings in front of an analyst
+with nothing to separate the 590 under active exploitation from the rest.
+
+Two feeds, joined by CVE ID, because they answer different questions:
+
+- **[CISA KEV](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)** —
+  vulnerabilities with *confirmed, observed* exploitation. Ground truth, small,
+  and carries a federal remediation due date plus a ransomware-campaign flag.
+- **[FIRST EPSS](https://www.first.org/epss/)** — a model's estimated
+  probability of exploitation in the next 30 days. A prediction rather than an
+  observation, but it covers essentially the whole corpus.
+
+```bash
+python src/exploitation.py       # inspect both feeds
+python src/enrich_index.py       # join them onto the index
+python src/enrich_index.py --check   # coverage, without writing
+```
+
+Coverage from the run recorded in [data/manifest.json](data/manifest.json):
+**358,167 of 358,170 documents carry an EPSS score**; 3 do not appear in the
+EPSS feed at all, and 481 feed entries name CVEs this corpus does not hold.
+
+### Two decisions worth stating
+
+**Enrichment is metadata only. Nothing is re-embedded.** EPSS re-scores the
+whole corpus daily and KEV grows weekly; embedding either into the document text
+would mean an hour of re-embedding to capture a number that changes again
+tomorrow. It also keeps the document layout fingerprint unchanged, so every
+result file committed under Phase 2 still describes the index that ships — the
+drift protection below doing its job.
+
+The honest cost: a question like *"what is being actively exploited right now"*
+will not semantically match KEV membership, because KEV membership is not in the
+embedded text. Exploitation is a **filter** here, not a retrieval signal. Making
+it one is query understanding — mapping such a question onto a filter — and is
+not built.
+
+**`NULL` is not `False`.** A CVE that was never checked against KEV and a CVE
+that was checked and is not listed are different facts. `kev: false` matches only
+the second. Collapsing them would report an unknown as an all-clear, which is
+the wrong direction to be wrong in for a security tool. Tests pin it.
+
+One more thing the two EPSS numbers invite getting wrong: `CVE-1999-0001` scores
+**0.034** — which reads as negligible — and sits at the **88th percentile**,
+because most CVEs score lower still. `min_epss` asks "how likely is this to be
+attacked"; `min_epss_percentile` asks "how does this compare to everything
+else". Both are stored so a caller can pick the question they mean.
+
+### Which index does a result describe?
+
+The pinned sample stops the *queries* drifting between measurements. Nothing
+stopped the *documents* drifting: change the layout above, re-ingest, and every
+committed result file silently starts describing a corpus rendering that no
+longer exists.
+
+[src/nvd_normalize.py](src/nvd_normalize.py) therefore carries a
+`layout_fingerprint()` — a hash of the documents the module renders for a set of
+fixed synthetic fixtures. Not a hash of its source, which would trip on every
+comment edit, and not a hand-maintained version number, which relies on
+remembering to bump it. The fixtures exercise each layout decision (field order,
+both text caps, both metadata caps, CNA-before-CPE vendor ordering, the list
+delimiter, CVSS precedence), so the hash moves when and only when the rendered
+documents move. Tests assert both directions.
+
+That fingerprint is recorded in [data/manifest.json](data/manifest.json) at
+ingest time and stamped into every result file alongside `generated_at`. Every
+experiment calls `require_layout_match()` first and **refuses to run** if the
+live layout differs from the one the index was built with, rather than producing
+numbers that look valid and describe something else.
+
+For the currently shipped index the question is settled by evidence rather than
+bookkeeping, because the manifest predates this mechanism.
+`python src/provenance.py --record` re-normalizes raw feed records from 2014,
+2021 and 2025 with the current code and compares them against what ChromaDB
+actually stores: **1,500 documents compared, 0 mismatches**. The ablation
+therefore describes the index that ships.
+
 ## 🛠️ Technology Stack
 
 | Component | Technology | Purpose |
@@ -199,7 +296,8 @@ A real evaluation, with paraphrased questions and a committed eval set, is
 | **Lexical Index** | SQLite FTS5 | On-disk BM25 over an inverted index — lexical arm |
 | **Reranker** | cross-encoder/ms-marco-MiniLM-L-6-v2 | Re-scores the fused top 50 |
 | **API Framework** | FastAPI | Modern async Python web framework |
-| **Testing** | Pytest | 213 unit tests |
+| **Exploitation** | CISA KEV + FIRST EPSS | Observed and predicted exploitation |
+| **Testing** | Pytest | 284 unit tests |
 
 SQLite FTS5 rather than a pip BM25 package: `rank_bm25` and similar hold the
 whole index in memory and score every document on every query. At 358,170
@@ -451,6 +549,9 @@ security-intel-rag/
 │   ├── nvd_api.py               # NVD API 2.0 incremental updates
 │   ├── nvd_normalize.py         # CVE record -> document + metadata
 │   ├── ingest_nvd.py            # Resumable corpus ingestion (main pipeline)
+│   ├── exploitation.py          # CISA KEV + FIRST EPSS fetch and parse
+│   ├── enrich_index.py          # Joins exploitation signals onto the index
+│   ├── provenance.py            # Document-layout fingerprint and drift check
 │   ├── ingest.py                # Legacy sample-data loader (demo only)
 │   ├── lexical_index.py         # SQLite FTS5 BM25 index + query escaping
 │   ├── build_fts.py             # Builds the lexical index, verifies vs Chroma
@@ -478,7 +579,7 @@ security-intel-rag/
 │   ├── samples/                 # Pinned evaluation and dev samples
 │   └── results/                 # Committed JSON output of the above
 │
-├── tests/                       # 213 unit tests
+├── tests/                       # 284 unit tests
 │   ├── test_rag.py              # Embedding + formatting tests
 │   ├── test_nvd_normalize.py    # Normalization, CVSS, CPE, filtering
 │   ├── test_nvd_sources.py      # Feed verification + API windowing
@@ -695,14 +796,14 @@ two candidate causes:
 
 | Query shape | p50 | p95 |
 |---|---:|---:|
-| Bare CVE ID | 1.0 ms | 1.4 ms |
-| Product + version | 13.0 ms | 66 ms |
-| Description sentence | 467 ms | 618 ms |
+| Bare CVE ID | 0.2 ms | 0.3 ms |
+| Product + version | 7 ms | 64 ms |
+| Description sentence | 460 ms | 635 ms |
 
 The tail is **query length, not term commonality**. Holding the text fixed and
-truncating it, cost rises from 17 ms at one term to 620 ms at 32; whereas the
+truncating it, cost rises from 16 ms at one term to 521 ms at 32; whereas the
 single most common term in the corpus — `vulnerability`, in 168,571 of 358,170
-documents — costs 81 ms on its own. No single term can produce the tail; only a
+documents — costs 71 ms on its own. No single term can produce the tail; only a
 long query can, because terms are combined with `OR` and each one is another
 postings list to walk. `MAX_QUERY_TERMS = 32` in
 [src/lexical_index.py](src/lexical_index.py) is the cap that bounds it.
@@ -769,8 +870,9 @@ Planned, in order:
       split](#bm25-solves-cve-id-lookup-is-not-true-and-here-is-the-number)
       showed that average was hiding 0.667 on the best-known CVEs, which
       un-deferred it. Bare-ID Recall@1 is now 1.000 for 0.03 ms per query.
-- [ ] **Exploitation enrichment** — join CISA KEV and FIRST EPSS by CVE ID so
-      results can be prioritised by real-world exploitation, not just CVSS
+- [x] **Exploitation enrichment** — CISA KEV and FIRST EPSS joined by CVE ID,
+      as filterable metadata rather than embedded text so a daily refresh costs
+      minutes instead of an hour of re-embedding
 - [ ] **Paraphrased eval set** — questions phrased as a person would phrase
       them, which is the only test that can show whether the dense arm earns its
       place; plus groundedness judging and refusal rate on unanswerable questions

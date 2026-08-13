@@ -42,6 +42,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import lexical_index as LX  # noqa: E402
 import nvd_normalize as N  # noqa: E402
+import provenance  # noqa: E402
 import retrieval as R  # noqa: E402
 from embeddings import EmbeddingService  # noqa: E402
 
@@ -142,6 +143,8 @@ def main() -> None:
                         default=str(PROJECT_ROOT / "chroma_db" / "lexical.sqlite3"))
     args = parser.parse_args()
 
+    provenance.require_layout_match()
+
     client = chromadb.PersistentClient(
         path=args.persist_dir, settings=Settings(anonymized_telemetry=False)
     )
@@ -210,6 +213,7 @@ def main() -> None:
     conn.close()
     RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     RESULTS_PATH.write_text(json.dumps({
+        **provenance.stamp(),
         "sample": "dev",
         "sample_path": str(DEV_SAMPLE_PATH.relative_to(PROJECT_ROOT)),
         "sample_seed": DEV_SEED,

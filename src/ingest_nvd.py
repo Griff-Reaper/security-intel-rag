@@ -291,6 +291,11 @@ def run(
                 "no_english_description": "no descriptions[] entry with lang == 'en'",
             },
         },
+        # Captured at build time so a later measurement can check that it is
+        # describing the index it thinks it is. nvd_normalize.layout_fingerprint()
+        # hashes the rendered output of fixed fixtures, so it moves when and only
+        # when the documents actually change.
+        "document_layout": nvd_normalize.layout_descriptor(),
         "index": {
             "collection": collection_name,
             "documents_in_collection": indexed_total,

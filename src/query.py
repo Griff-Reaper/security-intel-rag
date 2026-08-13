@@ -331,6 +331,12 @@ class SecurityRAG:
                     "published": meta.get("published") or None,
                     "vendors": meta.get("vendors") or None,
                     "products": meta.get("products") or None,
+                    # Exploitation signals, absent when the record predates the
+                    # last enrichment pass rather than defaulted to False.
+                    "kev": meta.get("kev"),
+                    "kev_ransomware": meta.get("kev_ransomware"),
+                    "epss_score": meta.get("epss_score"),
+                    "epss_percentile": meta.get("epss_percentile"),
                     "rank": rank,
                 })
             elif meta.get("type") == "threat_intel":
@@ -364,6 +370,10 @@ class SecurityRAG:
         cwe: Optional[str] = None,
         min_cvss: Optional[float] = None,
         published_after: Optional[int] = None,
+        kev: Optional[bool] = None,
+        kev_ransomware: Optional[bool] = None,
+        min_epss: Optional[float] = None,
+        min_epss_percentile: Optional[float] = None,
         n_results: int = 5,
     ) -> Dict[str, Any]:
         """
@@ -377,6 +387,12 @@ class SecurityRAG:
             cwe: CWE identifier, e.g. "CWE-502"
             min_cvss: Minimum CVSS base score
             published_after: Epoch seconds
+            kev: Restrict to CISA KEV listings (confirmed exploitation)
+            kev_ransomware: Restrict to KEV entries linked to ransomware campaigns
+            min_epss: Minimum EPSS probability, in [0, 1]
+            min_epss_percentile: Minimum EPSS percentile, in [0, 1]. Not the same
+                question as min_epss - a 0.034 score can sit at the 88th
+                percentile.
             n_results: How many documents to retrieve
 
         Returns:
@@ -386,7 +402,9 @@ class SecurityRAG:
         for key, value in (
             ("severity", severity), ("vendor", vendor), ("product", product),
             ("cwe", cwe), ("min_cvss", min_cvss),
-            ("published_after", published_after),
+            ("published_after", published_after), ("kev", kev),
+            ("kev_ransomware", kev_ransomware), ("min_epss", min_epss),
+            ("min_epss_percentile", min_epss_percentile),
         ):
             if value is not None:
                 spec[key] = value

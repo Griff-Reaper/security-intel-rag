@@ -125,6 +125,10 @@ def build(
         # POSIX separators so the committed manifest reads the same on any OS.
         "path": db_path.relative_to(PROJECT_ROOT).as_posix(),
         "tokenizer": tokenizer,
+        # The layout this index's text was rendered with. Recorded per index
+        # rather than only globally, because the lexical and dense indexes are
+        # built by separate commands and can be rebuilt independently.
+        "document_layout": nvd_normalize.layout_descriptor(),
         "documents": count,
         "records_raw": total_raw,
         "size_bytes": size_bytes,
@@ -194,6 +198,7 @@ def verify(db_path: Path, persist_dir: Path, collection_name: str) -> Dict[str, 
         "verified_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "chroma_documents": chroma_count,
         "documents_compared": len(sample),
+        "document_layout_fingerprint": nvd_normalize.layout_fingerprint(),
     }
 
 

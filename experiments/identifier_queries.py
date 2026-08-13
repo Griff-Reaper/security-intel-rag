@@ -71,6 +71,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import lexical_index as LX  # noqa: E402
 import nvd_normalize as N  # noqa: E402
+import provenance  # noqa: E402
 import retrieval  # noqa: E402
 from embeddings import EmbeddingService  # noqa: E402
 from retrieval import Retriever, build_retriever  # noqa: E402
@@ -229,6 +230,10 @@ def measure(collection, retriever: Retriever, sample_ids: List[str]) -> Dict[str
             })
 
     return {
+        # Which index these numbers describe. Without it, a later layout change
+        # and re-ingest would leave this file describing a corpus rendering that
+        # no longer exists, with nothing in the file to say so.
+        **provenance.stamp(),
         "collection": collection.name,
         "documents_in_collection": collection.count(),
         "sample_size": len(sample_ids),
@@ -336,6 +341,12 @@ def main() -> None:
     if args.compare:
         compare()
         return
+
+    # Refuse to measure an index built from a different document layout: the
+    # numbers would look valid and describe something else.
+    layout = provenance.require_layout_match()
+    logger.info("document layout v%s %s (%s)", layout["live"]["version"],
+                layout["live"]["fingerprint"], layout["status"])
 
     client = chromadb.PersistentClient(
         path=args.persist_dir, settings=Settings(anonymized_telemetry=False)

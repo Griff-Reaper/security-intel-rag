@@ -1,4 +1,14 @@
 {
+  "generated_at": "2026-08-13T20:00:13+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
   "collection": "nvd_cve",
   "documents_in_collection": 358170,
   "sample_size": 200,
@@ -33,10 +43,11 @@
   "latency": {
     "end_to_end": {
       "queries": 596,
-      "mean_ms": 155.27,
-      "p50_ms": 14.76,
-      "p95_ms": 587.96
-    }
+      "mean_ms": 154.71,
+      "p50_ms": 13.87,
+      "p95_ms": 589.62
+    },
+    "filters": "none"
   },
   "examples": [
     {

@@ -46,6 +46,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import lexical_index as LX  # noqa: E402
 import nvd_normalize as N  # noqa: E402
+import provenance  # noqa: E402
 import retrieval as R  # noqa: E402
 
 RESULTS_PATH = PROJECT_ROOT / "experiments" / "results" / "lexical_latency.json"
@@ -91,6 +92,8 @@ def main() -> None:
                         default=str(PROJECT_ROOT / "chroma_db" / "lexical.sqlite3"))
     args = parser.parse_args()
 
+    provenance.require_layout_match()
+
     conn = LX.connect(Path(args.lexical_db), read_only=True)
     total_docs = LX.document_count(conn)
     client = chromadb.PersistentClient(
@@ -109,6 +112,7 @@ def main() -> None:
         LX.search(conn, cve_id, DEPTH)
 
     results: Dict[str, Any] = {
+        **provenance.stamp(),
         "documents": total_docs,
         "search_depth": DEPTH,
         "sample": "dev",

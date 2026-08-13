@@ -1,4 +1,14 @@
 {
+  "generated_at": "2026-08-13T20:28:10+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
   "corpus_size": 358170,
   "cross_referenced_count": 11001,
   "cross_referenced_share": 0.03071,
@@ -24,21 +34,21 @@
         "recall_at_1": 0.0,
         "recall_at_10": 0.0133,
         "mrr": 0.0034,
-        "mean_ms": 27.8
+        "mean_ms": 22.9
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 0.0,
         "recall_at_10": 0.0,
         "mrr": 0.0,
-        "mean_ms": 22.0
+        "mean_ms": 18.3
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 0.0,
         "recall_at_10": 0.0,
         "mrr": 0.0,
-        "mean_ms": 25.6
+        "mean_ms": 18.0
       }
     },
     "dense+direct_id": {
@@ -47,21 +57,21 @@
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 21.6
+        "mean_ms": 18.0
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 20.5
+        "mean_ms": 17.9
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 21.6
+        "mean_ms": 17.8
       }
     },
     "bm25": {
@@ -70,21 +80,21 @@
         "recall_at_1": 0.6733,
         "recall_at_10": 0.98,
         "mrr": 0.7863,
-        "mean_ms": 0.4
+        "mean_ms": 0.1
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 0.3
+        "mean_ms": 0.1
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 0.6667,
         "recall_at_10": 1.0,
         "mrr": 0.7667,
-        "mean_ms": 0.3
+        "mean_ms": 0.1
       }
     },
     "bm25+direct_id": {
@@ -93,21 +103,21 @@
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 0.2
+        "mean_ms": 0.1
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 0.2
+        "mean_ms": 0.1
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 0.3
+        "mean_ms": 0.1
       }
     },
     "hybrid": {
@@ -116,21 +126,21 @@
         "recall_at_1": 0.6733,
         "recall_at_10": 0.9133,
         "mrr": 0.7455,
-        "mean_ms": 33.9
+        "mean_ms": 31.0
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 32.7
+        "mean_ms": 28.6
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 0.6667,
         "recall_at_10": 1.0,
         "mrr": 0.7259,
-        "mean_ms": 32.5
+        "mean_ms": 28.6
       }
     },
     "hybrid+direct_id": {
@@ -139,21 +149,21 @@
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 32.2
+        "mean_ms": 31.1
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 31.3
+        "mean_ms": 34.9
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 31.5
+        "mean_ms": 41.5
       }
     },
     "hybrid_rerank": {
@@ -162,21 +172,21 @@
         "recall_at_1": 0.9667,
         "recall_at_10": 1.0,
         "mrr": 0.9802,
-        "mean_ms": 458.5
+        "mean_ms": 739.1
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 0.9667,
         "recall_at_10": 0.9933,
         "mrr": 0.9781,
-        "mean_ms": 418.9
+        "mean_ms": 435.1
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 0.6667,
         "recall_at_10": 1.0,
         "mrr": 0.8036,
-        "mean_ms": 506.0
+        "mean_ms": 448.6
       }
     },
     "hybrid_rerank+direct_id": {
@@ -185,21 +195,21 @@
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 478.7
+        "mean_ms": 428.0
       },
       "not cross-referenced": {
         "queries": 150,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 422.5
+        "mean_ms": 404.0
       },
       "widely-known (named, not sampled)": {
         "queries": 12,
         "recall_at_1": 1.0,
         "recall_at_10": 1.0,
         "mrr": 1.0,
-        "mean_ms": 606.5
+        "mean_ms": 454.0
       }
     }
   },

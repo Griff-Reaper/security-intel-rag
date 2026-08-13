@@ -22,6 +22,8 @@ fields are stored as delimited strings and dates are stored twice: an ISO string
 for display and an epoch integer for range queries.
 """
 
+import hashlib
+import json
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -57,6 +59,11 @@ REJECTED_STATUSES = {"Rejected"}
 #
 # The metadata caps are looser because metadata is stored, not embedded, so it
 # costs retrieval quality nothing and keeps more detail available for filtering.
+# Bumped by hand when the layout changes deliberately; layout_fingerprint()
+# below is the machine-checked counterpart that cannot be forgotten.
+# 1 = metadata-first (pre-measurement). 2 = description-first, CNA vendors first.
+DOCUMENT_LAYOUT_VERSION = 2
+
 MAX_VENDORS_IN_TEXT = 6
 MAX_PRODUCTS_IN_TEXT = 8
 MAX_VENDORS_IN_METADATA = 25
@@ -260,6 +267,119 @@ def should_index(record: Dict[str, Any]) -> Tuple[bool, str]:
     if not extract_english_description(record):
         return False, "no_english_description"
     return True, ""
+
+
+# Synthetic records that exercise every layout decision. Deliberately not drawn
+# from the corpus: a fixture that changes when the feed changes cannot serve as
+# a fixed reference point.
+_LAYOUT_FIXTURES: Tuple[Dict[str, Any], ...] = (
+    {
+        # Caps: 9 vendors and 11 products, above both text caps (6 / 8) and
+        # below both metadata caps (25 / 40), so a change to either moves the
+        # hash. CNA `affected` first, then `configurations`, so a change to
+        # that ordering moves it too.
+        "id": "CVE-2000-00001",
+        "vulnStatus": "Analyzed",
+        "published": "2000-01-01T00:00:00.000",
+        "lastModified": "2000-01-02T00:00:00.000",
+        "sourceIdentifier": "layout@fixture.test",
+        "descriptions": [
+            {"lang": "en", "value": "First sentence of the description. Second sentence."},
+            {"lang": "es", "value": "No debe aparecer."},
+        ],
+        "affected": [
+            {"affectedData": [{"vendor": "cna_vendor", "product": "cna_product"}]}
+        ],
+        "configurations": [
+            {
+                "nodes": [
+                    {
+                        "cpeMatch": [
+                            {
+                                "criteria": (
+                                    f"cpe:2.3:a:vendor{i}:product{i}:1.0:*:*:*:*:*:*:*"
+                                ),
+                                "vulnerable": True,
+                            }
+                            for i in range(10)
+                        ]
+                    }
+                ]
+            }
+        ],
+        "weaknesses": [
+            {"description": [{"lang": "en", "value": "CWE-79"},
+                             {"lang": "en", "value": "CWE-89"}]}
+        ],
+        "metrics": {
+            # v3.1 must win over v2 under CVSS_METRIC_PRECEDENCE.
+            "cvssMetricV31": [{
+                "type": "Primary",
+                "cvssData": {"baseScore": 9.8, "baseSeverity": "CRITICAL",
+                             "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                             "version": "3.1"},
+            }],
+            "cvssMetricV2": [{
+                "type": "Primary",
+                "cvssData": {"baseScore": 5.0, "vectorString": "AV:N/AC:L/Au:N/C:P/I:N/A:N",
+                             "version": "2.0"},
+                "baseSeverity": "MEDIUM",
+            }],
+        },
+    },
+    {
+        # Minimal record: no CPE, no CWE, no metrics. Pins what the layout omits
+        # rather than only what it emits.
+        "id": "CVE-2000-00002",
+        "vulnStatus": "Awaiting Analysis",
+        "published": "2000-02-01T00:00:00.000",
+        "lastModified": "2000-02-01T00:00:00.000",
+        "sourceIdentifier": "layout@fixture.test",
+        "descriptions": [{"lang": "en", "value": "A description with no metadata at all."}],
+    },
+)
+
+
+def layout_fixtures() -> Tuple[Dict[str, Any], ...]:
+    """The fixed records layout_fingerprint() renders."""
+    return _LAYOUT_FIXTURES
+
+
+def layout_fingerprint() -> str:
+    """
+    A short hash of what this module currently *produces*, not of its source.
+
+    An index is only comparable with a measurement if both were made from the
+    same document layout. Recording a hand-maintained version number relies on
+    remembering to bump it; hashing the source of build_document_text() trips on
+    every comment edit. Hashing the output of a fixed set of fixtures changes
+    when, and only when, the rendered documents change - which is the property
+    that actually matters.
+
+    The fixtures are chosen to exercise each layout decision: field order, the
+    text and metadata caps, CNA-before-CPE vendor ordering, the list delimiter,
+    and the CVSS precedence. A change to any of them moves the hash.
+    """
+    payload = json.dumps(
+        [normalize(record) for record in layout_fixtures()],
+        sort_keys=True,
+        ensure_ascii=True,
+        default=str,
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+
+def layout_descriptor() -> Dict[str, Any]:
+    """The document layout as it should be recorded in artifacts."""
+    return {
+        "version": DOCUMENT_LAYOUT_VERSION,
+        "fingerprint": layout_fingerprint(),
+        "max_vendors_in_text": MAX_VENDORS_IN_TEXT,
+        "max_products_in_text": MAX_PRODUCTS_IN_TEXT,
+        "max_vendors_in_metadata": MAX_VENDORS_IN_METADATA,
+        "max_products_in_metadata": MAX_PRODUCTS_IN_METADATA,
+        "list_delimiter": LIST_DELIMITER,
+    }
 
 
 def build_document_text(record: Dict[str, Any]) -> str:

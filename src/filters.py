@@ -46,6 +46,11 @@ SCALAR_FILTERS: Tuple[str, ...] = (
     "max_cvss",
     "published_after",
     "published_before",
+    # Exploitation signals (src/exploitation.py). Scalars on both backends.
+    "kev",
+    "kev_ransomware",
+    "min_epss",
+    "min_epss_percentile",
 )
 
 # Packed-list fields only the lexical index can filter.
@@ -59,7 +64,12 @@ _CHROMA_RANGE = {
     "max_cvss": ("cvss_base_score", "$lte"),
     "published_after": ("published_ts", "$gte"),
     "published_before": ("published_ts", "$lte"),
+    "min_epss": ("epss_score", "$gte"),
+    "min_epss_percentile": ("epss_percentile", "$gte"),
 }
+
+# Boolean equality fields.
+_CHROMA_BOOL = {"kev": "kev", "kev_ransomware": "kev_ransomware"}
 
 
 class FilterError(ValueError):
@@ -81,9 +91,20 @@ def validate(filters: Optional[Dict[str, Any]]) -> Dict[str, Any]:
             f"unknown filter field(s): {', '.join(unknown)}. "
             f"Supported: {', '.join(ALL_FILTERS)}"
         )
-    for key in ("min_cvss", "max_cvss", "published_after", "published_before"):
+    numeric = ("min_cvss", "max_cvss", "published_after", "published_before",
+               "min_epss", "min_epss_percentile")
+    for key in numeric:
         if key in filters and not isinstance(filters[key], (int, float)):
             raise FilterError(f"{key} must be a number, got {filters[key]!r}")
+    for key in ("min_epss", "min_epss_percentile"):
+        if key in filters and not 0.0 <= float(filters[key]) <= 1.0:
+            raise FilterError(
+                f"{key} is a probability in [0, 1], got {filters[key]!r}. "
+                "EPSS scores are not percentages."
+            )
+    for key in ("kev", "kev_ransomware"):
+        if key in filters and not isinstance(filters[key], bool):
+            raise FilterError(f"{key} must be true or false, got {filters[key]!r}")
     if "min_cvss" in filters and "max_cvss" in filters:
         if filters["min_cvss"] > filters["max_cvss"]:
             raise FilterError(
@@ -138,6 +159,13 @@ def to_chroma_where(filters: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any
     for key, (field, operator) in _CHROMA_RANGE.items():
         if key in filters:
             conditions.append({field: {operator: filters[key]}})
+    for key, field in _CHROMA_BOOL.items():
+        if key in filters:
+            # $eq on the stored boolean. A record that was never enriched has no
+            # such key at all, and Chroma does not match a missing key, so an
+            # unenriched record cannot satisfy kev=False either - which matches
+            # the lexical side's NULL handling.
+            conditions.append({field: {"$eq": bool(filters[key])}})
 
     if not conditions:
         return None

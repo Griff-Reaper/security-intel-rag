@@ -42,6 +42,12 @@ class QueryRequest(BaseModel):
     max_cvss: Optional[float] = Field(None, description="Maximum CVSS base score", ge=0, le=10)
     published_after: Optional[int] = Field(None, description="Published at or after this epoch second")
     published_before: Optional[int] = Field(None, description="Published at or before this epoch second")
+    # Exploitation signals. kev=false means "checked and not listed", never
+    # "not checked" - records with no enrichment match neither value.
+    kev: Optional[bool] = Field(None, description="Restrict to CISA KEV listings (confirmed exploitation)")
+    kev_ransomware: Optional[bool] = Field(None, description="Restrict to KEV entries linked to ransomware campaigns")
+    min_epss: Optional[float] = Field(None, description="Minimum EPSS exploitation probability", ge=0, le=1)
+    min_epss_percentile: Optional[float] = Field(None, description="Minimum EPSS percentile rank", ge=0, le=1)
     return_context: bool = Field(False, description="Include retrieved documents in response")
 
     class Config:
@@ -66,6 +72,10 @@ class QueryRequest(BaseModel):
             "max_cvss": self.max_cvss,
             "published_after": self.published_after,
             "published_before": self.published_before,
+            "kev": self.kev,
+            "kev_ransomware": self.kev_ransomware,
+            "min_epss": self.min_epss,
+            "min_epss_percentile": self.min_epss_percentile,
         }
         return {k: v for k, v in spec.items() if v is not None}
 
@@ -86,6 +96,10 @@ class Source(BaseModel):
     published: Optional[str] = None
     vendors: Optional[str] = None
     products: Optional[str] = None
+    kev: Optional[bool] = None
+    kev_ransomware: Optional[bool] = None
+    epss_score: Optional[float] = None
+    epss_percentile: Optional[float] = None
     threat_actor: Optional[str] = None
     # Rank, not a similarity score: each retrieval backend scores on its own
     # scale, so a single "distance" field would mean different things per
