@@ -1,0 +1,138 @@
+{
+  "documents": 358170,
+  "search_depth": 200,
+  "sample": "dev",
+  "max_query_terms": 32,
+  "by_query_shape": {
+    "bare CVE ID": {
+      "queries": 200,
+      "p50_ms": 1.13,
+      "p95_ms": 1.52,
+      "max_ms": 5.23
+    },
+    "product + version": {
+      "queries": 199,
+      "p50_ms": 14.15,
+      "p95_ms": 75.51,
+      "max_ms": 199.24
+    },
+    "description sentence": {
+      "queries": 200,
+      "p50_ms": 455.97,
+      "p95_ms": 611.15,
+      "max_ms": 711.49
+    }
+  },
+  "by_term_count": {
+    "1": {
+      "queries": 200,
+      "p50_ms": 22.15,
+      "p95_ms": 128.99,
+      "max_ms": 162.74
+    },
+    "2": {
+      "queries": 200,
+      "p50_ms": 57.9,
+      "p95_ms": 152.16,
+      "max_ms": 185.8
+    },
+    "4": {
+      "queries": 200,
+      "p50_ms": 126.47,
+      "p95_ms": 182.52,
+      "max_ms": 213.08
+    },
+    "8": {
+      "queries": 194,
+      "p50_ms": 181.84,
+      "p95_ms": 226.94,
+      "max_ms": 250.45
+    },
+    "16": {
+      "queries": 160,
+      "p50_ms": 274.02,
+      "p95_ms": 335.76,
+      "max_ms": 393.22
+    },
+    "32": {
+      "queries": 96,
+      "p50_ms": 537.57,
+      "p95_ms": 707.16,
+      "max_ms": 877.61
+    }
+  },
+  "by_single_term_frequency": {
+    "heartbleed": {
+      "queries": 15,
+      "p50_ms": 0.03,
+      "p95_ms": 0.12,
+      "max_ms": 0.12,
+      "documents_matched": 1,
+      "corpus_share": 0.0
+    },
+    "log4shell": {
+      "queries": 15,
+      "p50_ms": 0.03,
+      "p95_ms": 0.15,
+      "max_ms": 0.15,
+      "documents_matched": 0,
+      "corpus_share": 0.0
+    },
+    "openssl": {
+      "queries": 15,
+      "p50_ms": 2.38,
+      "p95_ms": 3.11,
+      "max_ms": 3.11,
+      "documents_matched": 576,
+      "corpus_share": 0.0016
+    },
+    "wordpress": {
+      "queries": 15,
+      "p50_ms": 13.17,
+      "p95_ms": 14.08,
+      "max_ms": 14.08,
+      "documents_matched": 19488,
+      "corpus_share": 0.0544
+    },
+    "android": {
+      "queries": 15,
+      "p50_ms": 10.5,
+      "p95_ms": 15.68,
+      "max_ms": 15.68,
+      "documents_matched": 13339,
+      "corpus_share": 0.0372
+    },
+    "windows": {
+      "queries": 15,
+      "p50_ms": 20.12,
+      "p95_ms": 24.43,
+      "max_ms": 24.43,
+      "documents_matched": 23798,
+      "corpus_share": 0.0664
+    },
+    "buffer": {
+      "queries": 15,
+      "p50_ms": 20.09,
+      "p95_ms": 26.9,
+      "max_ms": 26.9,
+      "documents_matched": 24857,
+      "corpus_share": 0.0694
+    },
+    "attacker": {
+      "queries": 15,
+      "p50_ms": 39.73,
+      "p95_ms": 48.54,
+      "max_ms": 48.54,
+      "documents_matched": 72577,
+      "corpus_share": 0.2026
+    },
+    "vulnerability": {
+      "queries": 15,
+      "p50_ms": 75.99,
+      "p95_ms": 86.11,
+      "max_ms": 86.11,
+      "documents_matched": 168571,
+      "corpus_share": 0.4706
+    }
+  }
+}

@@ -31,7 +31,17 @@ for _path in (PROJECT_ROOT / "src", PROJECT_ROOT / "config"):
 DEFAULT_PERSIST_DIRECTORY = str(PROJECT_ROOT / "chroma_db")
 # The NVD corpus built by src/ingest_nvd.py. Overridable via COLLECTION_NAME.
 DEFAULT_COLLECTION_NAME = "nvd_cve"
+DEFAULT_LEXICAL_DB = str(PROJECT_ROOT / "chroma_db" / "lexical.sqlite3")
 
+# The configuration the ablation measured best on product + version queries,
+# which is the realistic query shape. See README "Measured behaviour" and
+# experiments/results/identifier_queries_*.json. Overridable via RETRIEVAL_MODE
+# so the weaker, faster configurations stay reachable without a code change.
+DEFAULT_RETRIEVAL_MODE = "hybrid_rerank"
+
+import filters as filters_mod
+import lexical_index as LX
+import retrieval as retrieval_mod
 from embeddings import EmbeddingService
 from prompts import (
     SECURITY_ANALYST_SYSTEM_PROMPT,
@@ -51,14 +61,20 @@ class SecurityRAG:
     def __init__(
         self,
         persist_directory: str = DEFAULT_PERSIST_DIRECTORY,
-        collection_name: Optional[str] = None
+        collection_name: Optional[str] = None,
+        retrieval: Optional[str] = None,
+        lexical_db: Optional[str] = None,
     ):
         """
         Initialize the RAG system.
-        
+
         Args:
             persist_directory: Where ChromaDB is stored
             collection_name: Which collection to query
+            retrieval: One of retrieval.MODES. Defaults to RETRIEVAL_MODE in the
+                environment, else DEFAULT_RETRIEVAL_MODE.
+            lexical_db: Path to the FTS5 index. Required by every mode except
+                `dense`.
         """
         # Load environment variables (API keys)
         load_dotenv()
@@ -97,60 +113,126 @@ class SecurityRAG:
         
         # Initialize embedding service (for query embedding)
         self.embedding_service = EmbeddingService()
-        
+
+        # Retrieval backend. This is the same code experiments/identifier_queries.py
+        # measures, so the numbers in the README describe what actually runs here.
+        self.retrieval_mode = (
+            retrieval or os.getenv("RETRIEVAL_MODE") or DEFAULT_RETRIEVAL_MODE
+        )
+        self.lexical_db = lexical_db or os.getenv("LEXICAL_DB") or DEFAULT_LEXICAL_DB
+        self.lexical_conn = None
+        if self.retrieval_mode != "dense":
+            # Fail loudly rather than falling back to dense: a silent downgrade
+            # would serve measurably worse results while the README described
+            # the better ones.
+            self.lexical_conn = LX.connect(Path(self.lexical_db), read_only=True)
+            lexical_count = LX.document_count(self.lexical_conn)
+            if lexical_count != count:
+                raise ValueError(
+                    f"lexical index has {lexical_count:,} documents but collection "
+                    f"'{collection_name}' has {count:,}. Rebuild with: "
+                    f"python src/build_fts.py"
+                )
+        print(f"[OK] Retrieval: {self.retrieval_mode}")
+
+    def _retriever(self, filters: Optional[Dict[str, Any]]):
+        """Get a retriever for this filter spec, reusing the last one if it matches.
+
+        Retrievers are cached rather than rebuilt per call because constructing
+        one for a packed-list filter resolves an ID allow-list against the
+        lexical index, which is the expensive part of filtering (about a second
+        for a vendor matching 26,000 records).
+        """
+        key = filters_mod.describe(filters)
+        cached = getattr(self, "_retriever_cache", None)
+        if cached is None or cached[0] != key:
+            self._retriever_cache = (
+                key,
+                retrieval_mod.build_retriever(
+                    self.retrieval_mode,
+                    collection=self.collection,
+                    embedder=self.embedding_service,
+                    lexical_conn=self.lexical_conn,
+                    filters=filters,
+                ),
+            )
+        return self._retriever_cache[1]
+
     def retrieve_context(
         self,
         query: str,
         n_results: int = 5,
-        filter_metadata: Optional[Dict] = None
+        filters: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
-        Retrieve relevant documents from the vector database.
-        
+        Retrieve relevant documents.
+
         This is the "Retrieval" part of RAG.
-        
+
         Args:
             query: The user's question
             n_results: How many relevant documents to retrieve
-            filter_metadata: Optional filters (e.g., {"severity": "CRITICAL"})
-            
+            filters: Optional metadata pre-filter, e.g.
+                {"severity": "CRITICAL", "vendor": "apache", "min_cvss": 9.0}.
+                See src/filters.py for the supported fields. Filters are applied
+                before ranking, so n_results returns that many *matching*
+                documents rather than however many of the top n happen to match.
+
         Returns:
-            Dictionary with documents, metadatas, and distances
+            Dictionary with documents, metadatas, ranks and n_results.
+
+        Note there is no similarity score in the return value. Each backend
+        scores on its own scale - cosine distance, BM25, an RRF sum, a
+        cross-encoder logit - and presenting whichever one happened to run under
+        a single name would invite comparisons between numbers that do not share
+        a meaning. Rank is well defined for all of them.
         """
-        # Convert query to embedding
-        query_embedding = self.embedding_service.get_embedding(query)
-        
-        # Search the vector database
-        # ChromaDB finds documents with embeddings most similar to the query
-        results = self.collection.query(
-            query_embeddings=[query_embedding],
-            n_results=n_results,
-            where=filter_metadata  # Optional filtering
+        ranked_ids = self._retriever(filters).search(query, n_results)
+        if not ranked_ids:
+            return {"documents": [], "metadatas": [], "ranks": [], "n_results": 0}
+
+        fetched = self.collection.get(
+            ids=ranked_ids, include=["documents", "metadatas"]
         )
-        
-        return {
-            "documents": results["documents"][0],  # The actual text
-            "metadatas": results["metadatas"][0],  # Structured data
-            "distances": results["distances"][0],  # Similarity scores (lower = more similar)
-            "n_results": len(results["documents"][0])
+        by_id = {
+            doc_id: (document, metadata)
+            for doc_id, document, metadata
+            in zip(fetched["ids"], fetched["documents"], fetched["metadatas"])
         }
-    
+
+        # Chroma returns rows in its own order; restore the ranking.
+        documents, metadatas, ranks = [], [], []
+        for rank, doc_id in enumerate(ranked_ids, start=1):
+            if doc_id not in by_id:
+                continue
+            document, metadata = by_id[doc_id]
+            documents.append(document)
+            metadatas.append(metadata)
+            ranks.append(rank)
+
+        return {
+            "documents": documents,
+            "metadatas": metadatas,
+            "ranks": ranks,
+            "n_results": len(documents),
+        }
+
     def query(
         self,
         question: str,
         n_results: int = 5,
         query_type: str = "general",
-        filter_metadata: Optional[Dict] = None,
+        filters: Optional[Dict[str, Any]] = None,
         return_context: bool = False
     ) -> Dict[str, Any]:
         """
         Main query function - the complete RAG pipeline.
-        
+
         Args:
             question: User's security question
             n_results: How many documents to retrieve
             query_type: Type of query (cve, threat, summary, etc.)
-            filter_metadata: Optional filters for retrieval
+            filters: Optional metadata pre-filter; see src/filters.py
             return_context: Whether to include retrieved documents in response
             
         Returns:
@@ -163,7 +245,7 @@ class SecurityRAG:
         context_results = self.retrieve_context(
             query=question,
             n_results=n_results,
-            filter_metadata=filter_metadata
+            filters=filters
         )
         
         if context_results["n_results"] == 0:
@@ -231,9 +313,7 @@ class SecurityRAG:
         # Citations are built from stored metadata, never from the generated
         # text: a model asked to name its sources will invent plausible CVE IDs.
         sources = []
-        for meta, distance in zip(
-            context_results["metadatas"], context_results["distances"]
-        ):
+        for meta, rank in zip(context_results["metadatas"], context_results["ranks"]):
             if meta.get("type") == "cve":
                 sources.append({
                     "type": "CVE",
@@ -243,7 +323,7 @@ class SecurityRAG:
                     "published": meta.get("published") or None,
                     "vendors": meta.get("vendors") or None,
                     "products": meta.get("products") or None,
-                    "distance": round(float(distance), 4),
+                    "rank": rank,
                 })
             elif meta.get("type") == "threat_intel":
                 sources.append({
@@ -252,7 +332,7 @@ class SecurityRAG:
                     "title": meta.get("title"),
                     "threat_actor": meta.get("threat_actor"),
                     "severity": meta.get("severity") or None,
-                    "distance": round(float(distance), 4),
+                    "rank": rank,
                 })
 
         result = {
@@ -270,35 +350,43 @@ class SecurityRAG:
     def query_with_filters(
         self,
         question: str,
-        severity: Optional[str] = None,
-        cve_only: bool = False,
-        threat_only: bool = False
+        severity: Optional[Any] = None,
+        vendor: Optional[str] = None,
+        product: Optional[str] = None,
+        cwe: Optional[str] = None,
+        min_cvss: Optional[float] = None,
+        published_after: Optional[int] = None,
+        n_results: int = 5,
     ) -> Dict[str, Any]:
         """
-        Convenience method for common filtering patterns.
-        
+        Convenience method for the filters an analyst actually narrows by.
+
         Args:
             question: User's question
-            severity: Filter by severity (CRITICAL, HIGH, MEDIUM, LOW)
-            cve_only: Only retrieve CVE documents
-            threat_only: Only retrieve threat intelligence
-            
+            severity: One severity or a list of them (CRITICAL, HIGH, MEDIUM, LOW)
+            vendor: Affected vendor, matched as a whole name
+            product: Affected product, matched as a whole name
+            cwe: CWE identifier, e.g. "CWE-502"
+            min_cvss: Minimum CVSS base score
+            published_after: Epoch seconds
+            n_results: How many documents to retrieve
+
         Returns:
             Query results
         """
-        filter_metadata = {}
-        
-        if severity:
-            filter_metadata["severity"] = severity
-        
-        if cve_only:
-            filter_metadata["type"] = "cve"
-        elif threat_only:
-            filter_metadata["type"] = "threat_intel"
-        
+        spec: Dict[str, Any] = {}
+        for key, value in (
+            ("severity", severity), ("vendor", vendor), ("product", product),
+            ("cwe", cwe), ("min_cvss", min_cvss),
+            ("published_after", published_after),
+        ):
+            if value is not None:
+                spec[key] = value
+
         return self.query(
             question=question,
-            filter_metadata=filter_metadata if filter_metadata else None
+            filters=spec or None,
+            n_results=n_results,
         )
 
 
@@ -366,8 +454,8 @@ def main():
                     print(f"   Products: {source['products'].replace('|', ', ')}")
                 if source.get("threat_actor"):
                     print(f"   Actor: {source['threat_actor']}")
-                if source.get("distance") is not None:
-                    print(f"   Distance: {source['distance']}")
+                if source.get("rank") is not None:
+                    print(f"   Rank: {source['rank']}")
             
         except KeyboardInterrupt:
             print("\n\n Goodbye!")

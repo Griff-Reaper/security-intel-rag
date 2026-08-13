@@ -103,8 +103,8 @@ def policy_prefer_dense(arms: List[List[str]]) -> Callable[[str], Any]:
 
 
 POLICIES: Dict[str, Callable[[List[List[str]]], Callable[[str], Any]]] = {
-    "document_id (shipped)": policy_document_id,
-    "prefer_lexical_arm": policy_prefer_lexical,
+    "document_id": policy_document_id,
+    "prefer_lexical_arm (shipped)": policy_prefer_lexical,
     "prefer_dense_arm": policy_prefer_dense,
 }
 

@@ -180,9 +180,16 @@ def _where_clause(filters: Optional[Dict[str, Any]]) -> Tuple[str, List[Any]]:
       min_cvss        cvss_base_score >= value
       max_cvss        cvss_base_score <= value
       published_after / published_before   epoch seconds
-      vendor / product / cwe               substring match on the packed lists
+      vendor / product / cwe               whole-element match on the packed lists
       year            exact match, or a list of years
+
+    Unknown keys raise rather than being skipped. Silently dropping a filter the
+    caller believed was applied returns records outside the filter, which is the
+    one thing filtering must never do.
     """
+    import filters as F
+
+    F.validate(filters)
     if not filters:
         return "", []
 

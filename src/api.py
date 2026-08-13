@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 import uvicorn
 
+import filters as filters_mod
 from query import SecurityRAG
 
 
@@ -30,20 +31,43 @@ class QueryRequest(BaseModel):
     question: str = Field(..., description="The security question to answer", min_length=5)
     n_results: int = Field(5, description="Number of documents to retrieve", ge=1, le=20)
     query_type: str = Field("general", description="Type of query (general, cve, threat, summary, mitigation)")
-    severity_filter: Optional[str] = Field(None, description="Filter by severity (CRITICAL, HIGH, MEDIUM, LOW)")
-    cve_only: bool = Field(False, description="Only retrieve CVE documents")
-    threat_only: bool = Field(False, description="Only retrieve threat intelligence")
+    # Pre-filters, applied before ranking. See src/filters.py.
+    severity: Optional[List[str]] = Field(
+        None, description="Restrict to these severities (CRITICAL, HIGH, MEDIUM, LOW)"
+    )
+    vendor: Optional[str] = Field(None, description="Affected vendor, whole name")
+    product: Optional[str] = Field(None, description="Affected product, whole name")
+    cwe: Optional[str] = Field(None, description="CWE identifier, e.g. CWE-502")
+    min_cvss: Optional[float] = Field(None, description="Minimum CVSS base score", ge=0, le=10)
+    max_cvss: Optional[float] = Field(None, description="Maximum CVSS base score", ge=0, le=10)
+    published_after: Optional[int] = Field(None, description="Published at or after this epoch second")
+    published_before: Optional[int] = Field(None, description="Published at or before this epoch second")
     return_context: bool = Field(False, description="Include retrieved documents in response")
-    
+
     class Config:
         json_schema_extra = {
             "example": {
                 "question": "What vulnerabilities affect VMware vSphere?",
                 "n_results": 5,
                 "query_type": "cve",
-                "severity_filter": "CRITICAL"
+                "severity": ["CRITICAL"],
+                "min_cvss": 9.0
             }
         }
+
+    def to_filter_spec(self) -> dict:
+        """The subset of this request that is a retrieval pre-filter."""
+        spec = {
+            "severity": self.severity,
+            "vendor": self.vendor,
+            "product": self.product,
+            "cwe": self.cwe,
+            "min_cvss": self.min_cvss,
+            "max_cvss": self.max_cvss,
+            "published_after": self.published_after,
+            "published_before": self.published_before,
+        }
+        return {k: v for k, v in spec.items() if v is not None}
 
 
 class Source(BaseModel):
@@ -63,7 +87,10 @@ class Source(BaseModel):
     vendors: Optional[str] = None
     products: Optional[str] = None
     threat_actor: Optional[str] = None
-    distance: Optional[float] = None
+    # Rank, not a similarity score: each retrieval backend scores on its own
+    # scale, so a single "distance" field would mean different things per
+    # configuration while looking comparable.
+    rank: Optional[int] = None
 
 
 class QueryResponse(BaseModel):
@@ -216,8 +243,8 @@ async def query_security_intel(request: QueryRequest):
         POST /query
         {
             "question": "What are the critical VMware vulnerabilities?",
-            "severity_filter": "CRITICAL",
-            "cve_only": true
+            "severity": ["CRITICAL"],
+            "min_cvss": 9.0
         }
         ```
     """
@@ -226,25 +253,21 @@ async def query_security_intel(request: QueryRequest):
             status_code=503,
             detail="RAG system not initialized. Server may still be starting up."
         )
-    
+
+    filters = request.to_filter_spec()
     try:
-        # Build filter metadata
-        filter_metadata = {}
-        
-        if request.severity_filter:
-            filter_metadata["severity"] = request.severity_filter
-        
-        if request.cve_only:
-            filter_metadata["type"] = "cve"
-        elif request.threat_only:
-            filter_metadata["type"] = "threat_intel"
-        
-        # Execute query
+        filters_mod.validate(filters)
+    except filters_mod.FilterError as exc:
+        # A bad filter is the caller's error, and answering it as if unfiltered
+        # would return records outside what they asked for.
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    try:
         result = rag_system.query(
             question=request.question,
             n_results=request.n_results,
             query_type=request.query_type,
-            filter_metadata=filter_metadata if filter_metadata else None,
+            filters=filters or None,
             return_context=request.return_context
         )
         

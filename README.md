@@ -9,11 +9,15 @@
 
 > **Project status.** The corpus is the full NVD CVE dataset — see
 > [Corpus](#-corpus) for exact counts, source and pull date, all recorded in the
-> committed [provenance manifest](data/manifest.json). Retrieval is
-> dense-vector only, and **retrieval quality has not been measured yet** — there
-> are no accuracy numbers in this README because none have been produced.
-> Hybrid retrieval, exploitation enrichment, and a measured evaluation harness
-> are the next steps; see [Roadmap](#-roadmap).
+> committed [provenance manifest](data/manifest.json). Retrieval is hybrid:
+> dense vectors fused with BM25 by reciprocal rank fusion, then reranked by a
+> cross-encoder, with metadata pre-filtering. Every accuracy and latency figure
+> below comes from a committed result file produced by a script in
+> [experiments/](experiments/) — see [Measured behaviour](#-measured-behaviour).
+> **End-to-end answer quality is still unmeasured**; the retrieval evaluation
+> uses queries drawn from the indexed documents themselves, which flatters
+> lexical matching. Exploitation enrichment and a paraphrased eval set are next;
+> see [Roadmap](#-roadmap).
 
 ## 🎯 Problem Statement
 
@@ -34,17 +38,21 @@ A Retrieval Augmented Generation (RAG) system that:
 
 ### Key Features
 
-- 🔍 **Semantic Search**: Find relevant vulnerabilities using natural language
+- 🔍 **Hybrid Search**: Dense vectors for meaning, BM25 for exact identifiers,
+  fused by reciprocal rank fusion and reranked by a cross-encoder
 - 🤖 **AI-Powered Analysis**: Claude provides expert security analysis
-- 📊 **Source Citations**: Answers carry the CVE and threat IDs of the retrieved
-  documents, taken from stored metadata rather than from generated text
-- 🎯 **Filtered Queries**: Restrict retrieval by severity and by document type
-  (CVE vs threat intelligence)
+- 📊 **Source Citations**: Answers carry the CVE IDs of the retrieved documents,
+  taken from stored metadata rather than from generated text
+- 🎯 **Metadata Pre-filtering**: Narrow by severity, CVSS range, publication
+  date, vendor, product or CWE *before* ranking, so asking for 5 results returns
+  5 matching ones rather than however many of the top 5 happened to match
 - 🚀 **REST API**: Easy integration with SIEM, SOAR, and custom tools
-- 💰 **Cost-Effective**: Local embeddings (free) + Claude API (pay-per-use)
+- 💰 **Cost-Effective**: Local embeddings and lexical index (free) + Claude API
+  (pay-per-use)
 
-Lexical/keyword matching, CVE-ID lookup, and reranking are **not** implemented
-yet — retrieval is currently dense-vector similarity only.
+Every retrieval claim above is measured in
+[Measured behaviour](#-measured-behaviour), including the configurations that
+came out *worse*.
 
 ## 🏗️ Architecture
 
@@ -61,48 +69,48 @@ fkie-cad bulk feeds          NVD API 2.0
                      │        metadata: CVSS score+vector, dates, CWE, CPE counts
                      ▼
         ingest_nvd.py  ──  batched embeddings, resumable checkpoint
-                     ▼
-              ChromaDB (cosine)  +  data/manifest.json
+                     │
+                     ├──▶ ChromaDB (cosine)        dense arm
+                     └──▶ build_fts.py ──▶ SQLite FTS5   lexical arm
+                                    │
+                     data/manifest.json records both
 ```
+
+Both indexes are built from the *same* normalized records through the same
+`nvd_normalize` functions, and `build_fts.py` verifies that afterwards: document
+counts must match and a random sample of documents must be byte-identical on
+both sides. Fusing two indexes that hold different text would rank documents
+against each other that are not the same documents.
 
 **Query** (online):
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                    User Query                                │
-│            "What vulnerabilities affect VMware?"             │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Embedding Service (Sentence Transformers)       │
-│              Converts query to 384-dim vector                │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│              ChromaDB Vector Database                        │
-│              Cosine similarity over the NVD CVE corpus       │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Context Formatter                               │
-│              Prepares retrieved docs for Claude              │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Claude API (Anthropic)                          │
-│              Generates informed answer with analysis         │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Response with Sources                           │
-│              Answer + CVE IDs + Threat Actors                │
-└─────────────────────────────────────────────────────────────┘
+                    "log4j 2.14.1"   +   optional filter
+                                          severity / CVSS / date / vendor / CWE
+                             │
+             ┌───────────────┴───────────────┐
+             ▼                               ▼
+   ChromaDB (cosine)                 SQLite FTS5 (BM25)
+   384-dim, top 200                  top 200
+   understands meaning,              matches identifiers exactly,
+   blind to identifiers              blind to synonyms
+             │                               │
+             └───────────────┬───────────────┘
+                             ▼
+              Reciprocal Rank Fusion (k = 60)
+              broadens the candidate pool
+                             │
+                             ▼
+              Cross-encoder rerank of the top 50
+              converts that pool into precision
+                             │
+                             ▼
+              Context formatter ──▶ Claude ──▶ answer + metadata citations
 ```
+
+The filter is applied *inside* both arms, not after fusion. A post-filter would
+return however many of the top 200 happened to match; a pre-filter returns 200
+matching candidates.
 
 ## 📊 Corpus
 
@@ -180,9 +188,17 @@ A real evaluation, with paraphrased questions and a committed eval set, is
 |-----------|------------|---------|
 | **LLM** | Claude Opus 5 (Anthropic) | Intelligent analysis and generation |
 | **Embeddings** | Sentence Transformers (all-MiniLM-L6-v2) | Free, fast semantic embeddings (384-dim) |
-| **Vector Database** | ChromaDB | Local persistent vector storage |
+| **Vector Database** | ChromaDB | Local persistent vector storage — dense arm |
+| **Lexical Index** | SQLite FTS5 | On-disk BM25 over an inverted index — lexical arm |
+| **Reranker** | cross-encoder/ms-marco-MiniLM-L-6-v2 | Re-scores the fused top 50 |
 | **API Framework** | FastAPI | Modern async Python web framework |
-| **Testing** | Pytest | Unit tests |
+| **Testing** | Pytest | 213 unit tests |
+
+SQLite FTS5 rather than a pip BM25 package: `rank_bm25` and similar hold the
+whole index in memory and score every document on every query. At 358,170
+documents that is slow and memory-hungry. FTS5 ships with the standard library,
+stores its index on disk, and touches only the postings for terms the query
+actually contains.
 
 ## 📦 Installation
 
@@ -253,6 +269,23 @@ python src/ingest_nvd.py --years 2024 2025   # a subset, for a quick trial
 python src/ingest_nvd.py --reset             # drop the collection and rebuild
 ```
 
+7. **Build the lexical index**
+
+```bash
+python src/build_fts.py
+```
+
+Builds the SQLite FTS5 index that the BM25 arm searches — about **1.1 minutes**
+for the full corpus. It reads the same feed files through the same normalization
+functions as the ingest above, then verifies itself against ChromaDB: counts
+must match and a random sample of documents must be byte-identical. Required for
+every retrieval mode except `dense`; `src/query.py` refuses to start without it
+rather than silently downgrading.
+
+```bash
+python src/build_fts.py --verify-only   # re-check an existing index
+```
+
 **Keeping the corpus current**
 
 ```bash
@@ -281,20 +314,33 @@ Interactive query interface:
 python src/query.py
 ```
 
-Example session (illustrative — the shape of the output, not a captured
-transcript; the CVE and threat IDs shown are real records in [data/](data/)):
+Example session. The source list is real output from the live index; the answer
+body is elided because it comes from a metered API call and is not reproducible
+verbatim:
 
 ```text
-Your question: What vulnerabilities affect Citrix?
+Your question: What vulnerabilities affect Citrix NetScaler?
 
 ANSWER:
 [Claude's analysis, grounded in the retrieved documents]
 
-SOURCES (2 documents used):
-1. [CVE] CVE-2023-4966: Citrix Bleed - Session Hijacking Vulnerability
-   Severity: CRITICAL
-2. [Threat Intelligence] THREAT-2024-002: LockBit 3.0 Ransomware Campaign Intensifies
+SOURCES (3 documents used):
+1. [CVE] CVE-2018-6811
+   Severity: MEDIUM (CVSS 6.1)
+   Products: netscaler application delivery controller firmware, netscaler
+   Rank: 1
+2. [CVE] CVE-2021-22919
+   Severity: HIGH (CVSS 7.5)
+   Products: Citrix ADC, Citrix Gateway, Citrix SD-WAN WANOP
+   Rank: 2
+3. [CVE] CVE-2021-22920
+   Severity: MEDIUM (CVSS 6.5)
+   Products: Citrix ADC, Citrix Gateway
+   Rank: 3
 ```
+
+Retrieval is usable without an Anthropic key via `retrieve_context()` — see the
+Python example below. Only answer generation calls the API.
 
 ### REST API
 
@@ -321,17 +367,22 @@ curl -X POST "http://localhost:8000/query" \
   }'
 ```
 
-**Filtered Query (CVEs only, Critical severity):**
+**Filtered Query (pre-filtered before ranking):**
 ```bash
 curl -X POST "http://localhost:8000/query" \
   -H "Content-Type: application/json" \
   -d '{
     "question": "What mitigations exist for authentication bypass?",
-    "severity_filter": "CRITICAL",
-    "cve_only": true,
+    "severity": ["CRITICAL", "HIGH"],
+    "vendor": "apache",
+    "min_cvss": 9.0,
     "query_type": "mitigation"
   }'
 ```
+
+Supported filters: `severity`, `vendor`, `product`, `cwe`, `min_cvss`,
+`max_cvss`, `published_after`, `published_before`. An unrecognised filter field
+is a `422`, never a silently unfiltered answer.
 
 **Health Check:**
 ```bash
@@ -345,20 +396,33 @@ Use the RAG system programmatically:
 ```python
 from src.query import SecurityRAG
 
-# Initialize
+# Initialize. Defaults to hybrid_rerank, the configuration the ablation
+# measured best; pass retrieval="dense" or "bm25" to compare.
 rag = SecurityRAG()
 
 # Simple query
 result = rag.query("What are the latest ransomware threats?")
 print(result["answer"])
 
-# Advanced query with filters
+# Pre-filtered query
 result = rag.query_with_filters(
     question="Tell me about critical Exchange vulnerabilities",
-    severity="CRITICAL",
-    cve_only=True
+    severity=["CRITICAL", "HIGH"],
+    vendor="microsoft",
+    min_cvss=9.0,
 )
+
+# Retrieval only, no Claude call and no API key needed
+hits = rag.retrieve_context("log4j 2.14.1", n_results=5,
+                            filters={"vendor": "apache"})
+for meta, rank in zip(hits["metadatas"], hits["ranks"]):
+    print(rank, meta["cve_id"], meta["severity"])
 ```
+
+Citations carry a **rank**, not a similarity score. Each backend scores on its
+own scale — cosine distance, BM25, an RRF sum, a cross-encoder logit — so a
+single `distance` field would mean something different per configuration while
+looking comparable.
 
 ## 📊 Project Structure
 
@@ -377,6 +441,10 @@ security-intel-rag/
 │   ├── nvd_normalize.py         # CVE record -> document + metadata
 │   ├── ingest_nvd.py            # Resumable corpus ingestion (main pipeline)
 │   ├── ingest.py                # Legacy sample-data loader (demo only)
+│   ├── lexical_index.py         # SQLite FTS5 BM25 index + query escaping
+│   ├── build_fts.py             # Builds the lexical index, verifies vs Chroma
+│   ├── retrieval.py             # dense | bm25 | hybrid | hybrid_rerank
+│   ├── filters.py               # Metadata pre-filter spec, both backends
 │   ├── query.py                 # RAG query engine
 │   └── api.py                   # FastAPI REST service
 │
@@ -391,21 +459,31 @@ security-intel-rag/
 │
 ├── experiments/                 # Re-runnable measurements behind design claims
 │   ├── document_layout.py       # Chooses the embedded-document layout
-│   ├── identifier_queries.py    # Measures dense-only weakness on CVE IDs
+│   ├── identifier_queries.py    # The four-configuration ablation
+│   ├── fts_tokenizer.py         # Chooses the FTS5 tokenizer
+│   ├── rrf_ties.py              # Chooses the RRF tie-break (dev sample)
+│   ├── lexical_latency.py       # Locates the BM25 latency tail
+│   ├── crossref_identifiers.py  # Splits ID lookup by cross-reference
+│   ├── samples/                 # Pinned evaluation and dev samples
 │   └── results/                 # Committed JSON output of the above
 │
-├── tests/                       # Unit tests
+├── tests/                       # 213 unit tests
 │   ├── test_rag.py              # Embedding + formatting tests
 │   ├── test_nvd_normalize.py    # Normalization, CVSS, CPE, filtering
-│   └── test_nvd_sources.py      # Feed verification + API windowing
+│   ├── test_nvd_sources.py      # Feed verification + API windowing
+│   ├── test_lexical_index.py    # FTS5 query escaping, ranking, filtering
+│   ├── test_retrieval.py        # RRF arithmetic, tie-breaks, rerank ordering
+│   └── test_filters.py          # Pre-filter invariant on both backends
 │
-└── chroma_db/                   # Vector database (generated, gitignored)
+└── chroma_db/                   # Vector + lexical indexes (generated, gitignored)
 ```
 
-The vector index is **not** committed. A collection of this size cannot be
-meaningfully reviewed in a repository, so the ingestion scripts plus
+Neither index is committed. A collection of this size cannot be meaningfully
+reviewed in a repository, so the build scripts plus
 [data/manifest.json](data/manifest.json) are the committed artifacts — they let
-anyone rebuild the exact corpus and check the numbers.
+anyone rebuild the exact corpus and check the numbers. The pinned evaluation
+sample and every result file *are* committed, so the ablation can be
+re-derived rather than taken on trust.
 
 ## 🧪 Testing
 
@@ -427,65 +505,227 @@ pytest tests/test_rag.py::TestEmbeddings -v
 |-----------|------|-------|
 | **Embeddings** | Free | Sentence Transformers runs locally on CPU |
 | **Vector Database** | Free | ChromaDB is open-source and runs locally |
+| **Lexical Index** | Free | SQLite FTS5, part of the standard library |
+| **Reranker** | Free | Cross-encoder runs locally on CPU |
 | **Claude API** | Metered | Billed per token — see [current pricing](https://platform.claude.com/docs/en/pricing) |
 
-Only the Claude API call costs money; retrieval and embedding are entirely local.
-Per-query cost and latency depend on corpus size and how many documents are
-retrieved, and are **not yet measured for this project** — no figures are quoted
-here until they come from a committed, re-runnable benchmark.
+Only the Claude API call costs money; the whole retrieval stack — embedding,
+vector search, BM25, and reranking — is local. Retrieval latency is measured
+(see [Measured behaviour](#-measured-behaviour)); **per-query token cost is
+not**, and no figure is quoted here until it comes from a committed,
+re-runnable benchmark.
 
 ## 📈 Measured behaviour
 
 Ingestion throughput, from [data/manifest.json](data/manifest.json): **358,170
 documents in 59.9 minutes — 100 documents/second** embedding and indexing on
-CPU, single process.
+CPU, single process. The lexical index adds **1.1 minutes at 5,434
+documents/second**.
 
-### Dense-only retrieval fails on identifiers
+Every number in this section is read from a committed file in
+[experiments/results/](experiments/results/), written by a script in
+[experiments/](experiments/) that can be re-run. The evaluation sample is pinned
+to [experiments/samples/identifier_sample.json](experiments/samples/identifier_sample.json)
+and committed, so all four configurations answer byte-identical queries. Where a
+parameter had to be chosen, it was chosen on a separate dev sample that shares
+no CVEs with the evaluation sample.
 
-The most useful thing measured so far is a weakness. Running
+### The retrieval ablation
+
 [experiments/identifier_queries.py](experiments/identifier_queries.py) against
-the live 358,170-document index, over 200 sampled CVEs:
+the live 358,170-document index, 200 pinned CVEs, three query shapes.
 
-| Query type | Recall@1 | Recall@10 | Found in top 100 | MRR |
+**Product + version** — the realistic query, and the one worth reading first:
+
+| Retrieval | Recall@1 | Recall@10 | Found in top 100 | MRR | p50 | p95 |
+|---|---:|---:|---:|---:|---:|---:|
+| dense | 0.122 | 0.270 | 0.434 | 0.173 | 20 ms | 23 ms |
+| bm25 | 0.235 | 0.515 | 0.745 | 0.324 | 15 ms | 588 ms |
+| hybrid (RRF) | 0.204 | 0.474 | 0.775 | 0.299 | 73 ms | 700 ms |
+| **hybrid + rerank** | **0.306** | **0.633** | 0.775 | **0.416** | 584 ms | 1347 ms |
+
+**Bare CVE ID** (`CVE-2021-44228`) — read with the caveat below it:
+
+| Retrieval | Recall@1 | Recall@10 | Found in top 100 | MRR |
 |---|---:|---:|---:|---:|
-| Bare CVE ID (`CVE-2021-44228`) | 0.000 | 0.000 | 0.005 | 0.000 |
-| Product + version | 0.122 | 0.270 | 0.434 | 0.173 |
-| Description sentence *(control)* | 0.765 | 0.860 | 0.895 | 0.803 |
+| dense | 0.000 | 0.000 | 0.005 | 0.000 |
+| bm25 | **0.995** | 1.000 | 1.000 | 0.998 |
+| hybrid (RRF) | 0.995 | 1.000 | 1.000 | 0.997 |
+| hybrid + rerank | 0.965 | 0.995 | 1.000 | 0.977 |
 
-**Searching for a CVE by its own identifier essentially never works** — not once
-at rank 1 across 200 queries, and found anywhere in the top 100 just once. The
-control rules out a broken pipeline: the same index answers semantic queries
-well, so the failure is specific to identifiers. A 384-dimensional embedding of
-`CVE-2021-44228` is near-indistinguishable from one of `CVE-2022-26973`, because
-the strings differ only in digits carrying no semantic weight.
+**Description sentence** *(control — see the caveat, this row is not an
+evaluation)*:
 
-This is precisely what hybrid retrieval and direct CVE-ID lookup exist to fix,
-and it is the next thing to build. Re-running this script after that change is
-what will turn a design choice into a demonstrated result.
+| Retrieval | Recall@1 | Recall@10 | Found in top 100 | MRR |
+|---|---:|---:|---:|---:|
+| dense | 0.765 | 0.860 | 0.895 | 0.803 |
+| bm25 | 0.870 | 0.970 | 1.000 | 0.909 |
+| hybrid (RRF) | 0.855 | 0.955 | 0.995 | 0.894 |
+| hybrid + rerank | 0.860 | 0.970 | 0.995 | 0.902 |
 
-Not yet measured: end-to-end answer quality, groundedness, refusal behaviour,
-and latency percentiles. Those need a committed eval set with paraphrased
-questions — see [Roadmap](#-roadmap). The control row above is *not* an
-evaluation: its queries are drawn from the documents themselves and share
-vocabulary with them, so it flatters the system.
+### What the ablation actually shows
+
+**Fusion buys recall depth; reranking converts it to precision; neither works
+alone.** On product + version, fusion *lowers* Recall@1 from BM25's 0.235 to
+0.204 — it dilutes a strong lexical signal with a weak dense one. But it raises
+found-in-top-100 from 0.745 to 0.775, because the two arms fail on different
+documents. The cross-encoder then turns that wider pool into 0.306 at rank 1,
+the best of any configuration. Run either stage without the other and the gain
+is not there. This is the opposite of the "hybrid is better, ship it" conclusion
+that a project reaches by not checking.
+
+**Reranking bought a lot here, and it is not cheap.** +0.071 Recall@1 over BM25
+alone on product + version, for a p50 of 584 ms against 15 ms — roughly 40× the
+latency for a 30% relative gain. The rerank step alone is 381 ms at p50
+([results](experiments/results/identifier_queries_hybrid_rerank.json)). Whether
+that trade is worth making depends on the deployment; in this system a
+multi-second Claude call follows, so it is.
+
+**Configurations that came out worse, stated rather than omitted:**
+
+- `hybrid` is below `bm25` at Recall@1 on two of three query shapes.
+- `hybrid + rerank` is below `bm25` on bare CVE IDs (0.965 vs 0.995): the
+  cross-encoder demotes six identifier matches it was handed at rank 1.
+- Nothing beats `dense` on latency; it is the fastest configuration and the
+  least accurate on every row.
+
+### "BM25 solves CVE-ID lookup" is not true, and here is the number
+
+Taken alone, BM25's 0.995 on bare identifiers looks like a solved problem. It is
+an artifact of who is in the sample.
+[experiments/crossref_identifiers.py](experiments/crossref_identifiers.py) scans
+all 358,170 documents and splits the corpus by whether *another* CVE record
+mentions the ID. **11,001 CVEs — 3.07% — are cross-referenced.**
+
+| Population | dense | bm25 | hybrid | hybrid + rerank |
+|---|---:|---:|---:|---:|
+| Not cross-referenced (96.9%) | 0.000 | **1.000** | 1.000 | 0.967 |
+| Cross-referenced (3.1%) | 0.000 | 0.673 | 0.673 | **0.967** |
+| Widely-known, named not sampled | 0.000 | 0.667 | 0.667 | 0.667 |
+
+BM25 is *perfect* on the 97% of CVEs that nothing cites and drops to 0.673 on the
+3% that are cited — and a uniform random sample is almost entirely the former.
+The cause is document-length normalization: a heavily-analysed CVE accumulates
+vendors and products, so its record is the longest of the documents containing
+its ID, and BM25 ranks the longest last. Searching `CVE-2021-44228` returns, in
+order, four CVEs that merely *cite* Log4Shell before the Log4Shell record
+itself.
+
+Reranking is what fixes this — 0.673 → 0.967 on the cross-referenced population,
+because a cross-encoder can tell "the record about Log4Shell" from "a record
+citing Log4Shell". It still is not enough for the best-known CVEs:
+
+| CVE | Docs citing it | dense | bm25 | hybrid | hybrid + rerank |
+|---|---:|---:|---:|---:|---:|
+| CVE-2021-44228 (Log4Shell) | 10 | miss | 5 | 9 | **7** |
+| CVE-2014-0160 (Heartbleed) | 3 | miss | 3 | 5 | 2 |
+| CVE-2014-6271 (Shellshock) | 4 | miss | 3 | 5 | 2 |
+| CVE-2017-0144 (EternalBlue) | 5 | miss | 1 | 1 | 1 |
+| CVE-2019-0708 (BlueKeep) | 1 | miss | 1 | 1 | 1 |
+
+**Typing the most famous CVE identifier in the corpus does not return its record
+first in any configuration this system offers.** Direct ID routing — matching
+`CVE-\d{4}-\d{4,}` and looking the record up by key — would fix it outright and
+is not implemented; see [Roadmap](#-roadmap).
+
+### The control row is compromised by construction
+
+The description-sentence queries are the documents' own opening sentences, so
+they are drawn verbatim from the indexed text. That structurally favours lexical
+matching, and it is why BM25 (0.870) outscores dense retrieval (0.765) on the
+row labelled "semantic".
+
+**This is not evidence that dense retrieval is useless.** It is evidence that on
+this test — where all three query shapes are either exact identifiers or
+copy-pasted document text — there is nothing for embeddings to do that string
+matching cannot do better. A real semantic test needs questions phrased the way a
+person would phrase them, not sentences lifted from the answer. That is the
+paraphrased eval set in the [Roadmap](#-roadmap), and it is the measurement that
+will decide whether the dense arm earns its place. Until then, "dense is
+dominated" should be read as "dense is dominated *on this workload*".
+
+### Latency: where the tail comes from
+
+BM25's p50 of 15 ms against a p95 of 588 ms is a 40× spread worth explaining
+before quoting either figure.
+[experiments/lexical_latency.py](experiments/lexical_latency.py) separates the
+two candidate causes:
+
+| Query shape | p50 | p95 |
+|---|---:|---:|
+| Bare CVE ID | 1.1 ms | 1.5 ms |
+| Product + version | 14.2 ms | 75.5 ms |
+| Description sentence | 456 ms | 611 ms |
+
+The tail is **query length, not term commonality**. Holding the text fixed and
+truncating it, cost rises from 22 ms at one term to 538 ms at 32; whereas the
+single most common term in the corpus — `vulnerability`, in 168,571 of 358,170
+documents — costs 76 ms on its own. No single term can produce the tail; only a
+long query can, because terms are combined with `OR` and each one is another
+postings list to walk. `MAX_QUERY_TERMS = 32` in
+[src/lexical_index.py](src/lexical_index.py) is the cap that bounds it.
+
+This matters for what comes next: the two shapes a person actually types are the
+fast ones, but the paraphrased natural-language questions of the planned eval set
+are long queries, and they will sit in the tail.
+
+### Two parameters chosen by measurement
+
+**Tokenizer.** [experiments/fts_tokenizer.py](experiments/fts_tokenizer.py) built
+a 61,030-document subset under each candidate. Accuracy was *identical* (Recall@1
+0.997 / 0.237); latency was 3.2 ms versus 15.4 ms. Keeping `-` and `.` as word
+characters makes `CVE-2021-44228` a single token lookup instead of a multi-token
+phrase match.
+
+**RRF tie-breaking.** With two arms and k = 60, a document ranked *r* by one arm
+alone scores 1/(60+r) — so when the arms return disjoint candidates, every rank
+produces a two-way tie and the tie-break, not the formula, decides the ranking.
+On bare CVE IDs that is 100% of targets.
+[experiments/rrf_ties.py](experiments/rrf_ties.py), run on the dev sample:
+
+| Tie-break | bare ID Recall@1 | product + version |
+|---|---:|---:|
+| Document ID (arbitrary) | 0.720 | 0.121 |
+| **Prefer the lexical arm** | **0.985** (ceiling) | **0.126** (ceiling) |
+| Prefer the dense arm | 0.000 | 0.095 |
+
+Breaking ties on document ID is not the neutral choice — it is a coin flip that
+discarded a quarter of the lexical arm's accuracy. The shipped tie-break prefers
+the lexical arm and is labelled in the source as the arm weighting it is.
+
+### Still not measured
+
+End-to-end answer quality, groundedness, refusal behaviour on unanswerable
+questions, and cost per query. Those need the paraphrased eval set; no figures
+are quoted here until they come from a committed, re-runnable benchmark.
 
 ## 🔮 Roadmap
 
 Planned, in order:
 
-- [ ] **Real corpus** — replace the sample data with the full NVD dataset via
-      bulk feeds, with a committed provenance manifest (source, pull date,
-      record counts) and resumable, batched ingestion
-- [ ] **Hybrid retrieval** — dense + BM25 with reciprocal rank fusion, direct
-      CVE-ID lookup, metadata pre-filtering, and cross-encoder reranking
-      (each behind a flag so its contribution stays separately measurable)
+- [x] **Real corpus** — the full NVD dataset via bulk feeds, with a committed
+      provenance manifest (source, pull date, record counts) and resumable,
+      batched ingestion
+- [x] **Hybrid retrieval** — dense + BM25 with reciprocal rank fusion,
+      metadata pre-filtering, and cross-encoder reranking, each selectable so
+      its contribution stays separately measurable
+- [x] **Retrieval evaluation** — Recall@k and MRR on a pinned sample, a
+      four-configuration ablation with p50/p95 latency, and parameters tuned on
+      a disjoint dev sample
+- [ ] **Direct CVE-ID routing** — match `CVE-\d{4}-\d{4,}` and look the record
+      up by key. Deferred once on the grounds that BM25 already reached 0.995 on
+      identifiers; the [cross-reference
+      split](#bm25-solves-cve-id-lookup-is-not-true-and-here-is-the-number)
+      since showed that average hides 0.667 on the best-known CVEs, and Log4Shell
+      does not come back first in any configuration. This is the cheapest
+      remaining accuracy win.
 - [ ] **Exploitation enrichment** — join CISA KEV and FIRST EPSS by CVE ID so
       results can be prioritised by real-world exploitation, not just CVSS
-- [ ] **Evaluation** — Recall@k and MRR on a committed eval set, a dense vs
-      hybrid vs hybrid+rerank ablation, groundedness judging, refusal rate on
-      unanswerable questions, and p50/p95 latency
-- [ ] **Interface and packaging** — metadata-derived citations, abstention below
-      a relevance floor, and a Dockerfile plus compose file
+- [ ] **Paraphrased eval set** — questions phrased as a person would phrase
+      them, which is the only test that can show whether the dense arm earns its
+      place; plus groundedness judging and refusal rate on unanswerable questions
+- [ ] **Interface and packaging** — abstention below a relevance floor, and a
+      Dockerfile plus compose file
 
 ## 🤝 Contributing
 

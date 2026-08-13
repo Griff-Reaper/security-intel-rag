@@ -30,6 +30,8 @@ from __future__ import annotations
 import math
 import time
 from collections import defaultdict
+
+import filters as filters_mod
 from typing import Any, Dict, List, Optional, Protocol, Sequence, Tuple
 
 # ── Fusion parameters ────────────────────────────────────────────────────────
@@ -221,23 +223,59 @@ class BaseRetriever:
         return {"end_to_end": self.latency.summary()}
 
 
+class _DenseArm:
+    """The Chroma side of retrieval, with filtering applied before ranking.
+
+    Filters reach Chroma two ways because Chroma can only express one of them.
+    Scalar fields become a `where` clause; the packed-list fields (vendor,
+    product, cwe) have no representable operator and arrive as an explicit ID
+    allow-list resolved from the lexical index. Both are pre-filters - Chroma
+    applies them while selecting neighbours, so `depth` results means `depth`
+    matching results, not however many survive a trim.
+    """
+
+    def __init__(self, collection, embedder, filters=None, allowlist=None) -> None:
+        self.collection = collection
+        self.embedder = embedder
+        self.filters = filters or {}
+        self.allowlist = allowlist
+        self.where = filters_mod.to_chroma_where(self.filters)
+
+    def rank(self, query: str, depth: int) -> List[str]:
+        if self.allowlist is not None and not self.allowlist:
+            return []
+        kwargs: Dict[str, Any] = {
+            "query_embeddings": [self.embedder.get_embedding(query)],
+            "n_results": depth,
+        }
+        if self.where is not None:
+            kwargs["where"] = self.where
+        if self.allowlist is not None:
+            kwargs["ids"] = self.allowlist
+        return self.collection.query(**kwargs)["ids"][0]
+
+
 class DenseRetriever(BaseRetriever):
     """Cosine similarity over sentence-transformer embeddings (the baseline)."""
 
     name = "dense"
     description = "dense-only (cosine over all-MiniLM-L6-v2)"
 
-    def __init__(self, collection, embedder) -> None:
+    def __init__(self, collection, embedder, filters=None, allowlist=None) -> None:
         super().__init__()
+        self.filters = filters_mod.validate(filters)
+        self.arm = _DenseArm(collection, embedder, self.filters, allowlist)
         self.collection = collection
         self.embedder = embedder
 
     def _search(self, query: str, depth: int) -> List[str]:
-        result = self.collection.query(
-            query_embeddings=[self.embedder.get_embedding(query)],
-            n_results=depth,
-        )
-        return result["ids"][0]
+        if filters_mod.matches_nothing(self.filters):
+            return []
+        return self.arm.rank(query, depth)
+
+    def stats(self) -> Dict[str, Any]:
+        return {"end_to_end": self.latency.summary(),
+                "filters": filters_mod.describe(self.filters)}
 
 
 class BM25Retriever(BaseRetriever):
@@ -246,16 +284,27 @@ class BM25Retriever(BaseRetriever):
     name = "bm25"
     description = "lexical-only (BM25 over SQLite FTS5)"
 
-    def __init__(self, conn) -> None:
+    def __init__(self, conn, filters=None) -> None:
         super().__init__()
         self.conn = conn
+        self.filters = filters_mod.validate(filters)
 
     def _search(self, query: str, depth: int) -> List[str]:
         # lexical_index.search escapes the query and returns (id, score) with
-        # larger-is-better; only the order is needed here.
+        # larger-is-better; only the order is needed here. Filtering is a join
+        # predicate inside that call, so it too is a pre-filter.
         import lexical_index as LX
 
-        return [doc_id for doc_id, _ in LX.search(self.conn, query, depth)]
+        if filters_mod.matches_nothing(self.filters):
+            return []
+        return [
+            doc_id for doc_id, _ in
+            LX.search(self.conn, query, depth, filters=self.filters or None)
+        ]
+
+    def stats(self) -> Dict[str, Any]:
+        return {"end_to_end": self.latency.summary(),
+                "filters": filters_mod.describe(self.filters)}
 
 
 class HybridRetriever(BaseRetriever):
@@ -274,6 +323,8 @@ class HybridRetriever(BaseRetriever):
         arm_depth: int = ARM_DEPTH,
         rrf_k: int = RRF_K,
         tie_break_arm: Optional[int] = TIE_BREAK_ARM,
+        filters: Optional[Dict[str, Any]] = None,
+        allowlist: Optional[List[str]] = None,
     ) -> None:
         super().__init__()
         self.collection = collection
@@ -282,6 +333,11 @@ class HybridRetriever(BaseRetriever):
         self.arm_depth = arm_depth
         self.rrf_k = rrf_k
         self.tie_break_arm = tie_break_arm
+        self.filters = filters_mod.validate(filters)
+        # Both arms get the same spec. Fusing a filtered arm with an unfiltered
+        # one would rank a candidate set that neither arm endorses, and the
+        # out-of-filter records would arrive with real-looking scores.
+        self.dense_arm = _DenseArm(collection, embedder, self.filters, allowlist)
         self.dense_latency = LatencyRecorder()
         self.lexical_latency = LatencyRecorder()
 
@@ -302,21 +358,21 @@ class HybridRetriever(BaseRetriever):
         import lexical_index as LX
 
         start = time.perf_counter()
-        dense = self.collection.query(
-            query_embeddings=[self.embedder.get_embedding(query)],
-            n_results=self.arm_depth,
-        )["ids"][0]
+        dense = self.dense_arm.rank(query, self.arm_depth)
         self.dense_latency.record((time.perf_counter() - start) * 1000.0)
 
         start = time.perf_counter()
         lexical = [
-            doc_id for doc_id, _ in LX.search(self.conn, query, self.arm_depth)
+            doc_id for doc_id, _ in
+            LX.search(self.conn, query, self.arm_depth, filters=self.filters or None)
         ]
         self.lexical_latency.record((time.perf_counter() - start) * 1000.0)
 
         return [dense, lexical]
 
     def _search(self, query: str, depth: int) -> List[str]:
+        if filters_mod.matches_nothing(self.filters):
+            return []
         return self._fuse(self._arms(query))[:depth]
 
     def stats(self) -> Dict[str, Any]:
@@ -331,6 +387,7 @@ class HybridRetriever(BaseRetriever):
                 else "document_id" if self.tie_break_arm is None
                 else f"arm[{self.tie_break_arm}]"
             ),
+            "filters": filters_mod.describe(self.filters),
         }
 
 
@@ -359,11 +416,14 @@ class HybridRerankRetriever(HybridRetriever):
         arm_depth: int = ARM_DEPTH,
         rrf_k: int = RRF_K,
         tie_break_arm: Optional[int] = TIE_BREAK_ARM,
+        filters: Optional[Dict[str, Any]] = None,
+        allowlist: Optional[List[str]] = None,
         rerank_depth: int = RERANK_DEPTH,
         model_name: str = CROSS_ENCODER_MODEL,
     ) -> None:
         super().__init__(collection, embedder, conn, arm_depth=arm_depth,
-                         rrf_k=rrf_k, tie_break_arm=tie_break_arm)
+                         rrf_k=rrf_k, tie_break_arm=tie_break_arm,
+                         filters=filters, allowlist=allowlist)
         self.rerank_depth = rerank_depth
         self.model_name = model_name
         self.rerank_latency = LatencyRecorder()
@@ -429,6 +489,7 @@ def build_retriever(
     collection=None,
     embedder=None,
     lexical_conn=None,
+    filters: Optional[Dict[str, Any]] = None,
 ) -> Retriever:
     """
     Construct a retrieval backend by name.
@@ -437,12 +498,17 @@ def build_retriever(
         mode: One of MODES.
         collection: An open ChromaDB collection (dense, hybrid, hybrid_rerank).
         embedder: An EmbeddingService (dense, hybrid, hybrid_rerank).
-        lexical_conn: An open FTS index connection (bm25, hybrid, hybrid_rerank).
+        lexical_conn: An open FTS index connection. Also required by `dense`
+            when the filter names a packed-list field, since only the lexical
+            index can resolve those into IDs.
+        filters: A metadata pre-filter spec. See src/filters.py.
 
     Raises:
         RetrievalError: A dependency the mode needs was not supplied.
+        FilterError: The filter spec is malformed.
         ValueError: Unknown mode.
     """
+    filters = filters_mod.validate(filters)
     needs_dense = mode in ("dense", "hybrid", "hybrid_rerank")
     needs_lexical = mode in ("bm25", "hybrid", "hybrid_rerank")
     if needs_dense and (collection is None or embedder is None):
@@ -453,12 +519,26 @@ def build_retriever(
             "Build it with: python src/build_fts.py"
         )
 
+    # Resolved once here, not per query: the spec is fixed for the retriever's
+    # life and the underlying scan is the expensive part of filtering.
+    allowlist = None
+    if needs_dense and filters_mod.list_filter_subset(filters):
+        if lexical_conn is None:
+            raise RetrievalError(
+                f"filtering on {', '.join(filters_mod.list_filter_subset(filters))} "
+                "needs the lexical index even in dense mode: Chroma has no "
+                "operator for the packed-list fields."
+            )
+        allowlist = filters_mod.resolve_allowlist(lexical_conn, filters)
+
     if mode == "dense":
-        return DenseRetriever(collection, embedder)
+        return DenseRetriever(collection, embedder, filters=filters, allowlist=allowlist)
     if mode == "bm25":
-        return BM25Retriever(lexical_conn)
+        return BM25Retriever(lexical_conn, filters=filters)
     if mode == "hybrid":
-        return HybridRetriever(collection, embedder, lexical_conn)
+        return HybridRetriever(collection, embedder, lexical_conn,
+                               filters=filters, allowlist=allowlist)
     if mode == "hybrid_rerank":
-        return HybridRerankRetriever(collection, embedder, lexical_conn)
+        return HybridRerankRetriever(collection, embedder, lexical_conn,
+                                     filters=filters, allowlist=allowlist)
     raise ValueError(f"unknown retrieval mode: {mode!r}")
