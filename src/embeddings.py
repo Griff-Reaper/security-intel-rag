@@ -64,8 +64,14 @@ class EmbeddingService:
 
         # The model handles all the ML magic internally. Normalized to match
         # get_embeddings() so query and document vectors live on the same scale.
+        # show_progress_bar is off because this is the per-query path: a bar for
+        # a single text is pure noise on stderr and its own writes land inside
+        # the interval the latency measurements are timing.
         embedding = self.model.encode(
-            text, convert_to_numpy=True, normalize_embeddings=True
+            text,
+            convert_to_numpy=True,
+            normalize_embeddings=True,
+            show_progress_bar=False,
         )
 
         # Convert numpy array to Python list (for JSON serialization)

@@ -1,0 +1,91 @@
+{
+  "collection": "nvd_cve",
+  "documents_in_collection": 358170,
+  "sample_size": 200,
+  "sample_source": "experiments\\samples\\identifier_sample.json",
+  "seed": 20260812,
+  "search_depth": 100,
+  "retrieval": "hybrid_rerank",
+  "retrieval_description": "RRF(dense, bm25) k=60, ties to lexical + cross-encoder rerank of top 50",
+  "query_types": {
+    "bare CVE ID": {
+      "queries": 200,
+      "recall_at_1": 0.965,
+      "recall_at_10": 0.995,
+      "found_in_top_100": 1.0,
+      "mrr": 0.9771
+    },
+    "product + version": {
+      "queries": 196,
+      "recall_at_1": 0.3061,
+      "recall_at_10": 0.6327,
+      "found_in_top_100": 0.7755,
+      "mrr": 0.4161
+    },
+    "description sentence (control)": {
+      "queries": 200,
+      "recall_at_1": 0.86,
+      "recall_at_10": 0.97,
+      "found_in_top_100": 0.995,
+      "mrr": 0.9024
+    }
+  },
+  "latency": {
+    "end_to_end": {
+      "queries": 596,
+      "mean_ms": 679.67,
+      "p50_ms": 584.16,
+      "p95_ms": 1347.17
+    },
+    "dense_arm": {
+      "queries": 596,
+      "mean_ms": 34.36,
+      "p50_ms": 34.01,
+      "p95_ms": 39.16
+    },
+    "lexical_arm": {
+      "queries": 596,
+      "mean_ms": 189.37,
+      "p50_ms": 11.87,
+      "p95_ms": 688.29
+    },
+    "rrf_k": 60,
+    "arm_depth": 200,
+    "tie_break_arm": "lexical",
+    "rerank": {
+      "queries": 596,
+      "mean_ms": 455.69,
+      "p50_ms": 381.18,
+      "p95_ms": 852.73
+    },
+    "rerank_depth": 50,
+    "cross_encoder": "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  },
+  "examples": [
+    {
+      "cve_id": "CVE-2002-1466",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2003-1190",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2003-1233",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2004-1873",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2006-0489",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    }
+  ]
+}

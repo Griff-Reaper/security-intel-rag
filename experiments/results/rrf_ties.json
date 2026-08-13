@@ -1,0 +1,34 @@
+{
+  "sample": "dev",
+  "sample_path": "experiments\\samples\\dev_sample.json",
+  "sample_seed": 20260813,
+  "disjoint_from_evaluation_sample": true,
+  "rrf_k": 60,
+  "arm_depth": 200,
+  "query_types": {
+    "bare CVE ID": {
+      "queries": 200,
+      "target_found": 200,
+      "mean_tied_group_size": 2.0,
+      "share_in_a_tie": 1.0,
+      "recall_at_1_ceiling": 0.985,
+      "recall_at_1_by_policy": {
+        "document_id (shipped)": 0.72,
+        "prefer_lexical_arm": 0.985,
+        "prefer_dense_arm": 0.0
+      }
+    },
+    "product + version": {
+      "queries": 199,
+      "target_found": 166,
+      "mean_tied_group_size": 1.36,
+      "share_in_a_tie": 0.3614,
+      "recall_at_1_ceiling": 0.1256,
+      "recall_at_1_by_policy": {
+        "document_id (shipped)": 0.1206,
+        "prefer_lexical_arm": 0.1256,
+        "prefer_dense_arm": 0.0955
+      }
+    }
+  }
+}

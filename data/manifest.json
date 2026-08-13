@@ -58,5 +58,19 @@
     "documents_written_this_run": 358170,
     "wall_clock_seconds": 3594.5,
     "docs_per_second": 99.6
+  },
+  "lexical_index": {
+    "path": "chroma_db/lexical.sqlite3",
+    "tokenizer": "unicode61 tokenchars '-.' remove_diacritics 2",
+    "documents": 358170,
+    "records_raw": 376092,
+    "size_bytes": 425623552,
+    "build_seconds": 65.9,
+    "built_at": "2026-08-13T01:21:44+00:00",
+    "verification": {
+      "verified_at": "2026-08-13T01:21:46+00:00",
+      "chroma_documents": 358170,
+      "documents_compared": 300
+    }
   }
 }
