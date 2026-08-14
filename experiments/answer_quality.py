@@ -66,7 +66,8 @@ import provenance  # noqa: E402
 
 EVAL_PATH = PROJECT_ROOT / "experiments" / "samples" / "paraphrased_eval.json"
 UNANSWERABLE_PATH = PROJECT_ROOT / "experiments" / "samples" / "unanswerable_questions.json"
-RESULTS_PATH = PROJECT_ROOT / "experiments" / "results" / "answer_quality.json"
+RESULTS_DIR = PROJECT_ROOT / "experiments" / "results"
+RESULTS_PATH = RESULTS_DIR / "answer_quality.json"
 LEXICAL_DB = PROJECT_ROOT / "chroma_db" / "lexical.sqlite3"
 
 SEED = 20260813
@@ -892,7 +893,88 @@ def decide(a_path: Path, b_path: Path) -> Dict[str, Any]:
     print()
     print(f"  VERDICT: {verdict.upper()}")
     print(f"  {consequence}")
+
+    result["post_hoc_target_hit"] = _target_hit_comparison(a_path, b_path)
+
+    out = RESULTS_DIR / "config_decision.json"
+    out.write_text(json.dumps({**provenance.stamp(), **result}, indent=2) + "\n",
+                   encoding="utf-8")
+    print(f"\n  wrote {out.relative_to(PROJECT_ROOT)}")
     return result
+
+
+def _target_hit_comparison(a_path: Path, b_path: Path) -> Dict[str, Any]:
+    """
+    Did the answer address the question it was asked?
+
+    POST HOC. Not in experiments/PREREGISTRATION.md, does not affect the
+    verdict above, and reported as a limitation of that verdict rather than as
+    a competing result.
+
+    The pre-registered outcome is groundedness, and groundedness turns out to be
+    close to blind to what this comparison exists to test. It asks whether the
+    answer follows from its context, not whether that context was the right
+    context. An answer that faithfully summarises five documents none of which
+    concern the CVE the user asked about is *grounded*, correctly so, and the
+    user has still been failed.
+
+    The gap is not hypothetical: on the held-out set the grounded rate is 0.993
+    while the target CVE was retrieved at all on 0.783 of questions. Whatever
+    the verdict above says, it is a statement about faithfulness and not about
+    whether one configuration finds the right documents more often than the
+    other.
+
+    So the same paired test is applied to a deterministic outcome that can see
+    the difference - was the target CVE among the five documents retrieved.
+    No judge is involved, which makes it the stronger measurement of the two,
+    and it is only reported second because it was thought of second.
+    """
+    import significance
+
+    def hits(path: Path) -> Dict[str, bool]:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        return {
+            r["id"]: r.get("target_cve") in (r.get("retrieved_ids") or [])
+            for r in payload.get("records", {}).get("answerable", [])
+            if r.get("target_cve") and not is_provider_refusal(r)
+        }
+
+    a, b = hits(a_path), hits(b_path)
+    shared = sorted(set(a) & set(b))
+    if not shared:
+        return {}
+
+    n = len(shared)
+    a_wins = sum(1 for k in shared if a[k] and not b[k])
+    b_wins = sum(1 for k in shared if b[k] and not a[k])
+    discordant = a_wins + b_wins
+    p_value = significance.exact_binomial_two_sided(min(a_wins, b_wins),
+                                                    discordant)
+    interval = paired_difference_interval(a_wins, b_wins, n)
+    block = {
+        "questions": n,
+        "a_target_retrieved": sum(1 for k in shared if a[k]),
+        "b_target_retrieved": sum(1 for k in shared if b[k]),
+        "a_wins": a_wins, "b_wins": b_wins, "discordant": discordant,
+        "p_value": round(p_value, 4),
+        "difference_interval_95": interval,
+        "status": "post hoc; not pre-registered; does not affect the verdict",
+    }
+
+    print()
+    print("  POST HOC, not pre-registered: was the target CVE retrieved at all?")
+    print(f"    A {block['a_target_retrieved']}/{n} = "
+          f"{block['a_target_retrieved'] / n:.3f}    "
+          f"B {block['b_target_retrieved']}/{n} = "
+          f"{block['b_target_retrieved'] / n:.3f}")
+    print(f"    difference A - B = {interval['difference']:+.3f}, "
+          f"95% interval [{interval['low']:+.3f}, {interval['high']:+.3f}], "
+          f"p = {p_value:.4f}")
+    print("    Groundedness asks whether the answer follows from its context, "
+          "not whether")
+    print("    that was the right context. This asks the second question, "
+          "deterministically.")
+    return block
 
 
 def report(results_path: Path) -> None:

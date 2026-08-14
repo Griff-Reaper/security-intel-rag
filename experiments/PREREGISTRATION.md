@@ -117,6 +117,81 @@ and provider refusal rate.
 
 ---
 
+## Result
+
+Run 2026-08-14. Verdict computed by `--decide`, artifact at
+`experiments/results/config_decision.json`.
+
+| | `hybrid_rerank` (A) | `bm25` (B) |
+|---|---:|---:|
+| Grounded | 141 / 142 = 0.993 | 142 / 142 = 1.000 |
+| Judge recall on planted corruptions | 12 / 12 | 12 / 12 |
+| Judge false positives on verbatim answers | 0 / 12 | 0 / 12 |
+| Correct decline, unanswerable | 10 / 10 | 20 / 20 |
+| Invented CVE IDs | 0 | 0 |
+
+Difference A − B = **−0.007**, 95% interval **[−0.021, +0.007]**, exact McNemar
+**p = 1.000** on one discordant pair.
+
+**VERDICT: EQUIVALENCE.** The whole interval lies inside ±10 points. Both judges
+passed calibration in both directions, so this is not judge drift.
+
+## Two things the result exposed, recorded rather than quietly fixed
+
+**1. The primary outcome was close to blind to what the comparison was for.**
+
+Groundedness asks whether the answer follows from its context. It does not ask
+whether that was the *right* context. An answer faithfully summarising five
+documents, none of which concern the CVE the user asked about, is grounded —
+correctly — and the user has still been failed.
+
+The gap is large. Grounded rate 0.993; target CVE actually retrieved 0.782. On
+roughly 3 questions in 14, the system produced an impeccable answer about the
+wrong vulnerabilities. Choosing groundedness as the primary outcome was an error
+in this document, not a finding of the run.
+
+A post-hoc deterministic check, added after seeing that and labelled as such,
+asks the second question: was the target CVE among the five documents retrieved?
+**A 111/142 = 0.782, B 108/142 = 0.761**, difference +0.021, interval
+[−0.036, +0.078], p = 0.629. It agrees with the pre-registered verdict, which is
+the only reason the verdict survives contact with this limitation.
+
+**2. The stated consequence was broader than the experiment.**
+
+The rule says equivalence flips the shipped default to `bm25`. That was written
+without noticing that this experiment covers **one query shape of four**.
+`hybrid_rerank` was made the default on Phase 2 per-shape evidence, and on the
+one shape where the two configs measurably differ it still wins:
+
+| Query shape | `hybrid_rerank` R@1 | `bm25` R@1 | Paired test |
+|---|---:|---:|---|
+| Product + version | **0.306** | 0.235 | p = 0.0125, significant |
+| Bare CVE ID | — | — | p = 0.070, and routed by keyed lookup anyway |
+| Description sentence | — | — | p = 0.791 |
+| Paraphrased analyst question | 0.625 | 0.609 | p = 0.775 |
+
+The latency premise was also weaker than stated. This document justifies Δ = 0.10
+with "587 ms against 13 ms", as though retrieval were the query. Measured from
+ledger timestamps, generation p50 is **4.0 s**, so the retrieval premium is
+**12.5% of end-to-end**, not 45×.
+
+So the honest position is that the verdict stands and its stated consequence does
+not follow from it. Flipping the default would trade a measured, significant
+7-point R@1 loss on product+version queries for 12.5% latency, on the strength of
+an experiment that did not test that shape. **The default is left unchanged and
+this paragraph is the record of the rule not being executed as written** — which
+is worse than the rule having been right, and better than either silently
+skipping it or following it off a cliff.
+
+The pre-registration did its job. It stopped "equivalent" being written where
+"the metric could not see it" belonged, and it made the overreach visible instead
+of letting a convenient reading pass. Routing by query shape is the correct fix
+and is on the roadmap.
+
+---
+
 *Committed before any held-out question was answered. Verify with
 `git log --diff-filter=A -- experiments/PREREGISTRATION.md` against the
-`generated_at` timestamps in `experiments/results/answer_quality_holdout_*.json`.*
+`generated_at` timestamps in `experiments/results/answer_quality_holdout_*.json`.
+Everything above the Result heading is as first committed, apart from the dated
+note under Design.*

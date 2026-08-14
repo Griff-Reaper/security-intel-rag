@@ -18,10 +18,13 @@
 > documents themselves, which flatters lexical matching, and once against a
 > committed set of 192 paraphrased analyst-style questions built to remove that
 > advantage. Exploitation signals from CISA KEV and FIRST EPSS are joined in as
-> filterable metadata. **End-to-end answer quality — groundedness and refusal
-> behaviour — is measured too**: zero invented CVE IDs across 50 answers, 20/20
-> correct refusals on unanswerable questions, and a groundedness rate reported
-> against a judge calibrated in both directions. See [Roadmap](#-roadmap).
+> filterable metadata. **End-to-end answer quality is measured on a held-out
+> set under a [pre-registered decision rule](experiments/PREREGISTRATION.md)**:
+> 154 questions through both retrieval configurations, zero invented CVE IDs,
+> correct refusal on every unanswerable question, and a groundedness rate of
+> 0.993 against a judge calibrated in both directions — next to the finding that
+> groundedness is nearly blind to whether the right documents were retrieved at
+> all. See [Roadmap](#-roadmap).
 
 ## 🎯 Problem Statement
 
@@ -1047,7 +1050,13 @@ answering one:
 |---|---:|---:|
 | Generating an analyst question from a CVE record | 8 / 200 | 0.040 |
 | Answering, baseline prompt | 2 / 38 | 0.053 |
-| Answering, current prompt | 6 / 62 | 0.097 |
+| Answering, held-out run, `hybrid_rerank` | 13 / 176 | 0.074 |
+| Answering, held-out run, `bm25` | 13 / 176 | 0.074 |
+| Every call with a recorded `stop_reason` | 51 / 782 | 0.065 |
+
+The two held-out arms refused at an identical rate on identical questions, which
+is what a property of the model rather than of the retrieval config should look
+like.
 
 The refused CVE IDs are named in the artifact. `stop_reason` is now recorded on
 every call in the [API ledger](src/api_ledger.py), so this keeps counting as the
@@ -1114,12 +1123,70 @@ Development signal, on the 16 questions the defect was diagnosed from
 | Grounded | 11 / 16 | **16 / 16** |
 | Correct decline, unanswerable (decline judge) | 18 / 18 | 18 / 18 |
 
-All five failures fixed, no regressions, and no cost on the decline side. **This
-is not a result.** These are the questions the change was developed against, and
+All five failures fixed, no regressions, no cost on the decline side. **This is
+not the result** — these are the questions the change was developed against, and
 five discordant pairs cannot reach significance under an exact McNemar test at
-any split — the tool says so in its own output rather than leaving it to be
-noticed. The reportable number is the held-out measurement, which has not been
-run.
+any split, which the tool prints rather than leaving to be noticed.
+
+### The held-out result
+
+154 questions, none of them used to develop the prompt, run through both
+retrieval configurations. The comparison and its decision rule were
+[pre-registered and committed](experiments/PREREGISTRATION.md) before any of
+them was answered, because a null result and an underpowered one produce the
+same output and the difference between them is a sentence anyone can write
+either way after the fact.
+
+| | `hybrid_rerank` | `bm25` |
+|---|---:|---:|
+| Grounded | 141 / 142 = **0.993** | 142 / 142 = **1.000** |
+| Invented CVE IDs | 0 | 0 |
+| False abstention | 0 / 143 | 0 / 143 |
+| Correct decline, unanswerable | 10 / 10 | 20 / 20 |
+| Judge recall on planted corruptions | 12 / 12 | 12 / 12 |
+| Judge false positives on verbatim answers | 0 / 12 | 0 / 12 |
+
+Difference −0.007, 95% interval **[−0.021, +0.007]**, exact McNemar p = 1.000 on
+one discordant pair. **Verdict: equivalence.** The prompt fix generalises — 0.312
+unsupported before it, 0.007 after, on questions it was never shown.
+
+**The primary outcome was close to blind to what the comparison was for, and
+that is the most useful thing the run produced.** Groundedness asks whether the
+answer follows from its context. It does not ask whether that was the *right*
+context. Alongside a grounded rate of 0.993, the target CVE was actually
+retrieved on **0.782** of questions: on roughly 3 questions in 14 the system
+returns an impeccable, faithful, correctly-cited answer about the wrong
+vulnerabilities.
+
+So a deterministic post-hoc check — labelled post-hoc because it was thought of
+after seeing that, and it is not in the pre-registration — asks the second
+question directly. Was the target CVE among the five documents retrieved?
+`hybrid_rerank` 111/142 = 0.782, `bm25` 108/142 = 0.761, difference +0.021,
+interval [−0.036, +0.078], p = 0.629. It agrees with the pre-registered verdict,
+which is the only reason that verdict survives contact with the limitation.
+
+That 0.782 matches the committed retrieval artifact exactly — 112/143 measured
+independently by [paraphrased_queries.py](experiments/paraphrased_queries.py) on
+the same CVEs. The evaluation harness and the production query path return the
+same documents, verified rather than asserted.
+
+**The rule's stated consequence did not follow from it, and was not executed.**
+It said equivalence flips the default to `bm25` on latency grounds. Two things
+that were wrong with that, both recorded in the pre-registration rather than
+quietly dropped:
+
+- The experiment covers **one query shape of four**. `hybrid_rerank` is the
+  default on Phase 2 per-shape evidence, and on the one shape where the configs
+  measurably differ it still wins: product+version R@1 **0.306 vs 0.235**,
+  p = 0.0125.
+- The latency premise was overstated. "587 ms against 13 ms" reads as though
+  retrieval were the query. Measured from ledger timestamps, generation p50 is
+  **4.0 s**, so the premium is **12.5% of end-to-end**, not 45×.
+
+Flipping would trade a measured, significant 7-point R@1 loss on a real query
+shape for 12.5% latency, on the strength of an experiment that never tested that
+shape. The default is unchanged and the departure is on the record. Routing by
+query shape is the actual fix and is on the roadmap.
 
 ### The judge is an instrument, and it was wrong twice
 
@@ -1253,12 +1320,20 @@ Planned, in order:
       fields into the prompt and removing the instruction to prioritise
       actionable recommendations. 5 of 5 development failures fixed with no cost
       to decline behaviour; the held-out measurement is the entry below
-- [ ] **Held-out answer-quality measurement** — 154 questions, `hybrid_rerank`
-      against `bm25`. The comparison is the point: every retrieval conclusion in
-      this project rests on Recall@1 proxying answer quality, and nothing has
-      tested that. Sized in [experiments/power.py](experiments/power.py); 154 is
-      the entire held-out set the pinned sample allows, so the interval it buys
-      (±7.2 points on the unsupported rate) is a ceiling rather than a choice
+- [x] **Held-out answer-quality measurement** — 154 questions, both configs,
+      [pre-registered](experiments/PREREGISTRATION.md) before the run. Grounded
+      0.993 and 1.000, equivalence on the pre-registered outcome. The useful
+      finding is that the outcome was close to blind to the question: grounded
+      0.993 against target-retrieved 0.782
+- [ ] **Route by query shape** — `hybrid_rerank` earns its latency on
+      product+version queries (R@1 0.306 vs 0.235, p = 0.0125) and on nothing
+      else measured. Paying 12.5% end-to-end latency on every query to win one
+      shape is the wrong default; picking a backend per shape is the fix, and
+      needs its own evaluation rather than an assumption
+- [ ] **An outcome that sees retrieval** — groundedness cannot distinguish a
+      faithful answer about the right CVEs from a faithful answer about the
+      wrong ones, and 22% of answers are the latter. The next answer-quality
+      evaluation needs a primary outcome that fails when retrieval fails
 - [ ] **A CWE catalogue join** — the model is currently forbidden from expanding
       `CWE-121` to "Stack-based Buffer Overflow" because the corpus carries the
       identifier and not the title. Grounding the title would be more useful

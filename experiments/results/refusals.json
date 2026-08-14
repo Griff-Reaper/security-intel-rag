@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-14T16:53:40+00:00",
+  "generated_at": "2026-08-14T19:02:40+00:00",
   "document_layout": {
     "version": 2,
     "fingerprint": "ffb8c1393e249003",
@@ -41,13 +41,50 @@
       ]
     },
     {
-      "run": "answer_quality_holdout_hybrid_rerank.json",
-      "retrieval": null,
+      "run": "answer_quality_holdout_bm25.json",
+      "retrieval": "bm25 + direct_id",
       "stage": "answering a question against retrieved context",
-      "attempted": 20,
-      "refused": 0,
-      "rate": 0.0,
-      "cve_ids": []
+      "attempted": 176,
+      "refused": 13,
+      "rate": 0.0739,
+      "cve_ids": [
+        "CVE-2002-1466",
+        "CVE-2007-1458",
+        "CVE-2007-5622",
+        "CVE-2013-3443",
+        "CVE-2014-3478",
+        "CVE-2015-3969",
+        "CVE-2019-0183",
+        "CVE-2020-6477",
+        "CVE-2020-8813",
+        "CVE-2023-5444",
+        "CVE-2025-35050",
+        "out-of-scope-02",
+        "out-of-scope-07"
+      ]
+    },
+    {
+      "run": "answer_quality_holdout_hybrid_rerank.json",
+      "retrieval": "hybrid_rerank + direct_id",
+      "stage": "answering a question against retrieved context",
+      "attempted": 176,
+      "refused": 13,
+      "rate": 0.0739,
+      "cve_ids": [
+        "CVE-2002-1466",
+        "CVE-2007-1458",
+        "CVE-2007-5622",
+        "CVE-2013-3443",
+        "CVE-2014-3478",
+        "CVE-2015-3969",
+        "CVE-2019-0183",
+        "CVE-2020-6477",
+        "CVE-2020-8813",
+        "CVE-2023-5444",
+        "CVE-2026-1158",
+        "out-of-scope-02",
+        "out-of-scope-07"
+      ]
     },
     {
       "run": "answer_quality_prompt_v2.json",
@@ -68,12 +105,12 @@
   ],
   "ledger": {
     "stage": "every API call in the project",
-    "attempted": 41,
-    "refused": 1,
-    "rate": 0.0244,
-    "total_calls_ever": 208,
+    "attempted": 782,
+    "refused": 51,
+    "rate": 0.0652,
+    "total_calls_ever": 949,
     "by_purpose": {
-      "query:answer": 1
+      "query:answer": 51
     },
     "caveat": "the denominator is calls with a recorded stop_reason, not all calls: the field was added partway through the project and earlier entries lack it. The per-run figures above cover those."
   }

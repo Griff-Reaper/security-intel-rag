@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-08-14T19:05:42+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "a": "C:\\Users\\domo_\\AppData\\Local\\Temp\\pytest-of-domo_\\pytest-57\\test_provider_refusals_are_not0\\a.json",
+  "b": "C:\\Users\\domo_\\AppData\\Local\\Temp\\pytest-of-domo_\\pytest-57\\test_provider_refusals_are_not0\\b.json",
+  "questions": 1,
+  "a_grounded": 1,
+  "b_grounded": 1,
+  "a_wins": 0,
+  "b_wins": 0,
+  "discordant": 0,
+  "observed_grade_discordance": 0.0,
+  "p_value": 1.0,
+  "difference_interval_95": {
+    "difference": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "half_width": 0.0
+  },
+  "preregistered_delta": 0.1,
+  "achieved_power_at_delta": null,
+  "achieved_power_note": "diagnostic only; the verdict is decided on the interval. None means a difference that size is arithmetically impossible at the observed discordance.",
+  "verdict": "equivalence",
+  "consequence": "the whole interval lies inside +/-10%: the default flips to bm25 on latency grounds",
+  "rule": "experiments/PREREGISTRATION.md",
+  "post_hoc_target_hit": {}
+}
