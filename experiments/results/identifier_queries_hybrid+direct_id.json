@@ -1,0 +1,105 @@
+{
+  "generated_at": "2026-08-13T23:10:55+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "collection": "nvd_cve",
+  "documents_in_collection": 358170,
+  "sample_size": 200,
+  "sample_source": "experiments\\samples\\identifier_sample.json",
+  "seed": 20260812,
+  "search_depth": 100,
+  "retrieval": "hybrid+direct_id",
+  "retrieval_description": "RRF(dense, bm25), k=60, top 200 per arm, ties to lexical, + direct CVE-ID routing",
+  "query_types": {
+    "bare CVE ID": {
+      "queries": 200,
+      "recall_at_1": 1.0,
+      "recall_at_10": 1.0,
+      "found_in_top_100": 1.0,
+      "mrr": 1.0
+    },
+    "product + version": {
+      "queries": 196,
+      "recall_at_1": 0.2041,
+      "recall_at_10": 0.4745,
+      "found_in_top_100": 0.7755,
+      "mrr": 0.2985
+    },
+    "description sentence (control)": {
+      "queries": 200,
+      "recall_at_1": 0.845,
+      "recall_at_10": 0.955,
+      "found_in_top_100": 0.995,
+      "mrr": 0.889
+    }
+  },
+  "latency": {
+    "end_to_end": {
+      "queries": 596,
+      "mean_ms": 261.14,
+      "p50_ms": 121.74,
+      "p95_ms": 762.67
+    },
+    "inner": {
+      "end_to_end": {
+        "queries": 596,
+        "mean_ms": 261.09,
+        "p50_ms": 121.73,
+        "p95_ms": 762.66
+      },
+      "dense_arm": {
+        "queries": 596,
+        "mean_ms": 80.95,
+        "p50_ms": 80.74,
+        "p95_ms": 142.59
+      },
+      "lexical_arm": {
+        "queries": 596,
+        "mean_ms": 179.94,
+        "p50_ms": 10.8,
+        "p95_ms": 664.04
+      },
+      "rrf_k": 60,
+      "arm_depth": 200,
+      "tie_break_arm": "lexical",
+      "filters": "none"
+    },
+    "queries_seen": 596,
+    "queries_routed": 202,
+    "routed_share": 0.3389
+  },
+  "examples": [
+    {
+      "cve_id": "CVE-2002-1466",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2003-1190",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2003-1233",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2004-1873",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    },
+    {
+      "cve_id": "CVE-2006-0489",
+      "rank_for_own_id": 1,
+      "rank_for_description": 1
+    }
+  ]
+}

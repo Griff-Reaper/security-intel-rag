@@ -1,0 +1,1391 @@
+{
+  "generated_at": "2026-08-13T23:41:28+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "purpose": "paraphrased retrieval evaluation; questions are generated, not copied from the documents",
+  "generator_model": "claude-opus-5",
+  "sample_source": "experiments\\samples\\identifier_sample.json",
+  "caveats": [
+    "Questions are what a language model believes an analyst would ask, not questions collected from analysts.",
+    "Paraphrasing reduces but cannot eliminate vocabulary overlap with the target document; the overlap is measured below.",
+    "Items flagged specific=false are kept, because dropping the CVEs with uninformative descriptions would inflate every score."
+  ],
+  "leakage": {
+    "metric": "share of query content words also present in the target document",
+    "paraphrased_question": {
+      "n": 192,
+      "mean": 0.4746,
+      "median": 0.4615,
+      "p90": 0.6667
+    },
+    "copied_sentence_control": {
+      "n": 192,
+      "mean": 0.9878,
+      "median": 1.0,
+      "p90": 1.0
+    }
+  },
+  "excluded": {
+    "CVE-2025-63888": "refusal",
+    "CVE-2003-1233": "refusal",
+    "CVE-2020-15009": "refusal",
+    "CVE-2017-12341": "refusal",
+    "CVE-2019-7727": "refusal",
+    "CVE-2016-10024": "refusal",
+    "CVE-2010-0114": "refusal",
+    "CVE-2026-15509": "refusal"
+  },
+  "items": [
+    {
+      "cve_id": "CVE-2007-5622",
+      "question": "Which 3proxy versions crash when repeated OPEN commands are sent to the FTP proxy, causing a memory double-release?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2008-6468",
+      "question": "Is there an SQL injection in Diesel Pay's index.php through the area parameter when browsing?",
+      "specific": true,
+      "leakage_vs_target": 0.7778,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-24973",
+      "question": "Which Site Reviews WordPress plugin version fixed the unauthenticated AJAX stored XSS affecting admins viewing the plugin's Tools page?",
+      "specific": true,
+      "leakage_vs_target": 0.5714,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-34819",
+      "question": "Is there a stored XSS in Endian Firewall's OpenVPN client CGI comment field affecting versions up to 3.3.25?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-15617",
+      "question": "Which Logto flaw lets attackers hijack accounts using differently-cased or Unicode-variant emails due to missing identifier normalization?",
+      "specific": true,
+      "leakage_vs_target": 0.1429,
+      "control_leakage_vs_target": 0.95
+    },
+    {
+      "cve_id": "CVE-2023-37597",
+      "question": "Is there a CSRF flaw in Issabel PBX 4.0.0-6 letting attackers delete user groups remotely?",
+      "specific": true,
+      "leakage_vs_target": 0.4444,
+      "control_leakage_vs_target": 0.95
+    },
+    {
+      "cve_id": "CVE-2025-5955",
+      "question": "Which WordPress SMS login plugin lets attackers log in as any user without validating the phone number?",
+      "specific": true,
+      "leakage_vs_target": 0.6364,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-1491",
+      "question": "How can an authenticated user read arbitrary files through the Cisco SD-WAN vManage web management GUI?",
+      "specific": true,
+      "leakage_vs_target": 0.8182,
+      "control_leakage_vs_target": 0.9444
+    },
+    {
+      "cve_id": "CVE-2019-17008",
+      "question": "Is there a use-after-free in Firefox when nested web workers are torn down, causing an exploitable crash?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2006-5926",
+      "question": "Which Vallheru versions have SQL injection in the mail script through the id and to parameters?",
+      "specific": true,
+      "leakage_vs_target": 0.375,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-36374",
+      "question": "Is there a stored cross-site scripting flaw in TeamCity build step configuration fields fixed in 2024.03.2?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-17526",
+      "question": "Which Giac computer algebra system flaw allows argument injection through unvalidated URLs passed to the BROWSER environment variable?",
+      "specific": true,
+      "leakage_vs_target": 0.2857,
+      "control_leakage_vs_target": 0.95
+    },
+    {
+      "cve_id": "CVE-2026-71559",
+      "question": "Which Apache Fory Go serializer flaw lets malformed type metadata trigger an unrecovered panic causing denial of service?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-24718",
+      "question": "Is there a missing authorization flaw in the PropertyHive WordPress real estate plugin in versions up to 2.0.6?",
+      "specific": true,
+      "leakage_vs_target": 0.375,
+      "control_leakage_vs_target": 0.9167
+    },
+    {
+      "cve_id": "CVE-2022-29843",
+      "question": "Is there a root-level command injection in the dynamic DNS settings of WD My Cloud OS 5 before 5.26.119?",
+      "specific": true,
+      "leakage_vs_target": 0.4286,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-12170",
+      "question": "Fedora pure-ftpd package update bug that discards existing config and reverts the daemon to insecure defaults?",
+      "specific": true,
+      "leakage_vs_target": 0.25,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-14582",
+      "question": "Which Site24x7 Android network monitoring app version failed to validate SSL certificates, enabling man-in-the-middle interception?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-7537",
+      "question": "Is there a remote SQL injection via the ID parameter in Campcodes Sales and Inventory System's product update page?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2018-12198",
+      "question": "Which flaw lets a local admin trigger denial of service through improper input checks in Intel Server Platform Services HECI?",
+      "specific": true,
+      "leakage_vs_target": 0.5333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2007-1458",
+      "question": "How can attackers execute PHP code remotely in CARE2X 1.1 by supplying an external URL to the root_path variable?",
+      "specific": true,
+      "leakage_vs_target": 0.6364,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-0645",
+      "question": "Android 11 flaw letting an app access private app folders on external storage via the documents provider?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2020-13825",
+      "question": "Which i-doit 1.14.2 parameters like viewMode, objID, or catgID allow reflected script injection by remote attackers?",
+      "specific": true,
+      "leakage_vs_target": 0.6,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2016-1855",
+      "question": "Which WebKit memory corruption bug lets a malicious webpage run code on iOS 9.3.1, Safari 9.1, and tvOS 9.2?",
+      "specific": true,
+      "leakage_vs_target": 0.5833,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-26787",
+      "question": "What is the recently patched Linux kernel vulnerability with no details provided beyond the fix notice?",
+      "specific": false,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 0.95
+    },
+    {
+      "cve_id": "CVE-2025-30152",
+      "question": "Is there a flaw in Sylius's PayPal integration letting shoppers change cart contents after payment authorization, causing underpaid orders?",
+      "specific": true,
+      "leakage_vs_target": 0.3571,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-15829",
+      "question": "Is there a race condition in the Qualcomm Adreno GPU kernel driver on Android that causes use-after-free?",
+      "specific": true,
+      "leakage_vs_target": 0.7,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-25970",
+      "question": "Which Dell PowerScale OneFS releases let a low-privilege remote user compromise integrity through insufficient input validation?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-8009",
+      "question": "Which Security Ninja WordPress plugin versions let admin users read arbitrary server files through a file source retrieval function?",
+      "specific": true,
+      "leakage_vs_target": 0.4667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-15125",
+      "question": "Is there a remote authorization bypass in JeecgBoot 3.9.0 via the departId parameter in the department permission query endpoint?",
+      "specific": true,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2008-4789",
+      "question": "Which Drupal 6 flaw let logged-in users attach files to nodes despite permission checks failing in the upload module?",
+      "specific": true,
+      "leakage_vs_target": 0.3846,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-33513",
+      "question": "Which Aruba access point vulnerability lets unauthenticated attackers crash the AP management service through PAPI protocol packets?",
+      "specific": true,
+      "leakage_vs_target": 0.3846,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-21012",
+      "question": "Samsung Android flaw where a privileged local app controls a filename in AOD service to create files as system?",
+      "specific": true,
+      "leakage_vs_target": 0.3846,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2019-10719",
+      "question": "Is there a path traversal flaw in BlogEngine.NET's upload API allowing arbitrary file write and code execution?",
+      "specific": true,
+      "leakage_vs_target": 0.5833,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-1576",
+      "question": "Which WordPress maintenance mode plugin version had a CSRF flaw letting attackers trick admins into clearing subscriber lists?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 0.9524
+    },
+    {
+      "cve_id": "CVE-2024-23291",
+      "question": "Which Apple OS flaw let a rogue app read sensitive user data leaked into accessibility notification logs, fixed in iOS 17.4?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-34031",
+      "question": "Is there a CSRF flaw in the bbPress Toolkit WordPress plugin versions up to 1.0.12?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 0.9412
+    },
+    {
+      "cve_id": "CVE-2025-6822",
+      "question": "Is there a remote SQL injection via the productId parameter in removeProduct.php of code-projects Inventory Management System 1.0?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2016-0712",
+      "question": "Is there a stored or reflected XSS in Apache Jetspeed portal via the URL path before version 2.3.1?",
+      "specific": true,
+      "leakage_vs_target": 0.375,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-3189",
+      "question": "Is there an SSRF flaw in sz-boot-parent's admin file download endpoint via the url parameter, fixed in 1.3.3-beta?",
+      "specific": true,
+      "leakage_vs_target": 0.5455,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-3073",
+      "question": "Is there a stored XSS or script injection flaw in SCHEMA ST4 sample Bootstrap web templates allowing session hijacking?",
+      "specific": true,
+      "leakage_vs_target": 0.5714,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-43312",
+      "question": "Which UPX flaw causes a heap overflow in the ELF64 dynamic segment inversion routine due to an invalid bucket pointer?",
+      "specific": true,
+      "leakage_vs_target": 0.2143,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2014-4006",
+      "question": "Are there any known embedded default credentials in SAP Oil & Gas Trader's and Scheduler's Workbench allowing remote access?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 0.9524
+    },
+    {
+      "cve_id": "CVE-2020-35205",
+      "question": "Is there an SSRF flaw in Quest Policy Authority's Web Compliance Manager allowing internal port scanning through a JSP endpoint?",
+      "specific": true,
+      "leakage_vs_target": 0.5333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2013-3443",
+      "question": "How can an attacker run arbitrary code on a Cisco WAAS Central Manager using a malicious POST request?",
+      "specific": true,
+      "leakage_vs_target": 0.7273,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-26496",
+      "question": "Is there a type confusion flaw in Tableau Server and Desktop file upload handling allowing local code inclusion before 2025.1.3?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-61458",
+      "question": "Is there a Password Pusher flaw allowing unlimited passphrase guessing on the push access endpoint due to missing rate limiting?",
+      "specific": true,
+      "leakage_vs_target": 0.3571,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-55627",
+      "question": "Which Reolink Wi-Fi video doorbell firmware flaw lets a logged-in user create admin-level accounts due to weak permission checks?",
+      "specific": true,
+      "leakage_vs_target": 0.4667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2008-3529",
+      "question": "Which libxml2 flaw before 2.7.0 lets an overly long entity name overflow the heap during attribute value parsing?",
+      "specific": true,
+      "leakage_vs_target": 0.3077,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-18612",
+      "question": "Is there a cross-site scripting flaw in the WordPress WHOIS domain lookup plugin's domain query parameter?",
+      "specific": true,
+      "leakage_vs_target": 0.3,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-36475",
+      "question": "Is there a stack buffer overflow in the MAC address list handling function on H3C B5 Mini routers?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-22159",
+      "question": "Is there a reflected XSS flaw in the WOLF WordPress bulk post editor plugin versions up to 1.0.8?",
+      "specific": true,
+      "leakage_vs_target": 0.5556,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-49281",
+      "question": "Is there a stored XSS flaw in the Ninja Team floating chat support widget plugin for WordPress up to version 2.3.3?",
+      "specific": true,
+      "leakage_vs_target": 0.6364,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2009-2299",
+      "question": "Which Apache WAF module is vulnerable to memory exhaustion when a request declares a huge Content-Length but sends no body?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 0.9375
+    },
+    {
+      "cve_id": "CVE-2022-39073",
+      "question": "Is there a command injection flaw in the ZTE MF286R router caused by unvalidated user input?",
+      "specific": true,
+      "leakage_vs_target": 0.5556,
+      "control_leakage_vs_target": 0.9375
+    },
+    {
+      "cve_id": "CVE-2024-12174",
+      "question": "Which Tenable Security Center flaw lets a privileged user intercept outgoing mail using a fake SMTP server due to unverified certificates?",
+      "specific": true,
+      "leakage_vs_target": 0.375,
+      "control_leakage_vs_target": 0.9474
+    },
+    {
+      "cve_id": "CVE-2026-27739",
+      "question": "Is there an Angular server-side rendering flaw where unvalidated Host or X-Forwarded headers let attackers redirect internal HttpClient requests?",
+      "specific": true,
+      "leakage_vs_target": 0.6,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-38963",
+      "question": "Is there a formula injection flaw in IBM Aspera Console 3.4.x allowing code execution via exported spreadsheet files?",
+      "specific": true,
+      "leakage_vs_target": 0.4167,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-36950",
+      "question": "Is there an unauthenticated RCE in Veritas NetBackup OpsCenter caused by Java classloader manipulation affecting versions 8 through 10?",
+      "specific": true,
+      "leakage_vs_target": 0.6364,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-4907",
+      "question": "Is there a heap overflow in VMware Unified Access Gateway or Horizon View allowing remote code execution on the gateway?",
+      "specific": true,
+      "leakage_vs_target": 0.7273,
+      "control_leakage_vs_target": 0.9231
+    },
+    {
+      "cve_id": "CVE-2021-42986",
+      "question": "Is there a kernel driver integer overflow in NoMachine client versions before 7.7.4 allowing local privilege escalation via crafted IOCTL requests?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-21649",
+      "question": "Convos web chat stored XSS via unescaped quotes in auto-linked URLs allowing autofocus/onfocus attribute injection?",
+      "specific": true,
+      "leakage_vs_target": 0.5714,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-41610",
+      "question": "Which Intel Endpoint Management Assistant config tool and Manageability Commander versions have an authorization flaw allowing local authenticated DoS?",
+      "specific": true,
+      "leakage_vs_target": 0.6429,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-48967",
+      "question": "Is there an unsafe deserialization flaw in Solon Java framework versions up to 2.6.0 and 2.5.12?",
+      "specific": true,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2010-4661",
+      "question": "Which udisks versions let an unprivileged local user trigger loading of arbitrary kernel modules?",
+      "specific": true,
+      "leakage_vs_target": 0.375,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-35009",
+      "question": "Is there a reflected XSS in Open ISES Tickets via the ticket_id URL parameter in add_note.php?",
+      "specific": true,
+      "leakage_vs_target": 0.8889,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-11650",
+      "question": "Are Furbo pet camera firmwares vulnerable to weak password hashing in the shadow file requiring physical access?",
+      "specific": true,
+      "leakage_vs_target": 0.5385,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-10251",
+      "question": "Is there a remote SQL injection in FoxCMS admin image controller's batch operation via the ids parameter?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2012-2530",
+      "question": "Which Windows kernel-mode driver flaw lets a local app exploit freed memory in win32k.sys to escalate privileges?",
+      "specific": true,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-48010",
+      "question": "Can supervisor-mode code on STMicroelectronics SPC58 PowerPC MCUs turn off the memory protection unit to access protected memory?",
+      "specific": true,
+      "leakage_vs_target": 0.6923,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-4381",
+      "question": "Which Popup Maker WordPress plugin versions let contributors inject stored XSS through an unsanitized shortcode attribute?",
+      "specific": true,
+      "leakage_vs_target": 0.4615,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-21876",
+      "question": "What is the Windows kernel-mode driver flaw that lets a local user leak memory contents?",
+      "specific": false,
+      "leakage_vs_target": 0.125,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-3757",
+      "question": "Which Lenovo consumer laptop touchpad driver has an unquoted service path allowing local privilege escalation to admin?",
+      "specific": true,
+      "leakage_vs_target": 0.4615,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-35050",
+      "question": "Is there an unauthenticated .NET deserialization RCE in Newforma Info Exchange's remoting endpoint running as NetworkService?",
+      "specific": true,
+      "leakage_vs_target": 0.6364,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-31106",
+      "question": "Which npm Underscore nested-object mixin library had prototype pollution via its flat-to-deep conversion function before 0.5.3?",
+      "specific": true,
+      "leakage_vs_target": 0.2727,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2020-15178",
+      "question": "Is there a stored XSS in PrestaShop's contact form module where the message field isn't properly escaped?",
+      "specific": true,
+      "leakage_vs_target": 0.4167,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-3625",
+      "question": "Is there an arbitrary file upload flaw in Suncreate flood warning monitoring system's UploadFile.ashx duty handler?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2019-9133",
+      "question": "KMPlayer subtitle file parsing integer underflow causing out-of-bounds read/write when opening a crafted media file?",
+      "specific": true,
+      "leakage_vs_target": 0.4615,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-3195",
+      "question": "Is there a QEMU virtio-snd audio input callback heap overflow from missing buffer size validation, bypassing an earlier patch?",
+      "specific": true,
+      "leakage_vs_target": 0.4286,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-21839",
+      "question": "Is there a Windows ETW flaw where weak access control permissions let an attacker disable event logging?",
+      "specific": false,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2020-8967",
+      "question": "Is there an SQL injection flaw in GESIO ERP PHP scripts allowing full database extraction before version 11.2?",
+      "specific": true,
+      "leakage_vs_target": 0.5455,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-44082",
+      "question": "Which OpenStack Ironic flaw lets an authenticated user supply a malicious disk image that abuses qemu-img to leak data?",
+      "specific": true,
+      "leakage_vs_target": 0.3846,
+      "control_leakage_vs_target": 0.9286
+    },
+    {
+      "cve_id": "CVE-2023-6032",
+      "question": "Path traversal in APC Network Management Card web interface allowing directory listing and file download over HTTPS?",
+      "specific": true,
+      "leakage_vs_target": 0.5333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-34866",
+      "question": "Which Passage Drive versions allow local privilege escalation to SYSTEM via unvalidated interprocess communication on Windows?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-43791",
+      "question": "Which Ruby gem version for per-request Rack storage shipped files with world-writable permissions allowing local code execution?",
+      "specific": true,
+      "leakage_vs_target": 0.4167,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2012-2604",
+      "question": "Which XSS flaws affect the guest and contractor access admin pages in Bradford Network Sentry before version 5.3.3?",
+      "specific": true,
+      "leakage_vs_target": 0.6364,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-1158",
+      "question": "Is there a remote buffer overflow in Totolink LR350 router via the ssid parameter in cstecgi.cgi wizard setup?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-24748",
+      "question": "Which Shopware 6 flaw lets apps edit customer records and place orders without the required permissions due to weak API route validation?",
+      "specific": true,
+      "leakage_vs_target": 0.2941,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-16084",
+      "question": "Which versions of the list-n-stream video streaming server allow path traversal via ../ sequences in the URL?",
+      "specific": true,
+      "leakage_vs_target": 0.375,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2017-10111",
+      "question": "Which Java SE 8u131 Libraries flaw lets untrusted applets escape the sandbox and fully compromise the client?",
+      "specific": true,
+      "leakage_vs_target": 0.5833,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-29907",
+      "question": "Is there a reflected cross-site scripting flaw in the SEO Backlink Monitor WordPress plugin up to version 1.5.0?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 0.9444
+    },
+    {
+      "cve_id": "CVE-2023-29656",
+      "question": "Which flaw lets deactivated or restricted Darktrace Android app users trigger network blocking actions across all monitored infrastructure?",
+      "specific": true,
+      "leakage_vs_target": 0.4286,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-18667",
+      "question": "Is there a remote code execution flaw in Tenable Sensor Proxy when an admin points it at a malicious server?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 0.9375
+    },
+    {
+      "cve_id": "CVE-2017-1000444",
+      "question": "Is there an SQL injection in Openhacker's signup and authentication flow allowing data leakage and code execution?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 0.9444
+    },
+    {
+      "cve_id": "CVE-2022-22252",
+      "question": "Is there a use-after-free flaw in the DFX component that could destabilize the system?",
+      "specific": false,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-23178",
+      "question": "Which Odoo 15 flaw lets an attacker charge another user's saved payment token when confirming an online payment?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-5444",
+      "question": "How can a low-privileged user in McAfee ePolicy Orchestrator create an admin account via forged request in the dashboard?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-25699",
+      "question": "Is there an authentication bypass in ArcGIS Portal Home app letting low-privileged users escalate beyond assigned permissions in 11.2 and earlier?",
+      "specific": true,
+      "leakage_vs_target": 0.4615,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2007-5265",
+      "question": "Format string flaw in Dawn of Time MUD web server allowing code execution via login credentials to protected areas?",
+      "specific": true,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-27846",
+      "question": "Which Linksys routers let someone with physical access join a mesh node without authentication and extract admin and Wi-Fi passwords?",
+      "specific": true,
+      "leakage_vs_target": 0.4667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2020-1294",
+      "question": "Windows WalletService memory object handling flaw allowing local privilege escalation \u2014 which vulnerability is this?",
+      "specific": true,
+      "leakage_vs_target": 0.4444,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2020-6477",
+      "question": "How can a local user escalate privileges through a malicious file during the Chrome installer process on macOS?",
+      "specific": true,
+      "leakage_vs_target": 0.2,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-56497",
+      "question": "Which FortiMail and FortiRecorder versions let an attacker run arbitrary commands through the command line interface?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2019-0183",
+      "question": "How can a local authenticated user extract credentials from the weakly protected attestation datastore in Intel's Cloud Integrity Technology?",
+      "specific": true,
+      "leakage_vs_target": 0.5455,
+      "control_leakage_vs_target": 0.9474
+    },
+    {
+      "cve_id": "CVE-2026-14045",
+      "question": "Which Chrome flaw lets a compromised renderer read cross-origin data through improper input checks in the network stack?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2013-0542",
+      "question": "Is there a stored/reflected script injection flaw in the WebSphere Application Server admin console via manipulated field input?",
+      "specific": true,
+      "leakage_vs_target": 0.4615,
+      "control_leakage_vs_target": 0.9167
+    },
+    {
+      "cve_id": "CVE-2014-2339",
+      "question": "Which GNUboard 5 flaw lets logged-in users inject SQL through the autosave script's subject or content fields?",
+      "specific": true,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 0.9444
+    },
+    {
+      "cve_id": "CVE-2023-2552",
+      "question": "Is there a CSRF flaw in the Bumsys business management system fixed in version 2.1.1?",
+      "specific": true,
+      "leakage_vs_target": 0.2857,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-47693",
+      "question": "What is the recently patched Linux kernel vulnerability with no details provided beyond the fix announcement?",
+      "specific": false,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-58479",
+      "question": "Which Samsung image codec library flaw lets remote attackers read memory outside allocated bounds, fixed in December 2025 security update?",
+      "specific": true,
+      "leakage_vs_target": 0.1875,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-27668",
+      "question": "Is there a stored XSS flaw in the custom blocks feature of Flusity CMS 2.33?",
+      "specific": true,
+      "leakage_vs_target": 0.375,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2009-2073",
+      "question": "Is there a CSRF flaw in the Linksys WRT160N router firmware 1.02.2 letting attackers perform admin actions?",
+      "specific": true,
+      "leakage_vs_target": 0.5455,
+      "control_leakage_vs_target": 0.9474
+    },
+    {
+      "cve_id": "CVE-2003-1190",
+      "question": "Is there a stored XSS in PHPRecipeBook where recipe content lets attackers inject HTML or scripts?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 0.9412
+    },
+    {
+      "cve_id": "CVE-2022-48178",
+      "question": "Is there a stored XSS in X2CRM 6.6/6.9 when creating or updating an action record?",
+      "specific": true,
+      "leakage_vs_target": 0.5714,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-40985",
+      "question": "Is there a stored XSS in Webmin's file manager triggered when searching or replacing text in files?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2008-2593",
+      "question": "What remotely exploitable flaw affects the Portal component of Oracle Application Server 10.1.2.3 and 10.1.4.2?",
+      "specific": true,
+      "leakage_vs_target": 0.625,
+      "control_leakage_vs_target": 0.9333
+    },
+    {
+      "cve_id": "CVE-2025-53264",
+      "question": "Is there a CSRF flaw in the ONet Regenerate Thumbnails WordPress plugin affecting versions up to 1.5?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 0.9333
+    },
+    {
+      "cve_id": "CVE-2024-44144",
+      "question": "Which Apple vulnerability fixed in iOS 18 and macOS Sequoia 15 lets a crafted file crash apps via buffer overflow?",
+      "specific": true,
+      "leakage_vs_target": 0.75,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2007-2921",
+      "question": "Are there memory corruption flaws in the Corel ActiveCGM browser ActiveX control allowing remote code execution before version 7.1.4.19?",
+      "specific": true,
+      "leakage_vs_target": 0.5455,
+      "control_leakage_vs_target": 0.9474
+    },
+    {
+      "cve_id": "CVE-2019-10960",
+      "question": "Can Zebra industrial printers leak their front panel PIN to unauthenticated network requests on a specific port?",
+      "specific": true,
+      "leakage_vs_target": 0.5385,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2014-9635",
+      "question": "Which Jenkins versions fail to mark session cookies HttpOnly when deployed on newer Tomcat 7 releases?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2014-2461",
+      "question": "Is there a confidentiality flaw in Oracle Transportation Management's security module affecting versions 5.5.06 through 6.3.3?",
+      "specific": true,
+      "leakage_vs_target": 0.4444,
+      "control_leakage_vs_target": 0.9333
+    },
+    {
+      "cve_id": "CVE-2025-14614",
+      "question": "Is there a temporary file handling flaw in Intel/Altera Quartus Prime Standard Edition FPGA design software?",
+      "specific": true,
+      "leakage_vs_target": 0.5385,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-54989",
+      "question": "Is there a local privilege escalation from a use-after-free in the Windows QWAVE audio/video streaming service?",
+      "specific": true,
+      "leakage_vs_target": 0.5556,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-0985",
+      "question": "Which mbCONNECT24 / myREX24 versions let a low-privileged user reset another account member's password and hijack the admin?",
+      "specific": true,
+      "leakage_vs_target": 0.3636,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2006-6812",
+      "question": "Is there a remote file inclusion flaw in myPHPCalendar allowing arbitrary code execution through a directory path parameter?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-22556",
+      "question": "Is there a denial of service flaw in Dell PowerStore's web UI exploitable by unauthenticated remote attackers?",
+      "specific": true,
+      "leakage_vs_target": 0.4444,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-35266",
+      "question": "Is there a known spoofing flaw affecting on-premises Azure DevOps Server that Microsoft has patched?",
+      "specific": false,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-13356",
+      "question": "Which WordPress GDPR compliance plugin has a CSRF flaw allowing attackers to delete administrator accounts via a crafted link?",
+      "specific": true,
+      "leakage_vs_target": 0.4286,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-58371",
+      "question": "Is there a JSONP callback injection in SeaweedFS letting cross-origin scripts read cluster status and directory listings?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 0.9524
+    },
+    {
+      "cve_id": "CVE-2025-25227",
+      "question": "How can improper state validation during login allow an attacker to skip two-factor authentication verification?",
+      "specific": false,
+      "leakage_vs_target": 0.1111,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-0173",
+      "question": "Which Intel PROSet/Wireless and Killer Wi-Fi firmware flaw lets a nearby unauthenticated attacker cause a denial of service?",
+      "specific": true,
+      "leakage_vs_target": 0.6923,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-60226",
+      "question": "Which unauthenticated remote flaw in Oracle Coherence Core allows full takeover over TCP in 12.2.1.4 and 14.1.x?",
+      "specific": true,
+      "leakage_vs_target": 0.6667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2014-3478",
+      "question": "How can a malformed Pascal string crash PHP's fileinfo extension through a memory overflow in libmagic's soft magic handling?",
+      "specific": true,
+      "leakage_vs_target": 0.4286,
+      "control_leakage_vs_target": 0.9412
+    },
+    {
+      "cve_id": "CVE-2020-8813",
+      "question": "How can a guest account with real-time graph access run system commands through a crafted cookie in Cacti 1.2.8?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2018-5234",
+      "question": "Is there a command injection flaw in Norton Core router firmware versions before v237?",
+      "specific": true,
+      "leakage_vs_target": 0.875,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-22466",
+      "question": "Which Tokio versions have a bug where setting pipe mode clears the remote client rejection setting on Windows named pipes?",
+      "specific": true,
+      "leakage_vs_target": 0.5385,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2020-24368",
+      "question": "Is there a path traversal flaw in Icinga Web 2 letting attackers read any file the web process can access?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-41723",
+      "question": "Which HTTP/2 flaw lets tiny requests exhaust CPU through the header compression decoder, causing denial of service?",
+      "specific": true,
+      "leakage_vs_target": 0.3571,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-20721",
+      "question": "Which input validation flaw in the Edge browser's built-in Acrobat Reader PDF component lets a crafted file crash the app?",
+      "specific": true,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-38845",
+      "question": "Is there an information disclosure flaw in Anglaise.Company 13.6.1 triggered by a specially crafted GET request?",
+      "specific": true,
+      "leakage_vs_target": 0.4444,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2002-1466",
+      "question": "How can attackers run arbitrary PHP on b2 weblog software by abusing a remote include path parameter?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-50248",
+      "question": "What is the recently patched Linux kernel vulnerability with no details given beyond the fix notice?",
+      "specific": false,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2010-5053",
+      "question": "Which Joomla XOBBIX extension version has SQL injection through the product ID parameter in product description views?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2018-13768",
+      "question": "Which Ethereum ERC20 token contract has an integer overflow in its minting function letting the owner arbitrarily set user balances?",
+      "specific": true,
+      "leakage_vs_target": 0.6429,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-23462",
+      "question": "What is the recently patched Linux kernel vulnerability with no details provided beyond the fix announcement?",
+      "specific": false,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 0.9524
+    },
+    {
+      "cve_id": "CVE-2025-6225",
+      "question": "Which building automation controller from Kieback&Peter allows OS command execution through its web login page before version 9.40.02?",
+      "specific": true,
+      "leakage_vs_target": 0.5455,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2019-3684",
+      "question": "Which SUSE Manager and Uyuni versions create swap files with permissions readable by all local users?",
+      "specific": true,
+      "leakage_vs_target": 0.625,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-48859",
+      "question": "Which TOTOLINK A3002RU firmware flaw lets authenticated users bypass web interface restrictions and run arbitrary commands?",
+      "specific": true,
+      "leakage_vs_target": 0.4615,
+      "control_leakage_vs_target": 0.95
+    },
+    {
+      "cve_id": "CVE-2021-21308",
+      "question": "Which PrestaShop versions have an incomplete soft logout allowing cross-site request forgery to run customer actions?",
+      "specific": true,
+      "leakage_vs_target": 0.4167,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-40622",
+      "question": "Which Unbound resolver versions let an attacker keep a revoked domain resolvable by refreshing cached parent NS records with child apex NS data?",
+      "specific": true,
+      "leakage_vs_target": 0.4286,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-12636",
+      "question": "Is there a vulnerability where Ubia cameras expose API keys, letting attackers reach backend servers and view live video?",
+      "specific": true,
+      "leakage_vs_target": 0.3571,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2016-2442",
+      "question": "How can a malicious app escalate privileges through the Qualcomm buspm kernel driver on Nexus phones?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2020-0065",
+      "question": "Is there an Android Suite Daemon broadcast receiver flaw allowing unauthorized access due to missing permission checks?",
+      "specific": true,
+      "leakage_vs_target": 0.2308,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2015-9467",
+      "question": "Which WordPress broken link manager plugin versions allow SQL injection through the url parameter in its delete or edit URL functions?",
+      "specific": true,
+      "leakage_vs_target": 0.6154,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-45549",
+      "question": "Is there a vulnerability leaking sensitive data during message queue channel creation in Qualcomm components?",
+      "specific": false,
+      "leakage_vs_target": 0.1,
+      "control_leakage_vs_target": 0.9412
+    },
+    {
+      "cve_id": "CVE-2021-32202",
+      "question": "Is there a stored XSS in CS-Cart 4.11 triggered by pasting content into the blog post description field?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-21639",
+      "question": "Is there an unauthenticated XSS-style flaw in PeopleTools 8.59 and 8.60 search integration requiring a user to click?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2016-5499",
+      "question": "Which local privilege flaw in Oracle Database 11.2.0.4 and 12.1.0.2 security subsystem exposes confidential data?",
+      "specific": true,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 0.9333
+    },
+    {
+      "cve_id": "CVE-2021-46991",
+      "question": "What is the recently patched Linux kernel vulnerability with no details given beyond the fix notice?",
+      "specific": false,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-64012",
+      "question": "Is there an InvoicePlane flaw where viewing an invoice doesn't check whether the requesting user owns it?",
+      "specific": true,
+      "leakage_vs_target": 0.2,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-61224",
+      "question": "Is there a reflected XSS in DokuWiki 2025 releases through the search query parameter?",
+      "specific": true,
+      "leakage_vs_target": 0.25,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-37280",
+      "question": "Is there a stored XSS in Pimcore's classic admin backend affecting admins who haven't enabled 2FA yet?",
+      "specific": true,
+      "leakage_vs_target": 0.3636,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2023-37925",
+      "question": "Which Zyxel firewall and access point firmware flaw lets a logged-in local user read system files via a debug command?",
+      "specific": true,
+      "leakage_vs_target": 0.5385,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-22417",
+      "question": "Which HarmonyOS flaw lets a local attacker trigger kernel memory disclosure through improper data handling in a system component?",
+      "specific": false,
+      "leakage_vs_target": 0.3846,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-68501",
+      "question": "Is there a reflected XSS flaw in the Mollie payment gateway plugin for WooCommerce up to version 8.1.1?",
+      "specific": true,
+      "leakage_vs_target": 0.375,
+      "control_leakage_vs_target": 0.9375
+    },
+    {
+      "cve_id": "CVE-2026-34677",
+      "question": "Which denial-of-service flaw lets attackers drain system resources in Content Authenticity Initiative C2PA libraries before version 0.78.2?",
+      "specific": true,
+      "leakage_vs_target": 0.4167,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2014-6013",
+      "question": "Which Android app nuSquare version fails to validate SSL server certificates, enabling man-in-the-middle interception?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 0.9474
+    },
+    {
+      "cve_id": "CVE-2006-0489",
+      "question": "Is there a disputed local buffer overflow in mIRC 6.16 triggered by an overly long argument to the font command?",
+      "specific": true,
+      "leakage_vs_target": 0.7,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2011-2323",
+      "question": "What integrity flaw affects the help module of Oracle's Thesaurus Management System in Health Sciences 4.6.1 and 4.6.2?",
+      "specific": true,
+      "leakage_vs_target": 0.7,
+      "control_leakage_vs_target": 0.9444
+    },
+    {
+      "cve_id": "CVE-2012-5905",
+      "question": "Is there a crash in KnFTPd 1.0.0 when a logged-in user sends an overly long FEAT argument?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-36935",
+      "question": "What Linux kernel vulnerability was fixed with no details given in the advisory text?",
+      "specific": false,
+      "leakage_vs_target": 0.2857,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2019-16252",
+      "question": "Which Android app fails to verify SSL certificates, letting attackers intercept login and location API traffic?",
+      "specific": true,
+      "leakage_vs_target": 0.3846,
+      "control_leakage_vs_target": 0.95
+    },
+    {
+      "cve_id": "CVE-2021-1674",
+      "question": "Is there a security feature bypass flaw in the core RDP component of Windows?",
+      "specific": false,
+      "leakage_vs_target": 0.625,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-34618",
+      "question": "Is there a persistent XSS in Mealie's recipe description field allowing script injection in beta 1.0.0 releases?",
+      "specific": true,
+      "leakage_vs_target": 0.3636,
+      "control_leakage_vs_target": 0.9565
+    },
+    {
+      "cve_id": "CVE-2021-40113",
+      "question": "Are there unauthenticated flaws in Cisco PON optical network terminal switches allowing hardcoded Telnet logins and command injection?",
+      "specific": true,
+      "leakage_vs_target": 0.7143,
+      "control_leakage_vs_target": 0.9444
+    },
+    {
+      "cve_id": "CVE-2014-9795",
+      "question": "Which Nexus 5 bootloader flaw lets crafted start and size parameters trigger an integer overflow in Qualcomm's aboot?",
+      "specific": true,
+      "leakage_vs_target": 0.6154,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-53323",
+      "question": "Is there a broken access control flaw in the Pre-Publish Post Checklist WordPress plugin up to version 3.1?",
+      "specific": true,
+      "leakage_vs_target": 0.5556,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2008-6810",
+      "question": "Which hotel group booking system has SQL injection in its admin login script via username and password fields?",
+      "specific": true,
+      "leakage_vs_target": 0.6154,
+      "control_leakage_vs_target": 0.9474
+    },
+    {
+      "cve_id": "CVE-2015-3969",
+      "question": "How can attackers retrieve network connection details from Janitza UMG power meters by querying UDP ports 1234/1235?",
+      "specific": true,
+      "leakage_vs_target": 0.3333,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2020-23452",
+      "question": "Is there a stored or reflected XSS in Selenium Grid 3.141.59 console page via the hub URL parameter?",
+      "specific": true,
+      "leakage_vs_target": 0.6,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2021-26706",
+      "question": "Is there an integer overflow in Micrium uC/OS uC/LIB memory pool creation functions from multiplying allocation sizes?",
+      "specific": true,
+      "leakage_vs_target": 0.8182,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2026-35672",
+      "question": "How can an empty API client token in phpMyFAQ let anyone create FAQ entries without authenticating?",
+      "specific": true,
+      "leakage_vs_target": 0.5,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-26117",
+      "question": "Is there a reflected XSS flaw in Adobe Experience Manager 6.5.20 that runs script when a user opens a crafted link?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2014-0067",
+      "question": "PostgreSQL local privilege escalation from test cluster created without authentication settings during make check regression runs?",
+      "specific": true,
+      "leakage_vs_target": 0.4286,
+      "control_leakage_vs_target": 0.95
+    },
+    {
+      "cve_id": "CVE-2020-35827",
+      "question": "Which NETGEAR routers like Orbi RBK50, Nighthawk XR500, and R7800 have a persistent cross-site scripting flaw?",
+      "specific": true,
+      "leakage_vs_target": 0.3077,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2025-27109",
+      "question": "Which SolidJS versions fail to escape expressions inside inline JSX fragments, allowing XSS from user input?",
+      "specific": true,
+      "leakage_vs_target": 0.6364,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2022-49325",
+      "question": "What is the recently patched Linux kernel vulnerability with no details provided in its advisory?",
+      "specific": false,
+      "leakage_vs_target": 0.2857,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2024-45577",
+      "question": "Which Qualcomm camera kernel driver flaw causes memory corruption via userspace IOCTL requests dumping request info?",
+      "specific": true,
+      "leakage_vs_target": 0.6429,
+      "control_leakage_vs_target": 0.9524
+    },
+    {
+      "cve_id": "CVE-2026-7089",
+      "question": "Is there a stored XSS in Home Service System 1.0 via first/last name fields on booking.php?",
+      "specific": true,
+      "leakage_vs_target": 0.4,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2014-1323",
+      "question": "Which WebKit memory corruption flaw fixed in Safari 6.1.4 and 7.0.4 allows remote code execution via malicious web pages?",
+      "specific": true,
+      "leakage_vs_target": 0.5455,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2019-11936",
+      "question": "Which HHVM flaw lets APC cache keys with embedded null characters get cut short, causing key collisions?",
+      "specific": true,
+      "leakage_vs_target": 0.2667,
+      "control_leakage_vs_target": 1.0
+    },
+    {
+      "cve_id": "CVE-2004-1873",
+      "question": "How can attackers escalate privileges through the catcode parameter in A-CART's category.asp shopping cart script?",
+      "specific": true,
+      "leakage_vs_target": 0.4545,
+      "control_leakage_vs_target": 1.0
+    }
+  ]
+}
