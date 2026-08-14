@@ -30,7 +30,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -45,6 +44,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "experiments"))
 import lexical_index as LX  # noqa: E402
 import provenance  # noqa: E402
 import retrieval  # noqa: E402
+import significance  # noqa: E402
 from embeddings import EmbeddingService  # noqa: E402
 
 # Same metric code as the identifier ablation. Importing rather than copying is
@@ -181,46 +181,10 @@ def compare() -> None:
 
 PAIRED_PATH = RESULTS_DIR / "paraphrased_paired_tests.json"
 
-# Comparisons worth testing: each isolates one component's contribution.
-PAIRINGS = (
-    ("bm25", "dense"),
-    ("hybrid_rerank", "dense"),
-    ("hybrid_rerank", "bm25"),
-    ("hybrid", "bm25"),
-)
-
-
-def mcnemar(a_ranks, b_ranks, ids, k: int) -> Dict[str, Any]:
-    """
-    Exact McNemar test on hit@k between two configurations.
-
-    Averages hide whether a 1.6-point gap is three queries moving or three
-    hundred. Only the *discordant* pairs carry information - questions both
-    configurations get right, or both get wrong, say nothing about which is
-    better - so the test counts those and asks whether the split is further from
-    even than chance would produce.
-    """
-    def hit(rank):
-        return rank is not None and rank <= k
-
-    a_only = sum(1 for i in ids if hit(a_ranks[i]) and not hit(b_ranks[i]))
-    b_only = sum(1 for i in ids if hit(b_ranks[i]) and not hit(a_ranks[i]))
-    n = a_only + b_only
-    if n == 0:
-        return {"a_wins": 0, "b_wins": 0, "discordant": 0, "p_value": 1.0}
-    smaller = min(a_only, b_only)
-    tail = sum(math.comb(n, i) for i in range(smaller + 1))
-    return {
-        "a_wins": a_only,
-        "b_wins": b_only,
-        "discordant": n,
-        "p_value": round(min(1.0, 2 * tail / 2 ** n), 4),
-    }
-
 
 def paired_tests() -> None:
     """Compare configurations pairwise and commit the result."""
-    ranks: Dict[str, Dict[str, Optional[int]]] = {}
+    ranks = {}
     for path in RESULTS_DIR.glob("paraphrased_queries_*.json"):
         payload = json.loads(path.read_text(encoding="utf-8"))
         if "ranks_by_cve" in payload:
@@ -228,51 +192,17 @@ def paired_tests() -> None:
     if len(ranks) < 2:
         raise SystemExit("need at least two result files carrying ranks_by_cve")
 
-    ids = sorted(set.intersection(*(set(v) for v in ranks.values())))
-    out: Dict[str, Any] = {
-        **provenance.stamp(),
-        "test": "exact McNemar on hit@k, two-sided",
-        "questions": len(ids),
-        "note": "only discordant pairs are informative; p is the probability of "
-                "a split at least this uneven under the null that the two "
-                "configurations are equally likely to win a disagreement",
-        "comparisons": {},
-    }
-
-    for a, b in PAIRINGS:
-        if a not in ranks or b not in ranks:
-            continue
-        out["comparisons"][f"{a} vs {b}"] = {
-            f"recall_at_{k}": mcnemar(ranks[a], ranks[b], ids, k) for k in (1, 10, 100)
-        }
-
-    # What each arm uniquely contributes, which an average cannot show.
-    if "dense" in ranks and "bm25" in ranks:
-        dense_only = [i for i in ids if ranks["dense"][i] == 1 and ranks["bm25"][i] != 1]
-        bm25_only = [i for i in ids if ranks["bm25"][i] == 1 and ranks["dense"][i] != 1]
-        kept = [i for i in dense_only
-                if ranks.get("hybrid_rerank", {}).get(i) == 1]
-        out["complementarity"] = {
-            "rank_1_dense_only": len(dense_only),
-            "rank_1_bm25_only": len(bm25_only),
-            "dense_only_wins_kept_by_hybrid_rerank": len(kept),
-        }
+    report = {**provenance.stamp(), "query_set": "paraphrased question",
+              **significance.compare_all(ranks)}
+    extra = significance.complementarity(ranks)
+    if extra:
+        report["complementarity"] = extra
 
     PAIRED_PATH.parent.mkdir(parents=True, exist_ok=True)
-    PAIRED_PATH.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
-
-    print(f"exact McNemar, {len(ids)} paired questions")
-    for name, byk in out["comparisons"].items():
-        r1 = byk["recall_at_1"]
-        print(f"  {name:<32} R@1 {r1['a_wins']:>3} vs {r1['b_wins']:>3}  "
-              f"p={r1['p_value']:.4f}")
-    if "complementarity" in out:
-        c = out["complementarity"]
-        print(f"\n  dense returns {c['rank_1_dense_only']} questions at rank 1 "
-              f"that bm25 misses; bm25 returns {c['rank_1_bm25_only']} that "
-              f"dense misses")
-        print(f"  hybrid_rerank keeps {c['dense_only_wins_kept_by_hybrid_rerank']} "
-              f"of the dense-only wins")
+    PAIRED_PATH.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    significance.print_report(report)
+    if extra:
+        print(f"\n{extra}")
     print(f"\nwrote {PAIRED_PATH.relative_to(PROJECT_ROOT)}")
 
 

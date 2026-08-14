@@ -1,0 +1,326 @@
+{
+  "generated_at": "2026-08-14T00:32:24+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "by_query_type": {
+    "bare CVE ID": {
+      "test": "exact McNemar on hit@k, two-sided",
+      "queries": 200,
+      "note": "only discordant pairs are informative; a large p means this sample cannot separate the two, not that they are equal",
+      "comparisons": {
+        "bm25 vs dense": {
+          "recall_at_1": {
+            "a_wins": 199,
+            "b_wins": 0,
+            "discordant": 199,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_10": {
+            "a_wins": 200,
+            "b_wins": 0,
+            "discordant": 200,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_100": {
+            "a_wins": 199,
+            "b_wins": 0,
+            "discordant": 199,
+            "p_value": 0.0,
+            "significant_at_05": true
+          }
+        },
+        "hybrid_rerank vs dense": {
+          "recall_at_1": {
+            "a_wins": 193,
+            "b_wins": 0,
+            "discordant": 193,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_10": {
+            "a_wins": 199,
+            "b_wins": 0,
+            "discordant": 199,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_100": {
+            "a_wins": 199,
+            "b_wins": 0,
+            "discordant": 199,
+            "p_value": 0.0,
+            "significant_at_05": true
+          }
+        },
+        "hybrid_rerank vs bm25": {
+          "recall_at_1": {
+            "a_wins": 1,
+            "b_wins": 7,
+            "discordant": 8,
+            "p_value": 0.0703,
+            "significant_at_05": false
+          },
+          "recall_at_10": {
+            "a_wins": 0,
+            "b_wins": 1,
+            "discordant": 1,
+            "p_value": 1.0,
+            "significant_at_05": false
+          },
+          "recall_at_100": {
+            "a_wins": 0,
+            "b_wins": 0,
+            "discordant": 0,
+            "p_value": 1.0,
+            "significant_at_05": false
+          }
+        },
+        "hybrid vs bm25": {
+          "recall_at_1": {
+            "a_wins": 0,
+            "b_wins": 0,
+            "discordant": 0,
+            "p_value": 1.0,
+            "significant_at_05": false
+          },
+          "recall_at_10": {
+            "a_wins": 0,
+            "b_wins": 0,
+            "discordant": 0,
+            "p_value": 1.0,
+            "significant_at_05": false
+          },
+          "recall_at_100": {
+            "a_wins": 0,
+            "b_wins": 0,
+            "discordant": 0,
+            "p_value": 1.0,
+            "significant_at_05": false
+          }
+        }
+      },
+      "complementarity": {
+        "rank_1_dense_only": 0,
+        "rank_1_bm25_only": 199,
+        "dense_only_wins_kept_by_hybrid_rerank": 0
+      }
+    },
+    "product + version": {
+      "test": "exact McNemar on hit@k, two-sided",
+      "queries": 196,
+      "note": "only discordant pairs are informative; a large p means this sample cannot separate the two, not that they are equal",
+      "comparisons": {
+        "bm25 vs dense": {
+          "recall_at_1": {
+            "a_wins": 30,
+            "b_wins": 8,
+            "discordant": 38,
+            "p_value": 0.0005,
+            "significant_at_05": true
+          },
+          "recall_at_10": {
+            "a_wins": 56,
+            "b_wins": 8,
+            "discordant": 64,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_100": {
+            "a_wins": 67,
+            "b_wins": 6,
+            "discordant": 73,
+            "p_value": 0.0,
+            "significant_at_05": true
+          }
+        },
+        "hybrid_rerank vs dense": {
+          "recall_at_1": {
+            "a_wins": 41,
+            "b_wins": 5,
+            "discordant": 46,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_10": {
+            "a_wins": 72,
+            "b_wins": 1,
+            "discordant": 73,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_100": {
+            "a_wins": 69,
+            "b_wins": 2,
+            "discordant": 71,
+            "p_value": 0.0,
+            "significant_at_05": true
+          }
+        },
+        "hybrid_rerank vs bm25": {
+          "recall_at_1": {
+            "a_wins": 21,
+            "b_wins": 7,
+            "discordant": 28,
+            "p_value": 0.0125,
+            "significant_at_05": true
+          },
+          "recall_at_10": {
+            "a_wins": 29,
+            "b_wins": 6,
+            "discordant": 35,
+            "p_value": 0.0001,
+            "significant_at_05": true
+          },
+          "recall_at_100": {
+            "a_wins": 8,
+            "b_wins": 2,
+            "discordant": 10,
+            "p_value": 0.1094,
+            "significant_at_05": false
+          }
+        },
+        "hybrid vs bm25": {
+          "recall_at_1": {
+            "a_wins": 5,
+            "b_wins": 11,
+            "discordant": 16,
+            "p_value": 0.2101,
+            "significant_at_05": false
+          },
+          "recall_at_10": {
+            "a_wins": 8,
+            "b_wins": 16,
+            "discordant": 24,
+            "p_value": 0.1516,
+            "significant_at_05": false
+          },
+          "recall_at_100": {
+            "a_wins": 8,
+            "b_wins": 2,
+            "discordant": 10,
+            "p_value": 0.1094,
+            "significant_at_05": false
+          }
+        }
+      },
+      "complementarity": {
+        "rank_1_dense_only": 8,
+        "rank_1_bm25_only": 30,
+        "dense_only_wins_kept_by_hybrid_rerank": 4
+      }
+    },
+    "description sentence (control)": {
+      "test": "exact McNemar on hit@k, two-sided",
+      "queries": 200,
+      "note": "only discordant pairs are informative; a large p means this sample cannot separate the two, not that they are equal",
+      "comparisons": {
+        "bm25 vs dense": {
+          "recall_at_1": {
+            "a_wins": 26,
+            "b_wins": 5,
+            "discordant": 31,
+            "p_value": 0.0002,
+            "significant_at_05": true
+          },
+          "recall_at_10": {
+            "a_wins": 22,
+            "b_wins": 0,
+            "discordant": 22,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_100": {
+            "a_wins": 21,
+            "b_wins": 0,
+            "discordant": 21,
+            "p_value": 0.0,
+            "significant_at_05": true
+          }
+        },
+        "hybrid_rerank vs dense": {
+          "recall_at_1": {
+            "a_wins": 28,
+            "b_wins": 9,
+            "discordant": 37,
+            "p_value": 0.0026,
+            "significant_at_05": true
+          },
+          "recall_at_10": {
+            "a_wins": 23,
+            "b_wins": 1,
+            "discordant": 24,
+            "p_value": 0.0,
+            "significant_at_05": true
+          },
+          "recall_at_100": {
+            "a_wins": 20,
+            "b_wins": 0,
+            "discordant": 20,
+            "p_value": 0.0,
+            "significant_at_05": true
+          }
+        },
+        "hybrid_rerank vs bm25": {
+          "recall_at_1": {
+            "a_wins": 6,
+            "b_wins": 8,
+            "discordant": 14,
+            "p_value": 0.7905,
+            "significant_at_05": false
+          },
+          "recall_at_10": {
+            "a_wins": 1,
+            "b_wins": 1,
+            "discordant": 2,
+            "p_value": 1.0,
+            "significant_at_05": false
+          },
+          "recall_at_100": {
+            "a_wins": 0,
+            "b_wins": 1,
+            "discordant": 1,
+            "p_value": 1.0,
+            "significant_at_05": false
+          }
+        },
+        "hybrid vs bm25": {
+          "recall_at_1": {
+            "a_wins": 2,
+            "b_wins": 5,
+            "discordant": 7,
+            "p_value": 0.4531,
+            "significant_at_05": false
+          },
+          "recall_at_10": {
+            "a_wins": 0,
+            "b_wins": 3,
+            "discordant": 3,
+            "p_value": 0.25,
+            "significant_at_05": false
+          },
+          "recall_at_100": {
+            "a_wins": 0,
+            "b_wins": 1,
+            "discordant": 1,
+            "p_value": 1.0,
+            "significant_at_05": false
+          }
+        }
+      },
+      "complementarity": {
+        "rank_1_dense_only": 5,
+        "rank_1_bm25_only": 26,
+        "dense_only_wins_kept_by_hybrid_rerank": 1
+      }
+    }
+  }
+}

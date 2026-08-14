@@ -1,5 +1,10 @@
 # Core dependencies
-anthropic>=0.121.0              # Claude API
+anthropic==0.122.0              # Claude API. Pinned exactly, not >=: releases
+                                # before 0.121.0 cannot parse thinking blocks and
+                                # fail with an opaque AttributeError inside
+                                # response parsing. src/claude_client.py asserts
+                                # this at runtime too, because an unenforced pin
+                                # fails silently -- which is how it was missed.
 python-dotenv>=1.0.1            # Environment variable management
 
 # Vector database and embeddings

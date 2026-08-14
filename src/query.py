@@ -15,7 +15,6 @@ import os
 import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from anthropic import Anthropic
 import chromadb
 from chromadb.config import Settings
 from dotenv import load_dotenv
@@ -39,6 +38,7 @@ DEFAULT_LEXICAL_DB = str(PROJECT_ROOT / "chroma_db" / "lexical.sqlite3")
 # so the weaker, faster configurations stay reachable without a code change.
 DEFAULT_RETRIEVAL_MODE = "hybrid_rerank"
 
+import claude_client
 import filters as filters_mod
 import lexical_index as LX
 import retrieval as retrieval_mod
@@ -87,12 +87,10 @@ class SecurityRAG:
             or DEFAULT_COLLECTION_NAME
         )
 
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not api_key:
-            raise ValueError("ANTHROPIC_API_KEY not found in environment!")
-        
-        # Initialize Claude client
-        self.claude = Anthropic(api_key=api_key)
+        # Checked construction: an SDK too old to parse thinking blocks fails
+        # here with an actionable message rather than as an AttributeError deep
+        # in response parsing on the first query. See src/claude_client.py.
+        self.claude = claude_client.build_client()
         self.model = os.getenv("CLAUDE_MODEL", "claude-opus-5")
         self.max_tokens = int(os.getenv("MAX_TOKENS", "4096"))
 

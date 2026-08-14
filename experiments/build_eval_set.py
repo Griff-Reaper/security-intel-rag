@@ -55,13 +55,13 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 import chromadb
-from anthropic import Anthropic
 from chromadb.config import Settings
 from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+import claude_client  # noqa: E402
 import provenance  # noqa: E402
 
 SAMPLE_PATH = PROJECT_ROOT / "experiments" / "samples" / "identifier_sample.json"
@@ -287,10 +287,10 @@ def main() -> None:
         print(json.dumps(stats, indent=2))
         return
 
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise SystemExit("ANTHROPIC_API_KEY not set; generation needs the Claude API")
-    client = Anthropic(api_key=api_key)
+    try:
+        client = claude_client.build_client()
+    except (claude_client.UnsupportedSDKError, ValueError) as exc:
+        raise SystemExit(str(exc)) from exc
 
     todo = [c for c in sample_ids if c not in existing][: args.limit or None]
     print(f"pinned sample: {len(sample_ids)} CVEs | already generated: "

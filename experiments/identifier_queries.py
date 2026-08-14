@@ -73,6 +73,7 @@ import lexical_index as LX  # noqa: E402
 import nvd_normalize as N  # noqa: E402
 import provenance  # noqa: E402
 import retrieval  # noqa: E402
+import significance  # noqa: E402
 from embeddings import EmbeddingService  # noqa: E402
 from retrieval import Retriever, build_retriever  # noqa: E402
 
@@ -204,12 +205,18 @@ def measure(collection, retriever: Retriever, sample_ids: List[str]) -> Dict[str
         )
 
     buckets: Dict[str, List[Optional[int]]] = {BARE_ID: [], PRODUCT: [], CONTROL: []}
+    # Per-query ranks, so two configurations can be compared as a paired test
+    # rather than by subtracting two averages. Additive: nothing below reads it.
+    per_query: Dict[str, Dict[str, Optional[int]]] = {
+        BARE_ID: {}, PRODUCT: {}, CONTROL: {}
+    }
     examples: List[Dict[str, Any]] = []
 
     for cve_id, document, meta in zip(
         records["ids"], records["documents"], records["metadatas"]
     ):
         buckets[BARE_ID].append(rank_of(retriever, cve_id, cve_id, DEPTH))
+        per_query[BARE_ID][cve_id] = buckets[BARE_ID][-1]
 
         products = (meta.get("products") or "").split(N.LIST_DELIMITER)
         product = products[0] if products and products[0] else None
@@ -217,10 +224,12 @@ def measure(collection, retriever: Retriever, sample_ids: List[str]) -> Dict[str
             year = (meta.get("year") or "").strip()
             query = f"{product} {year}" if year else product
             buckets[PRODUCT].append(rank_of(retriever, query, cve_id, DEPTH))
+            per_query[PRODUCT][cve_id] = buckets[PRODUCT][-1]
 
         buckets[CONTROL].append(
             rank_of(retriever, first_sentence(document), cve_id, DEPTH)
         )
+        per_query[CONTROL][cve_id] = buckets[CONTROL][-1]
 
         if len(examples) < 5:
             examples.append({
@@ -243,6 +252,7 @@ def measure(collection, retriever: Retriever, sample_ids: List[str]) -> Dict[str
         "retrieval": retriever.name,
         "retrieval_description": retriever.description,
         "query_types": {name: summarize(ranks) for name, ranks in buckets.items()},
+        "ranks_by_cve": per_query,
         # Recorded by the backend itself over every query above, so the timing
         # covers the same work the accuracy numbers describe.
         "latency": retriever.stats(),
@@ -267,6 +277,47 @@ def print_table(results: Dict[str, Any]) -> None:
             if isinstance(s, dict) and "p50_ms" in s:
                 print(f"{stage:<34}{s['p50_ms']:>8.1f}{s['p95_ms']:>8.1f}"
                       f"{s['mean_ms']:>8.1f}")
+
+
+PAIRED_PATH = RESULTS_DIR / "identifier_paired_tests.json"
+
+
+def paired_tests() -> None:
+    """Paired significance tests per query type, committed as an artifact.
+
+    Run per bucket rather than pooled: the configurations rank differently on
+    identifiers than on product strings, and averaging the two would hide
+    exactly the disagreement that decides which default to ship.
+    """
+    by_config: Dict[str, Dict[str, Dict[str, Optional[int]]]] = {}
+    for path in RESULTS_DIR.glob("identifier_queries_*.json"):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if "ranks_by_cve" in payload:
+            by_config[payload["retrieval"]] = payload["ranks_by_cve"]
+    if len(by_config) < 2:
+        raise SystemExit("need at least two result files carrying ranks_by_cve")
+
+    report: Dict[str, Any] = {**provenance.stamp(), "by_query_type": {}}
+    for bucket in (BARE_ID, PRODUCT, CONTROL):
+        ranks = {
+            name: buckets[bucket]
+            for name, buckets in by_config.items()
+            if bucket in buckets and buckets[bucket]
+        }
+        if len(ranks) < 2:
+            continue
+        section = significance.compare_all(ranks)
+        extra = significance.complementarity(ranks)
+        if extra:
+            section["complementarity"] = extra
+        report["by_query_type"][bucket] = section
+
+        print(f"\n{bucket}")
+        significance.print_report(section)
+
+    PAIRED_PATH.parent.mkdir(parents=True, exist_ok=True)
+    PAIRED_PATH.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    print(f"\nwrote {PAIRED_PATH.relative_to(PROJECT_ROOT)}")
 
 
 def compare() -> None:
@@ -336,10 +387,15 @@ def main() -> None:
                         help="draw and commit the fixed sample, then exit")
     parser.add_argument("--compare", action="store_true",
                         help="print the ablation across existing result files")
+    parser.add_argument("--paired", action="store_true",
+                        help="paired significance tests across existing results")
     args = parser.parse_args()
 
     if args.compare:
         compare()
+        return
+    if args.paired:
+        paired_tests()
         return
 
     # Refuse to measure an index built from a different document layout: the

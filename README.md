@@ -298,7 +298,7 @@ therefore describes the index that ships.
 | **Reranker** | cross-encoder/ms-marco-MiniLM-L-6-v2 | Re-scores the fused top 50 |
 | **API Framework** | FastAPI | Modern async Python web framework |
 | **Exploitation** | CISA KEV + FIRST EPSS | Observed and predicted exploitation |
-| **Testing** | Pytest | 284 unit tests |
+| **Testing** | Pytest | 302 unit tests |
 
 SQLite FTS5 rather than a pip BM25 package: `rank_bm25` and similar hold the
 whole index in memory and score every document on every query. At 358,170
@@ -553,6 +553,8 @@ security-intel-rag/
 │   ├── exploitation.py          # CISA KEV + FIRST EPSS fetch and parse
 │   ├── enrich_index.py          # Joins exploitation signals onto the index
 │   ├── provenance.py            # Document-layout fingerprint and drift check
+│   ├── significance.py          # Paired McNemar tests for retrieval comparisons
+│   ├── claude_client.py         # Guarded Anthropic client (SDK version assert)
 │   ├── ingest.py                # Legacy sample-data loader (demo only)
 │   ├── lexical_index.py         # SQLite FTS5 BM25 index + query escaping
 │   ├── build_fts.py             # Builds the lexical index, verifies vs Chroma
@@ -582,7 +584,7 @@ security-intel-rag/
 │   ├── samples/                 # Pinned evaluation and dev samples
 │   └── results/                 # Committed JSON output of the above
 │
-├── tests/                       # 284 unit tests
+├── tests/                       # 302 unit tests
 │   ├── test_rag.py              # Embedding + formatting tests
 │   ├── test_nvd_normalize.py    # Normalization, CVSS, CPE, filtering
 │   ├── test_nvd_sources.py      # Feed verification + API windowing
@@ -723,7 +725,8 @@ multi-second Claude call follows, so it is.
 
 **Configurations that came out worse, stated rather than omitted:**
 
-- `hybrid` is below `bm25` at Recall@1 on two of three query shapes.
+- `hybrid` is below `bm25` at Recall@1 on two of three query shapes (the gap is
+  not statistically significant: 5 wins to 11, p = 0.21).
 - `hybrid + rerank` is below `bm25` on bare CVE IDs (0.965 vs 0.995): the
   cross-encoder demotes six identifier matches it was handed at rank 1.
 - Nothing beats `dense` on latency; it is the fastest configuration and the
@@ -828,6 +831,46 @@ complementary — it just is not complementary *enough* to pay for itself here.
 - **Query mix.** Every query here targets one specific CVE. Dense retrieval's
   natural advantage is on questions with no single right answer — "what should I
   patch first on my Citrix estate" — which this eval set contains none of.
+
+### Why `hybrid + rerank` is still the default
+
+Reading only the paraphrased table, the shipped default looks unjustifiable: it
+costs 3.5× BM25's latency and an extra model dependency to buy a difference the
+test cannot see. That reading is incomplete, because the two workloads disagree.
+Running the same paired test per query shape
+([experiments/results/identifier_paired_tests.json](experiments/results/identifier_paired_tests.json)
+and [paraphrased_paired_tests.json](experiments/results/paraphrased_paired_tests.json)):
+
+| Query shape | `hybrid+rerank` wins | `bm25` wins | p | Verdict |
+|---|---:|---:|---:|---|
+| **product + version** | **21** | **7** | **0.013** | hybrid+rerank better |
+| product + version, @10 | 29 | 6 | **0.0001** | hybrid+rerank better |
+| paraphrased question | 26 | 23 | 0.775 | no measurable difference |
+| description control | 6 | 8 | 0.791 | no measurable difference |
+| bare CVE ID | 1 | 7 | 0.070 | moot — routing puts both at 1.000 |
+
+**`hybrid + rerank` is significantly better on one query shape and never
+significantly worse on any of them.** Product + version — "log4j 2.14.1" — is
+also the shape an analyst types most, and it is the row this project has treated
+as the interesting one since Phase 2.
+
+So the default stays, on the narrow grounds that it wins where it wins and does
+not lose elsewhere — not on the grounds that it is more sophisticated. The cost
+is real and the alternative is one environment variable away:
+
+```bash
+RETRIEVAL_MODE=bm25 python src/query.py
+```
+
+**Pick `bm25` if your queries are natural-language questions.** It is
+statistically indistinguishable from `hybrid + rerank` on those, at roughly a
+third of the latency and with no cross-encoder to download. **Keep the default
+if product-and-version lookups are a meaningful share of your traffic.** Direct
+CVE-ID routing is orthogonal and worth keeping either way — it costs 0.03 ms.
+
+One caveat on the negative results above: with ~200 queries this design cannot
+reliably detect a true difference below roughly ten points, so "no measurable
+difference" bounds what the eval set can see rather than proving equivalence.
 
 ### How compromised is the paraphrasing?
 
