@@ -350,7 +350,13 @@ class SecurityRAG:
         result = {
             "answer": answer,
             "sources": sources,
-            "n_sources": len(sources)
+            "n_sources": len(sources),
+            # Exact token counts from the API, so per-query cost can be measured
+            # rather than estimated from character counts.
+            "usage": {
+                "input_tokens": getattr(response.usage, "input_tokens", None),
+                "output_tokens": getattr(response.usage, "output_tokens", None),
+            },
         }
         
         # Optionally include the raw retrieved context

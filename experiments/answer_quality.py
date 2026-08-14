@@ -69,6 +69,10 @@ LEXICAL_DB = PROJECT_ROOT / "chroma_db" / "lexical.sqlite3"
 
 SEED = 20260813
 N_ANSWERABLE = 40
+# Grading is a much easier task than answering, so it does not need the same
+# model. Whether this one is good enough is not assumed - the calibration set
+# measures it, and the run reports the result next to every grade.
+DEFAULT_JUDGE_MODEL = "claude-haiku-4-5-20251001"
 N_RETRIEVED = 5
 JUDGE_MAX_TOKENS = 700
 CVE_PATTERN = re.compile(r"CVE-\d{4}-\d{4,}", re.IGNORECASE)
@@ -119,6 +123,26 @@ ANSWER:
 
 Respond with only a JSON object:
 {{"grade": "grounded" | "unsupported" | "abstained", "reason": "one short sentence"}}"""
+
+DECLINE_PROMPT = """A question was asked that the provided context cannot answer.
+
+Judge only one thing: did the answer make clear that the requested information is not available, rather than supplying it anyway?
+
+QUESTION:
+{question}
+
+CONTEXT THE ASSISTANT WAS SHOWN:
+{context}
+
+ANSWER:
+{answer}
+
+Set "declined" to true if the answer states that the information is absent, unavailable, or not covered by the context. It still counts as declining if the answer goes on to describe what the context *does* contain - that is helpful, not evasive.
+
+Set "fabricated" to true if the answer supplies a specific factual claim about the thing asked for - a version range, a severity, a threat actor, a patch step, an exploit location - that does not appear in the context.
+
+Respond with only a JSON object:
+{{"declined": true or false, "fabricated": true or false, "reason": "one short sentence"}}"""
 
 # How a real answer is corrupted to calibrate the judge. Each introduces a claim
 # the context cannot support, of a kind the system could plausibly produce.
@@ -188,7 +212,11 @@ def cited_ids(text: str) -> List[str]:
 
 
 def judge(client, model: str, context: str, answer: str) -> Optional[Dict[str, Any]]:
-    """Grade one answer against its context, or None if the judge gave nothing usable."""
+    """Grade one answer against its context, or None if the judge gave nothing usable.
+
+    Returns the verdict with the call's exact token usage attached, so the cost
+    of running this evaluation is a measured number rather than an estimate.
+    """
     for attempt in range(3):
         try:
             response = client.messages.create(
@@ -208,6 +236,37 @@ def judge(client, model: str, context: str, answer: str) -> Optional[Dict[str, A
             try:
                 parsed = json.loads(match.group(0))
                 if parsed.get("grade") in ("grounded", "unsupported", "abstained"):
+                    parsed["usage"] = {
+                        "input_tokens": getattr(response.usage, "input_tokens", None),
+                        "output_tokens": getattr(response.usage, "output_tokens", None),
+                    }
+                    return parsed
+            except json.JSONDecodeError:
+                pass
+    return None
+
+
+def judge_decline(client, model: str, question: str, context: str,
+                  answer: str) -> Optional[Dict[str, Any]]:
+    """Did the answer decline, and did it invent anything? For unanswerable items."""
+    for attempt in range(3):
+        try:
+            response = client.messages.create(
+                model=model, max_tokens=JUDGE_MAX_TOKENS,
+                messages=[{"role": "user", "content": DECLINE_PROMPT.format(
+                    question=question, context=context[:20000], answer=answer[:8000])}],
+            )
+        except Exception:  # noqa: BLE001
+            time.sleep(1.5 * (attempt + 1))
+            continue
+        if response.stop_reason == "refusal":
+            return None
+        text = next((b.text for b in response.content if b.type == "text"), "")
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if match:
+            try:
+                parsed = json.loads(match.group(0))
+                if isinstance(parsed.get("declined"), bool):
                     return parsed
             except json.JSONDecodeError:
                 pass
@@ -221,6 +280,9 @@ def summarize(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     counts: Dict[str, int] = {}
     for r in graded:
         counts[r["grade"]] = counts.get(r["grade"], 0) + 1
+    declined = [r for r in records if r.get("declined") is True]
+    fabricated = [r for r in records if r.get("fabricated") is True]
+    judged_decline = [r for r in records if r.get("declined") is not None]
     with_citations = [r for r in records if r.get("cited_ids")]
     invalid = [r for r in records if r.get("invalid_citations")]
     return {
@@ -235,17 +297,63 @@ def summarize(records: List[Dict[str, Any]]) -> Dict[str, Any]:
         "citation_validity": round(
             1 - len(invalid) / max(len(with_citations), 1), 4
         ),
+        # Only meaningful for the unanswerable group.
+        "decline_judged": len(judged_decline),
+        "declined_rate": round(len(declined) / max(len(judged_decline), 1), 4),
+        "fabricated_rate": round(len(fabricated) / max(len(judged_decline), 1), 4),
     }
+
+
+def rebuild_context(rag, question: str) -> str:
+    """
+    Reconstruct exactly the context string the answer model was shown.
+
+    Not `"
+".join(documents)`: the prompt the model receives is built by
+    format_context_documents(), which folds in metadata the document text does
+    not contain - publication date, CVSS score, CWE list. Judging an answer
+    against the raw documents shows the judge *less* than the model saw, so
+    every metadata-derived fact in a correct answer looks invented.
+
+    That is not hypothetical. An earlier version of this script did exactly
+    that, and both judges duly reported that the system was hallucinating
+    publication dates. The dates were in the prompt all along.
+    """
+    from prompts import format_context_documents
+
+    retrieved = rag.retrieve_context(question, n_results=N_RETRIEVED)
+    return format_context_documents(retrieved["documents"], retrieved["metadatas"])
+
+
+def verbatim_answer(context: str, lines: int = 6) -> str:
+    """
+    An "answer" quoted directly out of the context.
+
+    The mirror of a corrupted answer, and the half of calibration that was
+    missing. Corruptions measure whether the judge *catches* an unsupported
+    claim; they say nothing about whether it wrongly flags a supported one. A
+    judge with perfect recall and poor precision passes a one-sided calibration
+    and then reports a healthy system as broken - which is exactly what happened
+    here on the first pass.
+
+    An answer copied verbatim from the context cannot contain an unsupported
+    claim, so any grade other than "grounded" is a false positive by construction.
+    """
+    body = [ln for ln in context.splitlines()
+            if ln.strip() and not ln.startswith("---")]
+    return "Based on the retrieved documents:\n\n" + "\n".join(body[:lines])
 
 
 def load_state() -> Dict[str, Any]:
     """Existing graded answers, so a run can resume without re-paying for them."""
     if not RESULTS_PATH.exists():
-        return {"answerable": {}, "unanswerable": {}, "calibration": {}}
+        return {"answerable": {}, "unanswerable": {},
+                "calibration_corrupted": {}, "calibration_verbatim": {}}
     payload = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
     return {
         group: {r["id"]: r for r in payload.get("records", {}).get(group, [])}
-        for group in ("answerable", "unanswerable", "calibration")
+        for group in ("answerable", "unanswerable",
+                      "calibration_corrupted", "calibration_verbatim")
     }
 
 
@@ -281,7 +389,7 @@ def run(args) -> None:
 
     eval_items = json.loads(EVAL_PATH.read_text(encoding="utf-8"))["items"]
     answerable = random.Random(SEED).sample(
-        eval_items, min(N_ANSWERABLE, len(eval_items))
+        eval_items, min(args.answerable, len(eval_items))
     )
 
     rag = SecurityRAG()
@@ -289,6 +397,7 @@ def run(args) -> None:
     state = load_state()
     budget = args.limit or 10 ** 6
     spent = 0
+    failures: List[str] = []
 
     def record(group: str, item_id: str, question: str, expected: str,
                extra: Dict[str, Any]) -> bool:
@@ -304,11 +413,14 @@ def run(args) -> None:
             # error or a rate limit be scored as a hallucination, and the run is
             # resumable, so leaving the item unrecorded is the right outcome.
             print(f"  {item_id}: generation failed ({result['error'][:80]}); "
-                  f"not recorded", flush=True)
-            return False
+                  f"skipped", flush=True)
+            failures.append(item_id)
+            # Skip this item, but keep going: one refusal must not silently
+            # truncate the rest of the set and leave a smaller n unremarked.
+            return spent < budget
         retrieved = cited_ids(context)
         cited = cited_ids(answer)
-        verdict = judge(judge_client, args.model, context, answer)
+        verdict = judge(judge_client, args.judge_model, context, answer)
         state[group][item_id] = {
             "id": item_id,
             "question": question,
@@ -316,6 +428,8 @@ def run(args) -> None:
             "answer": answer,
             "grade": (verdict or {}).get("grade"),
             "judge_reason": (verdict or {}).get("reason"),
+            "usage": result.get("usage"),
+            "judge_usage": (verdict or {}).get("usage"),
             "cited_ids": cited,
             "retrieved_ids": retrieved,
             # The deterministic check: an ID in the answer that was never
@@ -334,23 +448,18 @@ def run(args) -> None:
         if not record("answerable", item["cve_id"], item["question"],
                       "grounded", {"target_cve": item["cve_id"]}):
             break
-    for item in unanswerable:
-        if not record("unanswerable", item["id"], item["question"],
-                      "abstained", {"kind": item["kind"]}):
-            break
 
     # Judge calibration: corrupt real answers and check the judge notices.
     graded = [r for r in state["answerable"].values() if r.get("answer")]
     for index, source in enumerate(graded[: args.calibration]):
         kind, injected = CORRUPTIONS[index % len(CORRUPTIONS)]
         item_id = f"corrupt-{kind}-{source['id']}"
-        if item_id in state["calibration"] or spent >= budget:
+        if item_id in state["calibration_corrupted"] or spent >= budget:
             continue
         corrupted = source["answer"] + injected
-        context_result = rag.retrieve_context(source["question"], n_results=N_RETRIEVED)
-        context = "\n\n".join(context_result["documents"])
-        verdict = judge(judge_client, args.model, context, corrupted)
-        state["calibration"][item_id] = {
+        context = rebuild_context(rag, source["question"])
+        verdict = judge(judge_client, args.judge_model, context, corrupted)
+        state["calibration_corrupted"][item_id] = {
             "id": item_id,
             "corruption": kind,
             "question": source["question"],
@@ -365,12 +474,95 @@ def run(args) -> None:
         }
         spent += 1
 
+    # The other half of calibration: answers that cannot be unsupported.
+    for source in graded[: args.calibration]:
+        item_id = f"verbatim-{source['id']}"
+        if item_id in state["calibration_verbatim"] or spent >= budget:
+            continue
+        context = rebuild_context(rag, source["question"])
+        quoted = verbatim_answer(context)
+        verdict = judge(judge_client, args.judge_model, context, quoted)
+        state["calibration_verbatim"][item_id] = {
+            "id": item_id,
+            "question": source["question"],
+            "expected": "grounded",
+            "answer": quoted,
+            "grade": (verdict or {}).get("grade"),
+            "judge_reason": (verdict or {}).get("reason"),
+            "judge_usage": (verdict or {}).get("usage"),
+            "cited_ids": cited_ids(quoted),
+            "retrieved_ids": cited_ids(context),
+            "invalid_citations": [],
+        }
+        spent += 1
+
+    for item in unanswerable:
+        if not record("unanswerable", item["id"], item["question"],
+                      "declined", {"kind": item["kind"]}):
+            break
+
+    # Abstention is judged with its own question, because the three-way
+    # groundedness grade cannot express it: an answer that says "not in the
+    # context, but here is what is" asserts supported facts and grades as
+    # grounded, which would read as a failure to decline when it is the
+    # opposite.
+    for item in unanswerable:
+        rec = state["unanswerable"].get(item["id"])
+        if not rec or rec.get("declined") is not None or spent >= budget:
+            continue
+        context = rebuild_context(rag, rec["question"])
+        verdict = judge_decline(judge_client, args.judge_model, rec["question"],
+                                context, rec["answer"])
+        if verdict:
+            rec["declined"] = verdict["declined"]
+            rec["fabricated"] = verdict.get("fabricated")
+            rec["decline_reason"] = verdict.get("reason")
+        spent += 1
+
     write_state(state, {
-        "judge_model": args.model,
+        "answer_model": args.model,
+        "judge_model": args.judge_model,
         "documents_per_answer": N_RETRIEVED,
+        "generation_failures": failures,
         "retrieval": rag.retrieval_mode + (" + direct_id" if rag.direct_id else ""),
     })
     conn.close()
+    report()
+
+
+def rejudge(args) -> None:
+    """Re-grade every existing answer with the current judge model.
+
+    Grades from two different judges are not comparable, so switching judge
+    means re-grading what already exists rather than mixing the two. Only the
+    judge is re-run: the answers are reused and retrieval is local, so this
+    costs one cheap call per record and changes nothing about what is measured.
+    """
+    from query import SecurityRAG
+
+    load_dotenv()
+    rag = SecurityRAG()
+    judge_client = claude_client.build_client()
+    state = load_state()
+    regraded = 0
+
+    wanted = set(args.groups.split(",")) if args.groups else set(state)
+    for group, records in state.items():
+        if group not in wanted:
+            continue
+        for item_id, rec in records.items():
+            if not rec.get("answer"):
+                continue
+            context = rebuild_context(rag, rec["question"])
+            verdict = judge(judge_client, args.judge_model, context, rec["answer"])
+            if verdict:
+                rec["grade"] = verdict["grade"]
+                rec["judge_reason"] = verdict.get("reason")
+                rec["judge_usage"] = verdict.get("usage")
+                regraded += 1
+        write_state(state, {"judge_model": args.judge_model})
+
+    print(f"re-graded {regraded} answers with {args.judge_model}")
     report()
 
 
@@ -381,7 +573,8 @@ def report() -> None:
     summary = payload.get("summary", {})
 
     print()
-    for group in ("answerable", "unanswerable", "calibration"):
+    for group in ("answerable", "unanswerable",
+                  "calibration_corrupted", "calibration_verbatim"):
         s = summary.get(group)
         if not s:
             continue
@@ -392,16 +585,30 @@ def report() -> None:
         print(f"  answers citing a CVE {s['answers_citing_a_cve']}, "
               f"invented citations {s['answers_with_an_invented_cve']}, "
               f"citation validity {s['citation_validity']:.3f}")
+        if s.get("decline_judged"):
+            print(f"  declined {s['declined_rate']:.3f}, "
+                  f"fabricated {s['fabricated_rate']:.3f} "
+                  f"(n={s['decline_judged']}, judged separately from groundedness)")
         print()
 
-    calib = summary.get("calibration")
-    if calib:
-        caught = calib["unsupported_rate"]
-        print(f"judge calibration: caught {caught:.1%} of deliberately "
-              f"corrupted answers")
-        if caught < 0.8:
-            print("  WARNING: the judge misses corruptions it was shown, so the "
-                  "groundedness figure above is an upper bound at best")
+    corrupted = summary.get("calibration_corrupted")
+    verbatim = summary.get("calibration_verbatim")
+    if corrupted or verbatim:
+        print("judge calibration")
+    if corrupted:
+        print(f"  recall    : caught {corrupted['unsupported_rate']:.1%} of "
+              f"deliberately corrupted answers (n={corrupted['answers']})")
+        if corrupted["unsupported_rate"] < 0.8:
+            print("    WARNING: misses planted errors, so groundedness is an "
+                  "upper bound at best")
+    if verbatim:
+        false_positive = 1 - verbatim["grounded_rate"]
+        print(f"  precision : wrongly flagged {false_positive:.1%} of answers "
+              f"quoted verbatim from their own context (n={verbatim['answers']})")
+        if false_positive > 0.1:
+            print("    WARNING: this judge invents faults in grounded answers, "
+                  "so the unsupported rate above is inflated and must not be "
+                  "quoted as a property of the system")
 
 
 def main() -> None:
@@ -411,13 +618,23 @@ def main() -> None:
     parser.add_argument("--persist-dir", default=str(PROJECT_ROOT / "chroma_db"))
     parser.add_argument("--collection", default="nvd_cve")
     parser.add_argument("--lexical-db", default=str(LEXICAL_DB))
-    parser.add_argument("--model", default=os.getenv("CLAUDE_MODEL", "claude-opus-5"))
+    parser.add_argument("--model", default=os.getenv("CLAUDE_MODEL", "claude-opus-5"),
+                        help="model under test; generates the answers")
+    parser.add_argument("--judge-model", default=DEFAULT_JUDGE_MODEL,
+                        help="model that grades. Cheaper is fine if it passes "
+                             "calibration - that is what calibration is for.")
+    parser.add_argument("--answerable", type=int, default=N_ANSWERABLE,
+                        help="how many answerable questions to reach in total")
     parser.add_argument("--limit", type=int, help="stop after this many API pairs")
     parser.add_argument("--calibration", type=int, default=12,
                         help="how many corrupted answers to grade")
     parser.add_argument("--build", action="store_true",
                         help="build the unanswerable set and exit")
     parser.add_argument("--run", action="store_true", help="generate and grade")
+    parser.add_argument("--rejudge", action="store_true",
+                        help="re-grade existing answers with --judge-model")
+    parser.add_argument("--groups", default=None,
+                        help="comma-separated groups to re-grade; default all")
     parser.add_argument("--report", action="store_true",
                         help="summarize existing results")
     args = parser.parse_args()
@@ -439,6 +656,9 @@ def main() -> None:
         return
     if args.report:
         report()
+        return
+    if args.rejudge:
+        rejudge(args)
         return
     if args.run:
         run(args)

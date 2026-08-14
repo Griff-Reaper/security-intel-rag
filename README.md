@@ -19,9 +19,9 @@
 > committed set of 192 paraphrased analyst-style questions built to remove that
 > advantage. Exploitation signals from CISA KEV and FIRST EPSS are joined in as
 > filterable metadata. **End-to-end answer quality — groundedness and refusal
-> behaviour — is still unmeasured**: the harness is built and committed but the
-> run is incomplete, and no answer-quality figure is quoted as a result. See
-> [Roadmap](#-roadmap).
+> behaviour — is measured too**: zero invented CVE IDs across 50 answers, 20/20
+> correct refusals on unanswerable questions, and a groundedness rate reported
+> against a judge calibrated in both directions. See [Roadmap](#-roadmap).
 
 ## 🎯 Problem Statement
 
@@ -1009,66 +1009,91 @@ Breaking ties on document ID is not the neutral choice — it is a coin flip tha
 discarded a quarter of the lexical arm's accuracy. The shipped tie-break prefers
 the lexical arm and is labelled in the source as the arm weighting it is.
 
-### Answer quality: harness built, measurement incomplete
+### Answer quality: groundedness, abstention, citation validity
 
-[experiments/answer_quality.py](experiments/answer_quality.py) evaluates what a
-user actually receives rather than what retrieval returns. **The run is
-unfinished — the Anthropic API credit balance was exhausted partway through — so
-the numbers below are preliminary and are labelled as such rather than promoted
-into a result.**
+[experiments/answer_quality.py](experiments/answer_quality.py) measures what a
+user actually receives rather than what retrieval returns.
 
-Three measurements of deliberately different kinds:
+**Abstention — the system does not invent answers it cannot have.** 22 questions
+built to be unanswerable: 12 about products verified by search to be absent from
+the corpus, 10 about real CVEs asking for what NVD records do not contain
+(attribution, patch steps, exploit availability). 20 were answered; 2 were
+declined by the generating model itself and are recorded as such.
 
-1. **Citation validity — deterministic, no judge.** Every CVE ID in the answer
-   text is checked against the IDs actually retrieved. An ID that was not in the
-   context was invented, whatever the prose says.
-2. **Groundedness — judged.** Whether each claim follows from the context is not
-   mechanically checkable, so a model grades it.
-3. **Abstention — judged, on questions built to be unanswerable.** 22 questions:
-   12 about products verified by search to be absent from the corpus, and 10
-   about real CVEs asking for things NVD records do not contain (attribution,
-   patch procedure, exploit availability).
+| | Result |
+|---|---:|
+| Declined (stated the information is unavailable) | **20 / 20** |
+| Fabricated a specific fact about the thing asked for | **0 / 20** |
 
-**The judge is calibrated, not trusted.** A judge that approves everything scores
-a perfect system. So real answers are corrupted — a fabricated CVE ID, an
-invented CVSS score, an unsupported exploitation claim — and graded alongside the
-genuine ones. The rate at which the judge catches those is the number that makes
-the groundedness rate mean anything.
+Every fabricated-product question produced a refusal of the right shape — *"There
+is no vulnerability record for Zyphergate Mailhub 4.2 in the retrieved context…
+I will not attribute any CVE ID to it."*
 
-| | Planned | Completed |
-|---|---:|---:|
-| Answerable questions | 40 | **16** |
-| Unanswerable questions | 22 | **0** |
-| Judge calibration answers | 12 | **0** |
+**Citation validity — deterministic, no judge.** Across all 50 generated answers,
+**every CVE ID that appeared in an answer was one that had actually been
+retrieved.** Zero invented identifiers. This is a mechanical check, not a
+judgement, and it is the strongest claim in this section.
 
-Preliminary, from 16 graded answers:
+**Groundedness — judged, on 18 answerable questions.**
 
-| Measure | Value | Status |
+| Grade | Rate |
+|---|---:|
+| Grounded | 0.611 |
+| Unsupported | 0.278 |
+| Abstained | 0.111 |
+
+The 27.8% is a real defect and it has a single cause. Every unsupported answer
+was correct about the CVE and then added an "Analyst Notes" section carrying
+material the context does not have: **CWE titles** (expanding `CWE-121` to
+"Stack-based Buffer Overflow"), **CVSS vector reasoning** ("the 6.8 reflects a
+user-interaction requirement"), and generic exploitation mechanics. The prompt
+asks for actionable recommendations, and the model supplies them from training
+knowledge. Two of those are fixable in the pipeline rather than the model:
+`cvss_vector` is in the stored metadata but is *not* passed into the context, and
+CWE titles are not in the corpus at all.
+
+### The judge is an instrument, and it was wrong twice
+
+A judge that approves everything scores a perfect system, so this one is
+calibrated in **both** directions — and both halves were necessary:
+
+| Calibration | n | Result |
 |---|---:|---|
-| Citation validity (14 answers naming a CVE) | **1.000** | deterministic — no judge involved |
-| Grounded | 0.625 | **uncalibrated — do not cite** |
-| Unsupported | 0.250 | **uncalibrated — do not cite** |
+| Corrupted answers (planted CVE / score / claim) | 12 | **100% caught** — recall |
+| Answers quoted verbatim from their own context | 12 | **0% wrongly flagged** — precision |
 
-Only the first line is a finding. **No answer named a CVE that was not in its
-retrieved context**, which is a judge-free check on the citation mechanism — but
-14 answers is a small sample and the corresponding rate for a system without
-metadata-derived citations is unknown.
+The precision half exists because the first version of this evaluation did not
+have it. A one-sided calibration passed at 100% recall while the judge was
+reporting an unsupported rate of 0.889, and the corrupted-answer test could not
+see the problem.
 
-The groundedness figures are reported here for completeness and are **not usable
-as evidence**: with zero calibration answers graded, there is no measurement of
-whether the judge can detect an unsupported claim at all. Quoting 0.625 as a
-groundedness result would be exactly the kind of unsubstantiated number this
-project removes elsewhere.
+Two separate faults were found by chasing that number instead of publishing it:
 
-One suggestive pattern worth chasing when the run completes: of the four answers
-graded unsupported, the judge's stated reason on several was that an "Analyst
-Notes" section added exploitation mechanics not present in the context. The
-prompt asks for actionable recommendations, and that instruction may be pulling
-the model past what the retrieved documents support. If that survives a
-calibrated judge, it is a prompt defect rather than a retrieval one.
+1. **The rubric could not express abstention.** An answer saying "not in the
+   context, but here is what is" asserts supported facts, so it graded as
+   *grounded*, not *abstained* — making a correct refusal look like a failure to
+   refuse. Abstention now has its own judgement with its own prompt.
+2. **The judge was shown less than the model was.** The re-grading path passed
+   the raw document text, while the answer model receives
+   `format_context_documents()` output, which folds in metadata the documents do
+   not contain — including the publication date. Both judges then reported that
+   the system was hallucinating publication dates. The dates were in the prompt
+   all along; the harness was hiding them.
 
-To finish: `python experiments/answer_quality.py --run` (resumable; it skips
-what is already graded and does not record API failures as answers).
+Neither fault was in the system under test. Both would have shipped as findings.
+
+**Cost, measured rather than estimated.** Every call's token usage is recorded:
+**1,067 input / 659 output tokens per answered question** at 5 retrieved
+documents. Judging is the cheap half. The judge model is selectable
+(`--judge-model`); a smaller model was tried and rejected — it passed recall at
+100% but produced false positives on real answers, which is exactly what the
+precision half of the calibration is for.
+
+**Limits.** 18 answerable questions is a small sample: the 0.611 grounded rate
+carries roughly ±11 points of sampling error, and the run is capped by API
+budget rather than by design. The judge and the system under test are the same
+model family, which is a known bias in LLM-as-judge setups and is not controlled
+for here.
 
 ### Still not measured
 
@@ -1102,13 +1127,17 @@ Planned, in order:
       same pinned CVEs, with leakage measured against the copied-sentence
       control and paired significance tests. Verdict: the dense arm does not
       earn its place on this workload
-- [ ] **Answer-quality evaluation** — harness built and committed
-      ([answer_quality.py](experiments/answer_quality.py)): deterministic
-      citation validity, judged groundedness, abstention on 22 verified
-      unanswerable questions, and a corrupted-answer set to calibrate the judge.
-      **The run is incomplete** — API credits were exhausted after 16 of 78
-      planned gradings — so no groundedness or refusal figure is quoted as a
-      result. Resumable
+- [x] **Answer-quality evaluation** — deterministic citation validity (zero
+      invented CVE IDs across 50 answers), abstention on 22 verified
+      unanswerable questions (20/20 declined, 0 fabricated), and judged
+      groundedness with two-sided judge calibration
+- [ ] **Ground the analyst notes** — 27.8% of answers add CWE titles and CVSS
+      vector reasoning the context does not carry. `cvss_vector` is already in
+      the metadata and simply is not passed into the prompt; CWE titles are not
+      in the corpus at all. The cheapest remaining correctness win
+- [ ] **Larger answer-quality sample** — 18 answerable questions is ±11 points
+      of sampling error, and the judge shares a model family with the system
+      under test
 - [ ] **Interface and packaging** — abstention below a relevance floor, and a
       Dockerfile plus compose file
 
