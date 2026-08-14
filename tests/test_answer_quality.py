@@ -188,7 +188,8 @@ class TestPreregisteredDecisionRule:
                 {"id": f"CVE-2000-{i:04d}", "grade": g, "answer": "a"}
                 for i, g in enumerate(grades)]}}), encoding="utf-8")
             return path
-        result = aq.decide(write("a.json", a_grades), write("b.json", b_grades))
+        result = aq.decide(write("a.json", a_grades), write("b.json", b_grades),
+                           tmp_path / "decision.json")
         capsys.readouterr()
         return result
 
@@ -242,7 +243,8 @@ class TestPreregisteredDecisionRule:
         refused = [{"id": "CVE-2000-0002", "grade": "abstained",
                     "answer": aq.REFUSAL_PLACEHOLDER}]
         result = aq.decide(write("a.json", common + refused),
-                           write("b.json", common + refused))
+                           write("b.json", common + refused),
+                           tmp_path / "decision.json")
         capsys.readouterr()
         assert result["questions"] == 1
 
@@ -393,6 +395,83 @@ class TestRefusalAggregation:
         assert totals["calls"] == 20
         assert totals["calls_with_stop_reason"] == 10
         assert totals["refusals"] == 1      # 1 in 10, not 1 in 20
+
+
+class TestNothingWritesIntoCommittedResults:
+    """
+    A test suite that writes into experiments/results/ can destroy a
+    measurement that cost real money, and does it silently, because the console
+    output of the real run was correct at the time.
+
+    That is not hypothetical either. `decide()` wrote to a module constant, the
+    tests below exercised all five branches of the rule on synthetic data, and
+    the last one to run left a one-question verdict in config_decision.json
+    where a 142-question one had been. It was caught by reading the artifact
+    instead of trusting the terminal.
+
+    Both fixes are structural: the output path is a required argument, and this
+    test fails if any experiment function grows a default that points inside the
+    results directory.
+    """
+
+    def _experiment_sources(self):
+        for path in sorted((ROOT / "experiments").glob("*.py")):
+            yield path, ast.parse(path.read_text(encoding="utf-8"))
+
+    def test_no_writing_function_defaults_to_the_results_directory(self):
+        """A default output path is what turns a test run into data loss."""
+        offenders = []
+        for path, tree in self._experiment_sources():
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.FunctionDef):
+                    continue
+                names = [a.arg for a in node.args.args]
+                defaults = node.args.defaults
+                first_defaulted = len(names) - len(defaults)
+                for index, name in enumerate(names):
+                    if index < first_defaulted:
+                        continue
+                    if not any(k in name for k in ("out", "path", "dest")):
+                        continue
+                    default = defaults[index - first_defaulted]
+                    rendered = ast.dump(default)
+                    if "RESULTS_DIR" in rendered or "RESULTS_PATH" in rendered:
+                        offenders.append(
+                            f"{path.name}:{node.lineno} {node.name}({name}=...)")
+        assert not offenders, (
+            "these default to a committed results path, so calling them from a "
+            f"test overwrites a real measurement: {offenders}"
+        )
+
+    def test_the_results_directory_is_untouched_by_this_suite(self, tmp_path):
+        """End-to-end: run the rule and confirm the real artifact is unchanged."""
+        real = ROOT / "experiments" / "results" / "config_decision.json"
+        before = real.read_text(encoding="utf-8") if real.exists() else None
+
+        def write(name, grades):
+            path = tmp_path / name
+            path.write_text(json.dumps({"records": {"answerable": [
+                {"id": f"CVE-2000-{i:04d}", "grade": g, "answer": "a"}
+                for i, g in enumerate(grades)]}}), encoding="utf-8")
+            return path
+        aq.decide(write("a.json", ["grounded"] * 3),
+                  write("b.json", ["grounded"] * 3),
+                  tmp_path / "decision.json")
+
+        after = real.read_text(encoding="utf-8") if real.exists() else None
+        assert after == before, "the test suite just overwrote a real result"
+
+    def test_decide_requires_an_explicit_destination(self):
+        for path, tree in self._experiment_sources():
+            if path.name != "answer_quality.py":
+                continue
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.name == "decide":
+                    names = [a.arg for a in node.args.args]
+                    first_defaulted = len(names) - len(node.args.defaults)
+                    assert names.index("out_path") < first_defaulted
+                    return
+        pytest.fail("decide() not found")
 
 
 class TestCommittedArtifactsAgree:

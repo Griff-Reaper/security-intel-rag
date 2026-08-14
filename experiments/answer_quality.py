@@ -767,9 +767,16 @@ def paired_difference_interval(a_wins: int, b_wins: int, n: int,
     }
 
 
-def decide(a_path: Path, b_path: Path) -> Dict[str, Any]:
+def decide(a_path: Path, b_path: Path, out_path: Path) -> Dict[str, Any]:
     """
     Apply the pre-registered decision rule to a config comparison.
+
+    `out_path` is required for the same reason `results_path` is. The first
+    version wrote to a module constant, the test suite exercised every branch
+    of the rule on synthetic data, and the last test to run left a one-question
+    verdict sitting in the committed artifact where the real one had been. The
+    console output was correct and the file on disk was not, which is the worst
+    available combination.
 
     A is the incumbent and the expensive one (hybrid_rerank, p50 587 ms);
     B is the challenger and the cheap one (bm25, p50 13 ms). The rule is not
@@ -896,10 +903,11 @@ def decide(a_path: Path, b_path: Path) -> Dict[str, Any]:
 
     result["post_hoc_target_hit"] = _target_hit_comparison(a_path, b_path)
 
-    out = RESULTS_DIR / "config_decision.json"
-    out.write_text(json.dumps({**provenance.stamp(), **result}, indent=2) + "\n",
-                   encoding="utf-8")
-    print(f"\n  wrote {out.relative_to(PROJECT_ROOT)}")
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(out_path).write_text(
+        json.dumps({**provenance.stamp(), **result}, indent=2) + "\n",
+        encoding="utf-8")
+    print(f"\n  wrote {out_path}")
     return result
 
 
@@ -1092,13 +1100,17 @@ def main() -> None:
     parser.add_argument("--decide", nargs=2, metavar=("A", "B"),
                         help="apply the pre-registered decision rule to two "
                              "config runs; see experiments/PREREGISTRATION.md")
+    parser.add_argument("--decision-out",
+                        default=str(RESULTS_DIR / "config_decision.json"),
+                        help="where --decide writes its verdict")
     parser.add_argument("--compare", metavar="BASELINE",
                         help="paired comparison of --results against an earlier "
                              "results file over the questions both contain")
     args = parser.parse_args()
 
     if args.decide:
-        decide(Path(args.decide[0]), Path(args.decide[1]))
+        decide(Path(args.decide[0]), Path(args.decide[1]),
+               Path(args.decision_out))
         return
 
     if args.compare:

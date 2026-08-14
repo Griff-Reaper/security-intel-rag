@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-14T19:05:42+00:00",
+  "generated_at": "2026-08-14T19:15:33+00:00",
   "document_layout": {
     "version": 2,
     "fingerprint": "ffb8c1393e249003",
@@ -9,21 +9,21 @@
     "max_products_in_metadata": 40,
     "list_delimiter": "|"
   },
-  "a": "C:\\Users\\domo_\\AppData\\Local\\Temp\\pytest-of-domo_\\pytest-57\\test_provider_refusals_are_not0\\a.json",
-  "b": "C:\\Users\\domo_\\AppData\\Local\\Temp\\pytest-of-domo_\\pytest-57\\test_provider_refusals_are_not0\\b.json",
-  "questions": 1,
-  "a_grounded": 1,
-  "b_grounded": 1,
+  "a": "experiments\\results\\answer_quality_holdout_hybrid_rerank.json",
+  "b": "experiments\\results\\answer_quality_holdout_bm25.json",
+  "questions": 142,
+  "a_grounded": 141,
+  "b_grounded": 142,
   "a_wins": 0,
-  "b_wins": 0,
-  "discordant": 0,
-  "observed_grade_discordance": 0.0,
+  "b_wins": 1,
+  "discordant": 1,
+  "observed_grade_discordance": 0.007,
   "p_value": 1.0,
   "difference_interval_95": {
-    "difference": 0.0,
-    "low": 0.0,
-    "high": 0.0,
-    "half_width": 0.0
+    "difference": -0.007,
+    "low": -0.0208,
+    "high": 0.0067,
+    "half_width": 0.0138
   },
   "preregistered_delta": 0.1,
   "achieved_power_at_delta": null,
@@ -31,5 +31,20 @@
   "verdict": "equivalence",
   "consequence": "the whole interval lies inside +/-10%: the default flips to bm25 on latency grounds",
   "rule": "experiments/PREREGISTRATION.md",
-  "post_hoc_target_hit": {}
+  "post_hoc_target_hit": {
+    "questions": 142,
+    "a_target_retrieved": 111,
+    "b_target_retrieved": 108,
+    "a_wins": 10,
+    "b_wins": 7,
+    "discordant": 17,
+    "p_value": 0.6291,
+    "difference_interval_95": {
+      "difference": 0.0211,
+      "low": -0.0357,
+      "high": 0.0779,
+      "half_width": 0.0568
+    },
+    "status": "post hoc; not pre-registered; does not affect the verdict"
+  }
 }
