@@ -1,0 +1,1321 @@
+{
+  "generated_at": "2026-08-14T17:00:31+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "in_progress": true,
+  "summary": {
+    "answerable": {
+      "answers": 40,
+      "graded": 40,
+      "grades": {
+        "grounded": 40
+      },
+      "grounded_rate": 1.0,
+      "unsupported_rate": 0.0,
+      "abstained_rate": 0.0,
+      "answers_citing_a_cve": 40,
+      "answers_with_an_invented_cve": 0,
+      "citation_validity": 1.0,
+      "decline_judged": 0,
+      "declined_rate": 0.0,
+      "fabricated_rate": 0.0,
+      "false_abstention_rate": 0.0,
+      "false_abstentions": 0
+    }
+  },
+  "records": {
+    "answerable": [
+      {
+        "id": "CVE-2021-42986",
+        "question": "Is there a kernel driver integer overflow in NoMachine client versions before 7.7.4 allowing local privilege escalation via crafted IOCTL requests?",
+        "expected": "grounded",
+        "answer": "## Short answer\n\nYes \u2014 the retrieved records document an integer overflow in the NoMachine Enterprise Client affecting versions above 4.0.346 and below 7.7.4, reached through an IOCTL handler. Note one wording distinction: the records describe the impact as arbitrary code execution **in kernel mode** or denial of service, not as \"privilege escalation\" in those terms.\n\n## The directly matching record\n\n**CVE-2021-42986**\n- **Product / vendor:** nomachine \u2014 Enterprise Client\n- **Description (verbatim substance):** NoMachine Enterprise Client is affected by Integer Overflow. IOCTL Handler 0x22001B in the NoMachine Enterprise Client above 4.0.346 and below 7.7.4 allow local attackers to execute arbitrary code in kernel mode or cause a denial of service (memory corruption and OS crash) via specially crafted I/O Request Packet.\n- **Severity:** HIGH, CVSS 3.1 base score 8.8\n- **Vector:** CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H \u2014 local attack vector, low attack complexity, low privileges required, no user interaction, scope changed, high confidentiality/integrity/availability impact\n- **CWE:** CWE-190\n- **Published:** 2021-12-07\n- **Exploitation:** not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.00481 (0.39215 percentile), scored 2026-08-13\n\n## Companion records \u2014 same defect across other NoMachine products\n\nThe context carries two further NoMachine entries with identical descriptive text, IOCTL handler (0x22001B), version range, CWE, CVSS vector, score, publication date, and EPSS values:\n\n| CVE | Product | Severity / CVSS 3.1 |\n|---|---|---|\n| CVE-2021-42973 | nomachine \u2014 server | HIGH, 8.8 |\n| CVE-2021-42977 | nomachine \u2014 enterprise desktop | HIGH, 8.8 |\n\nBoth are CWE-190, both carry the vector CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:H, and neither is listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n\n## Scope note\n\nThe context contains no NoMachine record beyond these three products (Enterprise Client, Server, Enterprise Desktop). If you are asking about a plainly named \"NoMachine Client\" product distinct from \"Enterprise Client,\" the indexed data does not cover it.\n\nTwo other CWE-190 records in the retrieved set \u2014 CVE-2025-22836 (HIGH, CVSS 4.0 base 8.8) and CVE-2025-24324 (LOW, CVSS 4.0 base 2.0) \u2014 concern the Linux kernel-mode driver for some Intel(R) 800 Series Ethernet before version 1.17.2 and are unrelated to NoMachine.\n\nThe corpus carries no vendor patch instructions and no ATT&CK mappings for any of these records.",
+        "grade": "grounded",
+        "judge_reason": "Every claim\u2014CVE identifiers, descriptions, versions, CVSS vectors/scores, CWE, EPSS, KEV status, and the note on unrelated Intel records\u2014matches the provided context.",
+        "usage": {
+          "input_tokens": 3423,
+          "output_tokens": 1277
+        },
+        "judge_usage": {
+          "input_tokens": 3676,
+          "output_tokens": 166
+        },
+        "cited_ids": [
+          "CVE-2021-42973",
+          "CVE-2021-42977",
+          "CVE-2021-42986",
+          "CVE-2025-22836",
+          "CVE-2025-24324"
+        ],
+        "retrieved_ids": [
+          "CVE-2021-42973",
+          "CVE-2021-42977",
+          "CVE-2021-42986",
+          "CVE-2025-22836",
+          "CVE-2025-24324"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2021-42986"
+      },
+      {
+        "id": "CVE-2022-24748",
+        "question": "Which Shopware 6 flaw lets apps edit customer records and place orders without the required permissions due to weak API route validation?",
+        "expected": "grounded",
+        "answer": "## Matching Vulnerability: CVE-2022-24748\n\n**Description (as recorded):** Shopware is an open commerce platform based on the Symfony PHP Framework and the Vue JavaScript framework. In versions prior to 6.4.8.2 it is possible to modify customers and to create orders without App Permission. The record attributes this to improper api route checking. Users are advised to upgrade to version 6.4.8.2, and the record states there are no known workarounds.\n\n**Severity and scoring:**\n- HIGH \u2014 CVSS 3.1 base score 7.5\n- Vector: `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N` \u2014 network attack vector, low attack complexity, no privileges required, no user interaction, unchanged scope, no confidentiality impact, high integrity impact, no availability impact\n\n**Affected vendors:** shopware\n**Affected products:** platform, shopware\n\n**Weaknesses:** CWE-863, CWE-287\n\n**Exploitation status:**\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- EPSS: 0.00759 predicted probability of exploitation activity in the next 30 days, 0.52012 percentile (scored 2026-08-13)\n\n**Published:** 2022-03-09\n\n---\n\n### Note on other Shopware records in the retrieved set\n\nThe question specifically describes app-permission bypass via api route checking, which matches only CVE-2022-24748. For completeness, the retrieved context contains four other Shopware authorization/session records that do **not** match the described conditions:\n\n| CVE | Summary per record | Severity / CVSS | CWE |\n|---|---|---|---|\n| CVE-2024-22407 | Order state handler insufficiently verifies user authorizations for payment, delivery, and/or order status changes; users lacking 'write' permissions for orders can still change order state | MEDIUM \u2014 CVSS 3.1 base 6.5 | CWE-284 |\n| CVE-2026-31887 | Insufficient check on filter types for unauthenticated customers allows access to orders of other customers, part of deepLinkCode support on the store-api.order endpoint | HIGH \u2014 CVSS 4.0 base 8.9 | CWE-863 |\n| CVE-2025-30150 | Via `/store-api/account/recovery-password`, responses distinguish whether an e-mail address has an account in the shop | MEDIUM \u2014 CVSS 4.0 base 5.5 | CWE-204 |\n| CVE-2024-31447 | `POST /store-api/account/logout` clears the cart but does not log the user out | MEDIUM \u2014 CVSS 3.1 base 5.3 | CWE-613 |\n\nAll four are likewise not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).",
+        "grade": "grounded",
+        "judge_reason": "Every claim, including descriptions, CVSS scores/vectors, CWEs, EPSS, KEV status, and publication date, matches the provided documents.",
+        "usage": {
+          "input_tokens": 3775,
+          "output_tokens": 981
+        },
+        "judge_usage": {
+          "input_tokens": 3925,
+          "output_tokens": 185
+        },
+        "cited_ids": [
+          "CVE-2022-24748",
+          "CVE-2024-22407",
+          "CVE-2024-31447",
+          "CVE-2025-30150",
+          "CVE-2026-31887"
+        ],
+        "retrieved_ids": [
+          "CVE-2022-24748",
+          "CVE-2024-22407",
+          "CVE-2024-31447",
+          "CVE-2025-30150",
+          "CVE-2026-31887"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2022-24748"
+      },
+      {
+        "id": "CVE-2025-68501",
+        "question": "Is there a reflected XSS flaw in the Mollie payment gateway plugin for WooCommerce up to version 8.1.1?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nYes. The retrieved context contains one record matching this description: **CVE-2025-68501**.\n\n## CVE-2025-68501\n\n| Field | Value |\n|---|---|\n| **Description** | \"Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Mollie Mollie Payments for WooCommerce mollie-payments-for-woocommerce allows Reflected XSS.\" |\n| **Affected versions** | \"from n/a through <= 8.1.1\" |\n| **Vendor** | Mollie |\n| **Product** | Mollie Payments for WooCommerce (`mollie-payments-for-woocommerce`) |\n| **Severity** | HIGH |\n| **CVSS 3.1 base score** | 7.1 |\n| **CVSS vector** | CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:L |\n| **CWE** | CWE-79 |\n| **Published** | 2026-02-20 |\n\n**Vector components as stated:** Attack Vector: Network; Attack Complexity: Low; Privileges Required: None; User Interaction: Required; Scope: Changed; Confidentiality: Low; Integrity: Low; Availability: Low.\n\n**Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS is 0.0018 \u2014 a predicted probability of exploitation activity in the next 30 days, placing it at the 0.07741 percentile (scored 2026-08-13). Note that EPSS is a model prediction, not a record of observed activity.\n\n## Related records in the retrieved set\n\nThe context also carries four other reflected XSS records affecting WooCommerce payment-gateway plugins from **other** vendors \u2014 these are distinct products and are not the Mollie plugin:\n\n- **CVE-2025-26541** \u2014 CodeSolz, Bitcoin / AltCoin Payment Gateway for WooCommerce, through <= 1.7.6. HIGH, CVSS 3.1 base 7.1 (AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:L). CWE-79. Not in CISA KEV; EPSS 0.00363.\n- **CVE-2023-44144** \u2014 Dreamfox / dreamfoxmedia, Payment gateway per Product for WooCommerce, <= 3.2.7. MEDIUM, CVSS 3.1 base 6.1. CWE-79. Not in CISA KEV; EPSS 0.00351.\n- **CVE-2021-39308** \u2014 WooCommerce myghpay Payment Gateway, versions up to and including 3.0; the record identifies the `clientref` parameter in `~/processresponse.php`. MEDIUM, CVSS 3.1 base 6.1. CWE-79. Not in CISA KEV; EPSS 0.00757.\n- **CVE-2021-38341** \u2014 WooCommerce Payment Gateway Per Category / dreamfoxmedia, up to and including 2.0.10; the record cites a reflected `$_SERVER[\"PHP_SELF\"]` value in `~/includes/plugin_settings.php`. MEDIUM, CVSS 3.1 base 6.1. CWE-79. Not in CISA KEV; EPSS 0.00938.\n\n## Limits of this data\n\nThe CVE-2025-68501 record does not identify the vulnerable parameter, file, or endpoint, and carries no patch or fixed-version information. The corpus carries no MITRE ATT&CK mappings and no vendor remediation instructions.",
+        "grade": "grounded",
+        "judge_reason": "Every stated detail (identifiers, versions, vendors, CVSS scores/vectors, CWE, KEV status, EPSS values, and file/parameter details) matches the provided CVE records, and the limitations noted are accurate.",
+        "usage": {
+          "input_tokens": 3358,
+          "output_tokens": 1252
+        },
+        "judge_usage": {
+          "input_tokens": 3772,
+          "output_tokens": 183
+        },
+        "cited_ids": [
+          "CVE-2021-38341",
+          "CVE-2021-39308",
+          "CVE-2023-44144",
+          "CVE-2025-26541",
+          "CVE-2025-68501"
+        ],
+        "retrieved_ids": [
+          "CVE-2021-38341",
+          "CVE-2021-39308",
+          "CVE-2023-44144",
+          "CVE-2025-26541",
+          "CVE-2025-68501"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2025-68501"
+      },
+      {
+        "id": "CVE-2024-50248",
+        "question": "What is the recently patched Linux kernel vulnerability with no details given beyond the fix notice?",
+        "expected": "grounded",
+        "answer": "## Scope note\n\nThe question doesn't map uniquely onto one record. All five retrieved entries are Linux kernel advisories phrased as \"In the Linux kernel, the following vulnerability has been resolved,\" i.e. all are fix notices. Two of them carry essentially nothing beyond the fix statement itself, and those are the best candidates. I've listed both rather than guess between them.\n\n## Closest match: CVE-2022-48741\n\nThe shortest record in the set \u2014 the entire technical body is that the patch fixes a NULL pointer dereference in an overlayfs copy-up warning path, \"to get a recently introduced warning message working.\" No trigger conditions, no affected code paths, no version detail.\n\n- **CVE ID:** CVE-2022-48741\n- **Severity:** MEDIUM, CVSS 3.1 base score 5.5\n- **CVSS vector:** CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H \u2014 local attack vector, low attack complexity, low privileges required, no user interaction, unchanged scope, no confidentiality or integrity impact, high availability impact\n- **Affected vendors/products:** Linux, linux \u2014 Linux, linux kernel\n- **CWE:** CWE-476\n- **Exploitation:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.00222 predicted probability of exploitation activity in the next 30 days (0.12857 percentile, scored 2026-08-13)\n- **Published:** 2024-06-20\n\n## Second candidate: CVE-2022-50333\n\nAlso near-contentless: the record states the fix addresses a shift-out-of-bounds in `dbDiscardAG` in jfs by guarding `dbMount`, and notes syzbot \"feeding rubbish into the bmap descriptor.\" No further mechanism is described.\n\n- **CVE ID:** CVE-2022-50333\n- **Severity:** HIGH, CVSS 3.1 base score 7.1\n- **CVSS vector:** CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:H \u2014 local attack vector, low attack complexity, low privileges required, no user interaction, unchanged scope, high confidentiality impact, no integrity impact, high availability impact\n- **Affected vendors/products:** Linux, linux \u2014 Linux, linux kernel\n- **CWE:** CWE-125\n- **Exploitation:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.00159 (0.05488 percentile, scored 2026-08-13)\n- **Published:** 2025-09-15\n\n## The remaining three records, for completeness\n\nEach carries more descriptive detail than the two above, so they fit the question less well:\n\n| CVE | Severity / CVSS 3.1 | CWE | Subsystem per record |\n|---|---|---|---|\n| CVE-2022-50492 | HIGH, 7.8 (AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H) | CWE-416 | drm/msm, use-after-free on probe deferral |\n| CVE-2021-47475 | HIGH, 7.8 (AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H) | CWE-787 | comedi vmk80xx transfer-buffer overflows |\n| CVE-2022-50479 | MEDIUM, 5.5 (AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H) | CWE-401 | drm/amd, potential memory leak |\n\nAll three list affected vendors/products as Linux, linux / Linux, linux kernel, and none is listed in the CISA KEV catalog (version 2026.08.11). EPSS scores (2026-08-13): CVE-2022-50492 \u2014 0.00143 (0.04068 percentile); CVE-2021-47475 \u2014 0.00259 (0.17564 percentile); CVE-2022-50479 \u2014 0.00128 (0.02811 percentile).\n\nIf you had a specific advisory in mind, narrowing by subsystem or publication date would let me confirm which of these you mean.",
+        "grade": "grounded",
+        "judge_reason": "All CVE IDs, severities, vectors, CWEs, EPSS values, KEV status, dates, and descriptions match the provided documents.",
+        "usage": {
+          "input_tokens": 3462,
+          "output_tokens": 1737
+        },
+        "judge_usage": {
+          "input_tokens": 4118,
+          "output_tokens": 336
+        },
+        "cited_ids": [
+          "CVE-2021-47475",
+          "CVE-2022-48741",
+          "CVE-2022-50333",
+          "CVE-2022-50479",
+          "CVE-2022-50492"
+        ],
+        "retrieved_ids": [
+          "CVE-2021-47475",
+          "CVE-2022-48741",
+          "CVE-2022-50333",
+          "CVE-2022-50479",
+          "CVE-2022-50492"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2024-50248"
+      },
+      {
+        "id": "CVE-2017-14582",
+        "question": "Which Site24x7 Android network monitoring app version failed to validate SSL certificates, enabling man-in-the-middle interception?",
+        "expected": "grounded",
+        "answer": "## Answer\n\n**CVE-2017-14582** \u2014 the Zoho Site24x7 Mobile Network Poller application **before version 1.1.5 for Android**.\n\n### Record details\n\n| Field | Value |\n|---|---|\n| CVE ID | CVE-2017-14582 |\n| Severity | MEDIUM |\n| CVSS 3.0 base score | 5.9 |\n| CVSS vector | CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N |\n| Published | 2017-09-30T01:29:01.587 |\n| CWE | CWE-295 |\n| Affected vendor | zohocorp |\n| Affected product | site24x7 mobile network poller |\n\n### Description as stated\n\nThe Zoho Site24x7 Mobile Network Poller application before 1.1.5 for Android does not verify X.509 certificates from SSL servers, which allows man-in-the-middle attackers to spoof servers and obtain sensitive information via a self-signed certificate.\n\n### Vector components (as given in the record)\n\nAttack Vector: Network; Attack Complexity: High; Privileges Required: None; User Interaction: None; Scope: Unchanged; Confidentiality: High; Integrity: None; Availability: None.\n\n### Exploitation status\n\n- **CISA KEV:** not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n- **EPSS:** 0.02356 predicted probability of exploitation activity in the next 30 days, 0.82224 percentile (scored 2026-08-13). This is a model prediction, not a record of observed activity.\n\n### Note on the other retrieved records\n\nThe remaining documents in the retrieved set (CVE-2017-3194 / Pandora iOS, CVE-2017-3190 / Flash Seats Mobile App, CVE-2016-5648 / Acer Portal, CVE-2016-2268 / Dell SecureWorks iOS) concern other vendors and products and do not relate to Site24x7.",
+        "grade": "grounded",
+        "judge_reason": "All details (CVE ID, severity, CVSS vector and its decoded components, publish date, CWE, vendor/product, description, KEV/EPSS status, and the summary of other records) match Document 1 and the other documents exactly.",
+        "usage": {
+          "input_tokens": 3089,
+          "output_tokens": 733
+        },
+        "judge_usage": {
+          "input_tokens": 2957,
+          "output_tokens": 117
+        },
+        "cited_ids": [
+          "CVE-2016-2268",
+          "CVE-2016-5648",
+          "CVE-2017-14582",
+          "CVE-2017-3190",
+          "CVE-2017-3194"
+        ],
+        "retrieved_ids": [
+          "CVE-2016-2268",
+          "CVE-2016-5648",
+          "CVE-2017-14582",
+          "CVE-2017-3190",
+          "CVE-2017-3194"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2017-14582"
+      },
+      {
+        "id": "CVE-2026-35009",
+        "question": "Is there a reflected XSS in Open ISES Tickets via the ticket_id URL parameter in add_note.php?",
+        "expected": "grounded",
+        "answer": "## Direct Answer\n\nYes. **CVE-2026-35009** covers exactly this condition.\n\n## Details\n\n**CVE-2026-35009**\n- **Description (as recorded):** Open ISES Tickets before 3.44.2 contains a reflected cross-site scripting vulnerability in `add_note.php` that allows authenticated attackers to inject arbitrary JavaScript by passing an unsanitized value through the `ticket_id` GET parameter directly into a hidden input field VALUE attribute. Attackers can craft a malicious URL containing a JavaScript payload in the `ticket_id` parameter that executes in the victim's browser when the URL is visited.\n- **Severity:** MEDIUM \u2014 CVSS 4.0 base score 5.1\n- **CVSS vector:** `CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N/...`\n- **Affected vendor / product:** openises / tickets\n- **Weakness:** CWE-79\n- **Published:** 2026-05-20T20:16:38.063\n- **Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.00221 predicted probability of exploitation activity in the next 30 days, 0.1275 percentile (scored 2026-08-13)\n\n## Closely Related Records in the Same Product\n\nThe retrieved context contains four additional entries against Open ISES Tickets before 3.44.2, all CWE-79, all MEDIUM / CVSS 4.0 base 5.1, and all with the same CVSS vector shown above. None are listed in the CISA KEV catalog (version 2026.08.11).\n\n| CVE | File | Parameter / sink |\n|---|---|---|\n| CVE-2026-35012 | `add_facnote.php` | `ticket_id` GET parameter into a hidden input field VALUE attribute |\n| CVE-2026-35008 | `single.php` | `ticket_id` GET parameter into an HTML attribute (record states the crafted URL carries the payload in the `id` parameter) |\n| CVE-2026-48213 | `add.php` | `ticket_id` POST parameter into an HTML form input value attribute |\n| CVE-2026-48214 | `add_nm.php` | `ticket_id` POST parameter into an HTML form input value attribute and an inline JavaScript string literal |\n\nEPSS scores (scored 2026-08-13): CVE-2026-35012 \u2014 0.00221 (0.1275 percentile); CVE-2026-35008 \u2014 0.00221 (0.1275 percentile); CVE-2026-48213 \u2014 0.00172 (0.06905 percentile); CVE-2026-48214 \u2014 0.00212 (0.11713 percentile).\n\nNote that vendor/product strings differ in casing across records: \"openises / tickets\" for CVE-2026-35008, -35009, -35012, and \"Open ISES / Tickets\" for CVE-2026-48213, -48214.\n\n## Not Covered\n\nThe retrieved records state the affected version boundary (\"before 3.44.2\") but carry no vendor patch instructions and no MITRE ATT&CK mappings.",
+        "grade": "grounded",
+        "judge_reason": "Every detail\u2014descriptions, CVSS vectors, EPSS values, KEV status, and vendor/product casing differences\u2014matches the provided CVE records exactly.",
+        "usage": {
+          "input_tokens": 4033,
+          "output_tokens": 1121
+        },
+        "judge_usage": {
+          "input_tokens": 4321,
+          "output_tokens": 216
+        },
+        "cited_ids": [
+          "CVE-2026-35008",
+          "CVE-2026-35009",
+          "CVE-2026-35012",
+          "CVE-2026-48213",
+          "CVE-2026-48214"
+        ],
+        "retrieved_ids": [
+          "CVE-2026-35008",
+          "CVE-2026-35009",
+          "CVE-2026-35012",
+          "CVE-2026-48213",
+          "CVE-2026-48214"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2026-35009"
+      },
+      {
+        "id": "CVE-2019-10719",
+        "question": "Is there a path traversal flaw in BlogEngine.NET's upload API allowing arbitrary file write and code execution?",
+        "expected": "grounded",
+        "answer": "## Direct Answer: Yes\n\n**CVE-2019-10719** covers this.\n\n### Record details\n\n| Field | Value |\n|---|---|\n| CVE ID | CVE-2019-10719 |\n| Severity | HIGH \u2014 CVSS 3.0 base score 8.8 |\n| CVSS vector | CVSS:3.0/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H |\n| Published | 2019-06-21T19:15:09.880 |\n| CWE | CWE-22 |\n| Affected vendor | dotnetblogengine |\n| Affected product | blogengine.net |\n\n### What the record states\n\nBlogEngine.NET 3.3.7.0 and earlier allows Directory Traversal and Remote Code Execution because file creation is mishandled. The record relates the issue to `/api/upload` and `BlogEngine.NET/AppCode/Api/UploadController.cs`.\n\nThe record carries a note: this issue exists because of an incomplete fix for CVE-2019-6714. (CVE-2019-6714 itself is referenced only inside this note; no separate record for it is present in the retrieved context.)\n\n### Exploitation status\n\n- **CISA KEV:** not listed in the Known Exploited Vulnerabilities catalog (version 2026.08.11).\n- **EPSS:** 0.07595 predicted probability of exploitation activity in the next 30 days, 0.93994 percentile (scored 2026-08-13). This is the highest EPSS value among the five records in the retrieved set.\n\n### Reading the vector components\n\nThe vector string provided states network attack vector (AV:N), low attack complexity (AC:L), low privileges required (PR:L), no user interaction (UI:N), unchanged scope (S:U), and high confidentiality, integrity, and availability impact (C:H/I:H/A:H).\n\n### Note on scope\n\nThe retrieved context contains four other CWE-22 records involving file upload path traversal \u2014 CVE-2026-6057 (FalkorDB Browser), CVE-2024-10902 (eosphoros-ai/db-gpt), CVE-2024-9415 (transformeroptimus/superagi), and CVE-2026-65700 (h2oai h2ogpt) \u2014 but none of these affect BlogEngine.NET. Only CVE-2019-10719 is responsive to your question.\n\nThe corpus carries no vendor patch instructions for this CVE.",
+        "grade": "grounded",
+        "judge_reason": "All details, including the CVSS vector reading, EPSS comparison, and scope notes, match the provided CVE records.",
+        "usage": {
+          "input_tokens": 3481,
+          "output_tokens": 827
+        },
+        "judge_usage": {
+          "input_tokens": 3474,
+          "output_tokens": 122
+        },
+        "cited_ids": [
+          "CVE-2019-10719",
+          "CVE-2019-6714",
+          "CVE-2024-10902",
+          "CVE-2024-9415",
+          "CVE-2026-6057",
+          "CVE-2026-65700"
+        ],
+        "retrieved_ids": [
+          "CVE-2019-10719",
+          "CVE-2019-6714",
+          "CVE-2024-10902",
+          "CVE-2024-9415",
+          "CVE-2026-6057",
+          "CVE-2026-65700"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2019-10719"
+      },
+      {
+        "id": "CVE-2018-5234",
+        "question": "Is there a command injection flaw in Norton Core router firmware versions before v237?",
+        "expected": "grounded",
+        "answer": "## Answer: Yes \u2014 CVE-2018-5234\n\nThe retrieved context contains one record matching this description.\n\n### CVE-2018-5234\n\n| Field | Value |\n|---|---|\n| **Description** | \"The Norton Core router prior to v237 may be susceptible to a command injection exploit. This is a type of attack in which the goal is execution of arbitrary commands on the host system via vulnerable software.\" |\n| **Severity** | HIGH |\n| **CVSS base score** | 8.0 (CVSS 3.0) |\n| **CVSS vector** | CVSS:3.0/AV:A/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H |\n| **Published** | 2018-04-30 |\n| **Affected vendors** | Symantec Corporation, symantec |\n| **Affected products** | Norton Core, norton core firmware, norton core |\n| **CWE** | Not carried in this record |\n\n**Vector components** (as stated in the vector string): Attack Vector: Adjacent (AV:A); Attack Complexity: Low (AC:L); Privileges Required: None (PR:N); User Interaction: Required (UI:R); Scope: Unchanged (S:U); Confidentiality, Integrity, and Availability impacts all High.\n\n### Exploitation status\n\n- **CISA KEV:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n- **EPSS:** 0.16711 predicted probability of exploitation activity in the next 30 days, 0.96743 percentile (scored 2026-08-13). This is a model prediction, not a record of observed activity.\n\n### Notes and limits\n\n- The record uses hedged language \u2014 \"may be susceptible\" \u2014 and does not identify an affected component, parameter, or interface. No further technical detail on the flaw is present in the retrieved context.\n- Unlike the other router command-injection records in this result set (CVE-2023-33532, CVE-2023-31746, CVE-2022-50596, CVE-2025-34319), the CVE-2018-5234 record carries **no CWE identifier**.\n- The corpus carries no vendor patch instructions, so remediation guidance beyond the \"prior to v237\" version boundary stated in the description is not available here.",
+        "grade": "grounded",
+        "judge_reason": "All stated fields, vector interpretation, EPSS/KEV status, and the observation that CVE-2018-5234 lacks a CWE while the other four records list one are directly supported by the context.",
+        "usage": {
+          "input_tokens": 3419,
+          "output_tokens": 783
+        },
+        "judge_usage": {
+          "input_tokens": 3371,
+          "output_tokens": 79
+        },
+        "cited_ids": [
+          "CVE-2018-5234",
+          "CVE-2022-50596",
+          "CVE-2023-31746",
+          "CVE-2023-33532",
+          "CVE-2025-34319"
+        ],
+        "retrieved_ids": [
+          "CVE-2018-5234",
+          "CVE-2022-50596",
+          "CVE-2023-31746",
+          "CVE-2023-33532",
+          "CVE-2025-34319"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2018-5234"
+      },
+      {
+        "id": "CVE-2012-5905",
+        "question": "Is there a crash in KnFTPd 1.0.0 when a logged-in user sends an overly long FEAT argument?",
+        "expected": "grounded",
+        "answer": "## Yes \u2014 CVE-2012-5905\n\nThe retrieved context contains a record matching this description directly.\n\n**Vulnerability description (as recorded):**\n> \"Buffer overflow in KnFTPd 1.0.0 allows remote authenticated users to cause a denial of service (crash) via a long string in a FEAT command.\"\n\nThis matches the question on all three points: the product and version (KnFTPd 1.0.0), the authenticated status of the actor (\"remote authenticated users\"), and the vector (a long string in a FEAT command). The recorded impact is a denial of service (crash).\n\n**Record details:**\n\n| Field | Value |\n|---|---|\n| CVE ID | CVE-2012-5905 |\n| Severity | MEDIUM |\n| CVSS | 2.0 base score 4.0 |\n| CVSS vector | AV:N/AC:L/Au:S/C:N/I:N/A:P |\n| Published | 2012-11-17T21:55:05.097 |\n| Affected vendor | elif keir |\n| Affected product | knftpd |\n| Weakness | CWE-119 |\n\nReading the vector components as given: attack vector Network, attack complexity Low, authentication Single, confidentiality None, integrity None, availability Partial.\n\n**Exploitation status:**\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n- EPSS: 0.02864 predicted probability of exploitation activity in the next 30 days, 0.85518 percentile (scored 2026-08-13). This is a model prediction, not a record of observed activity.\n\n**Note on the weakness identifier:** the record carries CWE-119 as an identifier only; the retrieved text does not include a title or description for it.\n\n**Scope of the corpus:** the other records returned concern different products (freeFTPd \u2014 CVE-2005-3683, CVE-2005-3684; wzdftpd \u2014 CVE-2007-5300; the `ws` node module \u2014 CVE-2016-10542) and do not bear on KnFTPd. The corpus carries no vendor patch instructions or fixed-version information for CVE-2012-5905.",
+        "grade": "grounded",
+        "judge_reason": "Every claim\u2014CVE ID, description, CVSS score/vector, dates, vendor/product, CWE, KEV and EPSS status, and the characterization of the other records\u2014matches Document 1 and the rest of the context.",
+        "usage": {
+          "input_tokens": 2991,
+          "output_tokens": 723
+        },
+        "judge_usage": {
+          "input_tokens": 2881,
+          "output_tokens": 226
+        },
+        "cited_ids": [
+          "CVE-2005-3683",
+          "CVE-2005-3684",
+          "CVE-2007-5300",
+          "CVE-2012-5905",
+          "CVE-2016-10542"
+        ],
+        "retrieved_ids": [
+          "CVE-2005-3683",
+          "CVE-2005-3684",
+          "CVE-2007-5300",
+          "CVE-2012-5905",
+          "CVE-2016-10542"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2012-5905"
+      },
+      {
+        "id": "CVE-2019-11936",
+        "question": "Which HHVM flaw lets APC cache keys with embedded null characters get cut short, causing key collisions?",
+        "expected": "grounded",
+        "answer": "## Matching Record: CVE-2019-11936\n\n**Description (as stated in the record):** \"Various APC functions accept keys containing null bytes as input, leading to premature truncation of input.\"\n\nOne caveat on the phrasing of your question: the record states that the truncation occurs, but it does **not** state that key collisions result. That consequence is not carried in the retrieved text.\n\n### Details\n\n| Field | Value |\n|---|---|\n| CVE ID | CVE-2019-11936 |\n| Severity | CRITICAL |\n| CVSS 3.1 base score | 9.8 |\n| CVSS vector | CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H |\n| CWE | CWE-626 |\n| Published | 2019-12-04 |\n| Affected vendors | Facebook, facebook |\n| Affected products | HHVM, hhvm |\n\n**Affected versions:** HHVM versions prior to 3.30.12, all versions between 4.0.0 and 4.8.5, all versions between 4.9.0 and 4.23.1, as well as 4.24.0, 4.25.0, 4.26.0, 4.27.0, 4.28.0, and 4.28.1.\n\n**Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS is 0.01476 \u2014 a predicted probability of exploitation activity in the next 30 days \u2014 at the 0.71527 percentile (scored 2026-08-13).\n\n### Related records in the retrieved set\n\nOther HHVM (Facebook) entries appear in the context but describe different flaws:\n\n- **CVE-2020-1899** \u2014 `unserialize()` supported a type code \"S\" meant only for APC serialization, allowing arbitrary memory addresses to be accessed as if they were static StringData objects. HIGH, CVSS 3.1 base 7.5 (AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N). CWE-119, CWE-822. Not in the CISA KEV catalog (2026.08.11); EPSS 0.01218.\n- **CVE-2020-1917** \u2014 out-of-bounds write in `xbuf_format_converter` used by `exif_read_data`. CRITICAL, CVSS 3.1 base 9.8. CWE-787, CWE-122. Not in the CISA KEV catalog (2026.08.11); EPSS 0.01384.\n\nTwo further records in the context (CVE-2026-25480 in Litestar, CVE-2026-56850 in Node.js) involve key collisions but are not HHVM.\n\nThe corpus carries no vendor patch instructions for these entries.",
+        "grade": "grounded",
+        "judge_reason": "All stated details (descriptions, scores, CWEs, versions, EPSS, KEV status) match the context, and the caveats about missing collision/patch info are accurate.",
+        "usage": {
+          "input_tokens": 3422,
+          "output_tokens": 1014
+        },
+        "judge_usage": {
+          "input_tokens": 3520,
+          "output_tokens": 72
+        },
+        "cited_ids": [
+          "CVE-2019-11936",
+          "CVE-2020-1899",
+          "CVE-2020-1917",
+          "CVE-2026-25480",
+          "CVE-2026-56850"
+        ],
+        "retrieved_ids": [
+          "CVE-2019-11936",
+          "CVE-2020-1899",
+          "CVE-2020-1917",
+          "CVE-2026-25480",
+          "CVE-2026-56850"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2019-11936"
+      },
+      {
+        "id": "CVE-2007-5265",
+        "question": "Format string flaw in Dawn of Time MUD web server allowing code execution via login credentials to protected areas?",
+        "expected": "grounded",
+        "answer": "## CVE-2007-5265 \u2014 Dawn of Time\n\n**Description (as recorded):** Multiple format string vulnerabilities in `websrv.cpp` in Dawn of Time 1.69s beta4 and earlier allow remote attackers to execute arbitrary code via format string specifiers in the (1) username or (2) password fields when accessing certain \"restricted zones\", which are not properly handled by the (a) `processWebHeader` and (b) `filterWebRequest` functions.\n\n**Details from the record:**\n\n| Field | Value |\n|---|---|\n| CVE ID | CVE-2007-5265 |\n| Severity | HIGH |\n| CVSS | 2.0 base score 7.5 |\n| CVSS vector | AV:N/AC:L/Au:N/C:P/I:P/A:P |\n| Published | 2007-10-08 |\n| CWE | CWE-134 |\n| Affected vendor | dawnoftime |\n| Affected product | dawn of time |\n| Affected versions | 1.69s beta4 and earlier |\n\n**Exploitation status:**\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n- EPSS: 0.0533 predicted probability of exploitation activity in the next 30 days, 0.91879 percentile (scored 2026-08-13). This is a model prediction, not a record of observed activity.\n\n**Notes and scope limits:**\n- The record does not characterize Dawn of Time as a \"MUD\"; it identifies the affected component only as `websrv.cpp` in the product \"dawn of time.\"\n- The vector string components are readable as given above (AV:N, AC:L, Au:N, with partial confidentiality, integrity, and availability impact); nothing beyond those components is stated.\n- CWE-134 is carried in the record as an identifier only; the corpus does not supply a weakness title or description for it.\n- The corpus carries no patch or remediation guidance and no MITRE ATT&CK mappings for this CVE.\n\n**Related records in the retrieved set** (other format string entries, none involving Dawn of Time): CVE-2005-3912 (Webmin/Usermin miniserv.pl, CVSS 2.0 base 7.5, HIGH), CVE-2008-6519 (Xitami Web Server, CVSS 2.0 base 10.0, HIGH, CWE-134), CVE-2018-10388 and CVE-2018-10389 (Open TFTP Server, CVSS 3.1 base 9.8, CRITICAL, CWE-134).",
+        "grade": "grounded",
+        "judge_reason": "All stated fields, descriptions, EPSS/KEV details, and related-CVE summaries match the provided documents, and the scope limits correctly reflect what the context omits.",
+        "usage": {
+          "input_tokens": 3106,
+          "output_tokens": 877
+        },
+        "judge_usage": {
+          "input_tokens": 3148,
+          "output_tokens": 149
+        },
+        "cited_ids": [
+          "CVE-2005-3912",
+          "CVE-2007-5265",
+          "CVE-2008-6519",
+          "CVE-2018-10388",
+          "CVE-2018-10389"
+        ],
+        "retrieved_ids": [
+          "CVE-2005-3912",
+          "CVE-2007-5265",
+          "CVE-2008-6519",
+          "CVE-2018-10388",
+          "CVE-2018-10389"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2007-5265"
+      },
+      {
+        "id": "CVE-2026-3189",
+        "question": "Is there an SSRF flaw in sz-boot-parent's admin file download endpoint via the url parameter, fixed in 1.3.3-beta?",
+        "expected": "grounded",
+        "answer": "## Yes \u2014 CVE-2026-3189\n\n**Record:** CVE-2026-3189\n\n**Description as recorded:** A weakness has been identified in feiyuchuixue sz-boot-parent up to 1.3.2-beta. The vulnerability affects unknown code of the file `/api/admin/common/files/download`. Executing a manipulation of the argument `url` can lead to server-side request forgery. The attack can be executed remotely. The record states that attacks of this nature are highly complex and that the exploitability is difficult.\n\n**Severity / CVSS:** LOW \u2014 CVSS 4.0 base score 2.3\nVector: `CVSS:4.0/AV:N/AC:H/AT:N/PR:L/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:X` (remaining metrics unset)\n\n**Affected vendors/products:** feiyuchuixue \u2014 sz-boot-parent\n\n**Weakness:** CWE-918\n\n**Fix:** Upgrading to version 1.3.3-beta is stated to resolve the issue. The patch is identified as commit `aefaabfd7527188bfba3c8c9eee17c316d094802`. Upgrading the affected component is advised. The record quotes the project: \"We have added a URL protocol whitelist validation to the file download interface, allowing only http and https protocols.\"\n\n**Exploitation status:**\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n- EPSS: 0.00212 predicted probability of exploitation activity in the next 30 days, 0.11707 percentile (scored 2026-08-13).\n\n---\n\n### Note on a nearby, distinct endpoint\n\nThe context also carries **CVE-2026-3188**, affecting a different file \u2014 `/api/admin/common/download/templates` \u2014 where manipulation of the argument `templateName` results in path traversal (CWE-22). That record is LOW, CVSS 4.0 base 2.1, same vendor/product (feiyuchuixue sz-boot-parent up to 1.3.2-beta), same patch commit and 1.3.3-beta fix version. It states the exploit has been released to the public. Do not conflate it with the `url`-parameter SSRF issue above.\n\nA second CWE-918 record is present in the context, **CVE-2025-27501**, but it affects openziti (ziti-console, openziti) and is unrelated to sz-boot-parent.",
+        "grade": "grounded",
+        "judge_reason": "All details (CVE IDs, endpoints, arguments, CWEs, CVSS scores/vectors, patch commit, EPSS, KEV status, and the distinctions between records) match the provided context.",
+        "usage": {
+          "input_tokens": 4423,
+          "output_tokens": 834
+        },
+        "judge_usage": {
+          "input_tokens": 4416,
+          "output_tokens": 83
+        },
+        "cited_ids": [
+          "CVE-2025-27501",
+          "CVE-2026-3188",
+          "CVE-2026-3189"
+        ],
+        "retrieved_ids": [
+          "CVE-2025-27501",
+          "CVE-2026-3185",
+          "CVE-2026-3187",
+          "CVE-2026-3188",
+          "CVE-2026-3189"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2026-3189"
+      },
+      {
+        "id": "CVE-2019-16252",
+        "question": "Which Android app fails to verify SSL certificates, letting attackers intercept login and location API traffic?",
+        "expected": "grounded",
+        "answer": "## Direct answer to the question as asked\n\nThe retrieved records do **not** identify any app whose failure to verify SSL certificates is described as exposing \"login and location API traffic.\" None of the five records characterizes the intercepted traffic beyond the phrase \"obtain sensitive information.\" One affected product carries \"Login\" in its name \u2014 Mzone Login (CVE-2014-5665) \u2014 but that is a product name, not a statement about what traffic is exposed. No record in the context mentions a location API.\n\nWhat the context does cover is a set of five Android applications that share the same certificate-verification finding.\n\n## The vulnerabilities\n\nAll five records use identical wording: the application \"does not verify X.509 certificates from SSL servers, which allows man-in-the-middle attackers to spoof servers and obtain sensitive information via a crafted certificate.\"\n\n| CVE ID | Product (package) | Vendor | Version | CVSS 2.0 base | Vector |\n|---|---|---|---|---|---|\n| CVE-2014-5601 | 1800CONTACTS App (com.contacts1800.ecomapp) | 1800contacts | 2.7.0 | 5.4 MEDIUM | AV:A/AC:M/Au:N/C:P/I:P/A:P |\n| CVE-2014-5665 | Mzone Login (com.mr384.MzoneLogin) | mr384 | 1.2.0 | 5.4 MEDIUM | AV:A/AC:M/Au:N/C:P/I:P/A:P |\n| CVE-2014-5650 | Traffic Jam Free (com.jiuzhangtech.rushhour) | jiuzhangtech | 1.7.7 | 5.4 MEDIUM | AV:A/AC:M/Au:N/C:P/I:P/A:P |\n| CVE-2014-6779 | Cart App (com.virtecha.mobilewallet) | cart-app | 1.5 | 5.4 MEDIUM | AV:A/AC:M/Au:N/C:P/I:P/A:P |\n| CVE-2014-2992 | Misli.com application | misli | not stated | 6.4 MEDIUM | AV:N/AC:L/Au:N/C:P/I:P/A:N |\n\nFour of the five carry the vector AV:A/AC:M/Au:N/C:P/I:P/A:P. CVE-2014-2992 differs: AV:N/AC:L/Au:N/C:P/I:P/A:N, with a higher base score of 6.4.\n\n## Weakness identifier\n\nAll five records list **CWE-310**. The records carry the identifier only.\n\n## Exploitation status\n\nNone of the five is listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n\nEPSS scores (predicted probability of exploitation activity in the next 30 days, scored 2026-08-13):\n\n- CVE-2014-5601 \u2014 0.00271 (0.19282 percentile)\n- CVE-2014-5665 \u2014 0.00271 (0.19283 percentile)\n- CVE-2014-5650 \u2014 0.00271 (0.19333 percentile)\n- CVE-2014-6779 \u2014 0.00266 (0.18673 percentile)\n- CVE-2014-2992 \u2014 0.00567 (0.44114 percentile)\n\n## Gap\n\nIf you are working from a specific advisory describing interception of login and location API traffic, that app is not among the indexed records here. You would need to supply the product name or CVE for a targeted lookup.",
+        "grade": "grounded",
+        "judge_reason": "All CVE details, scores, vectors, CWEs, EPSS values, and the note that no record mentions login/location API traffic accurately reflect the context.",
+        "usage": {
+          "input_tokens": 2994,
+          "output_tokens": 1252
+        },
+        "judge_usage": {
+          "input_tokens": 3343,
+          "output_tokens": 67
+        },
+        "cited_ids": [
+          "CVE-2014-2992",
+          "CVE-2014-5601",
+          "CVE-2014-5650",
+          "CVE-2014-5665",
+          "CVE-2014-6779"
+        ],
+        "retrieved_ids": [
+          "CVE-2014-2992",
+          "CVE-2014-5601",
+          "CVE-2014-5650",
+          "CVE-2014-5665",
+          "CVE-2014-6779"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2019-16252"
+      },
+      {
+        "id": "CVE-2026-35672",
+        "question": "How can an empty API client token in phpMyFAQ let anyone create FAQ entries without authenticating?",
+        "expected": "grounded",
+        "answer": "## CVE-2026-35672 \u2014 phpMyFAQ API v4.0 authentication bypass\n\nThis is the record that addresses the empty API client token.\n\n**What the record states**\n\nphpMyFAQ before 4.1.3 contains an authentication bypass vulnerability in API v4.0 where the default empty `api.apiClientToken` allows unauthenticated users to create and modify FAQ entries. Per the record, attackers can send an empty `x-pmf-token` header to bypass token validation and inject malicious content via the POST endpoints:\n\n- `/api/v4.0/faq/create`\n- `/api/v4.0/category`\n- `/api/v4.0/question`\n\nThat description is the whole of the mechanism the record carries \u2014 the default configuration value is empty, and an empty header value satisfies the token check. The record does not elaborate further on the validation logic.\n\n**Severity and scoring**\n\n- Severity: HIGH, CVSS 4.0 base score 8.7\n- Vector: `CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N` (remaining metrics are `X`/not defined). Reading the defined components: network attack vector, low attack complexity, no attack requirements, no privileges required, no user interaction, with High impact to vulnerable-system integrity and None to confidentiality and availability.\n\n**Affected vendor/product**\n\n- Vendor: thorsten\n- Product: phpMyFAQ\n- Fixed version indicated by the record text: 4.1.3 (versions before 4.1.3 are affected)\n\n**Weakness identifier**\n\n- CWE-1188\n\n**Exploitation status**\n\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- EPSS: 0.00384 predicted probability of exploitation activity in the next 30 days, 0.31361 percentile (scored 2026-08-13)\n\n**Published:** 2026-05-28T16:16:21.667\n\n---\n\n**Related note on scope:** the retrieved context contains three other phpMyFAQ records \u2014 CVE-2026-24420 (CWE-284, MEDIUM, CVSS 3.1 base 6.5), CVE-2026-24421 (CWE-862, MEDIUM, CVSS 3.1 base 6.5), and CVE-2026-27836 (CWE-862, HIGH, CVSS 3.1 base 7.5) \u2014 but none of them concern the API client token or FAQ entry creation. Only CVE-2026-35672 answers your question.\n\nThe corpus carries no vendor patch instructions beyond the fixed-version numbers stated in the descriptions, and no MITRE ATT&CK mappings.",
+        "grade": "grounded",
+        "judge_reason": "All stated details\u2014description, CVSS vector/score, CWE, EPSS, KEV status, publication date, and the characterization of the other phpMyFAQ records\u2014match the provided documents.",
+        "usage": {
+          "input_tokens": 3621,
+          "output_tokens": 959
+        },
+        "judge_usage": {
+          "input_tokens": 3729,
+          "output_tokens": 291
+        },
+        "cited_ids": [
+          "CVE-2026-24420",
+          "CVE-2026-24421",
+          "CVE-2026-27836",
+          "CVE-2026-35672"
+        ],
+        "retrieved_ids": [
+          "CVE-2026-24420",
+          "CVE-2026-24421",
+          "CVE-2026-27836",
+          "CVE-2026-34531",
+          "CVE-2026-35672"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2026-35672"
+      },
+      {
+        "id": "CVE-2021-26706",
+        "question": "Is there an integer overflow in Micrium uC/OS uC/LIB memory pool creation functions from multiplying allocation sizes?",
+        "expected": "grounded",
+        "answer": "## Direct answer: Yes\n\nThe retrieved context documents this issue explicitly.\n\n### CVE-2021-26706 \u2014 the matching record\n\n**Description (as stated):** An issue was discovered in `lib_mem.c` in Micrium uC/OS uC/LIB 1.38.x and 1.39.00. The following memory allocation functions do not check for integer overflow when allocating a pool whose size exceeds the address space: `Mem_PoolCreate`, `Mem_DynPoolCreate`, and `Mem_DynPoolCreateHW`. Because these functions use multiplication to calculate the pool sizes, the operation may cause an integer overflow if the arguments are large enough. The resulting memory pool will be smaller than expected and may be exploited by an attacker.\n\nThat matches the question on every point: the multiplication-based size calculation, the pool creation functions, and the uC/OS uC/LIB component.\n\n| Field | Value |\n|---|---|\n| Severity | CRITICAL |\n| CVSS 3.1 base score | 9.8 |\n| CVSS vector | CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H |\n| Affected vendor | micrium |\n| Affected product | uc/lib |\n| Affected versions | 1.38.x and 1.39.00 |\n| Weakness | CWE-190 |\n| Published | 2022-01-24 |\n\n**Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS is 0.01939 predicted probability of exploitation activity in the next 30 days, 0.78288 percentile (scored 2026-08-13) \u2014 a model prediction, not observed activity.\n\n### CVE-2021-27411 \u2014 closely related record covering the same three functions\n\nThe context also carries a separate entry naming the identical function set in a different Micrium product:\n\n- **Description:** Micrium OS Versions 5.10.1 and prior are vulnerable to integer wrap-around in functions `Mem_DynPoolCreate`, `Mem_DynPoolCreateHW` and `Mem_PoolCreate`. The record states this unverified memory assignment can lead to arbitrary memory allocation, resulting in unexpected behavior such as very small blocks of memory being allocated instead of very large ones.\n- **Severity:** MEDIUM, CVSS 3.1 base score 6.5\n- **CVSS vector:** CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L\n- **Affected vendors:** Micrium, silabs \u2014 **Products:** Micrium OS, micrium os\n- **Weakness:** CWE-190\n- **Exploitation status:** Not listed in the CISA KEV catalog (version 2026.08.11). EPSS 0.00852, 0.55003 percentile (scored 2026-08-13).\n\nNote the two records differ in the affected product (uc/lib vs. Micrium OS) and in scored severity (9.8 CRITICAL vs. 6.5 MEDIUM), despite naming the same three functions.\n\n### Other records in the context\n\nThree further entries describe integer overflows leading to undersized allocations, but in unrelated products \u2014 they do not concern Micrium:\n\n- **CVE-2006-7252** \u2014 `calloc` in `libc/stdlib/malloc.c` in jemalloc, FreeBSD 6.4 and NetBSD; MEDIUM, CVSS 2.0 base 5.0; CWE-189.\n- **CVE-2012-2677** \u2014 `ordered_malloc` in `boost/pool/pool.hpp`, Boost Pool before 3.9; MEDIUM, CVSS 2.0 base 5.0; CWE-189.\n- **CVE-2013-1983** \u2014 X.org libXfixes 5.0 and earlier, related to `XFixesGetCursorImage`; MEDIUM, CVSS 2.0 base 6.8; CWE-189.\n\nNone of the three is listed in the CISA KEV catalog (version 2026.08.11).\n\n### Not covered\n\nThe retrieved records contain no patch or remediation information for either Micrium CVE, and the corpus carries no MITRE ATT&CK mappings.",
+        "grade": "grounded",
+        "judge_reason": "All stated details\u2014descriptions, CVSS scores, vectors, CWEs, vendors, EPSS values, and KEV status\u2014match the context accurately, and the answer correctly notes absent patch/ATT&CK info.",
+        "usage": {
+          "input_tokens": 3215,
+          "output_tokens": 1479
+        },
+        "judge_usage": {
+          "input_tokens": 3831,
+          "output_tokens": 89
+        },
+        "cited_ids": [
+          "CVE-2006-7252",
+          "CVE-2012-2677",
+          "CVE-2013-1983",
+          "CVE-2021-26706",
+          "CVE-2021-27411"
+        ],
+        "retrieved_ids": [
+          "CVE-2006-7252",
+          "CVE-2012-2677",
+          "CVE-2013-1983",
+          "CVE-2021-26706",
+          "CVE-2021-27411"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2021-26706"
+      },
+      {
+        "id": "CVE-2007-2921",
+        "question": "Are there memory corruption flaws in the Corel ActiveCGM browser ActiveX control allowing remote code execution before version 7.1.4.19?",
+        "expected": "grounded",
+        "answer": "## Yes \u2014 one record in the retrieved context covers this\n\n**CVE-2007-2921**\n\n- **Description (as stated):** Multiple buffer overflows in `acgm.dll` in the Corel / Micrografx ActiveCGM Browser ActiveX control before 7.1.4.19 allow remote attackers to execute arbitrary code via unspecified vectors.\n- **Severity:** HIGH \u2014 CVSS 2.0 base score 9.3\n- **CVSS vector:** `AV:N/AC:M/Au:N/C:C/I:C/A:C` \u2014 network attack vector, medium access complexity, no authentication, complete confidentiality, integrity, and availability impact\n- **Affected vendor:** corel\n- **Affected product:** activecgm browser (version threshold: before 7.1.4.19)\n- **Published:** 2007-06-14\n- **CWE:** None \u2014 this record carries no CWE identifier.\n- **Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (catalog version 2026.08.11).\n- **EPSS:** 0.07829 predicted probability of exploitation activity in the next 30 days, 0.94135 percentile (scored 2026-08-13).\n\n## Scope notes\n\n- The record characterizes the flaws specifically as **buffer overflows**, and states the vector as **unspecified**. That is the whole of what the record says about the mechanism \u2014 it does not identify a method, parameter, or triggering condition.\n- The remaining four documents in the retrieved set concern ActiveX controls from other vendors (Novell iPrint \u2014 CVE-2010-3106 and CVE-2011-4185; Microsoft Internet Explorer \u2014 CVE-2008-0078; Apple iTunes \u2014 CVE-2013-1035) and are not relevant to Corel ActiveCGM.\n- No other Corel/Micrografx ActiveCGM entries appear in the retrieved context, so this set does not establish whether additional flaws in that product exist.\n- The corpus carries no vendor patch instructions; the only remediation-adjacent fact present is the fixed-version boundary stated in the CVE text itself (7.1.4.19).",
+        "grade": "grounded",
+        "judge_reason": "All details (CVE ID, description, CVSS, EPSS, KEV status, absence of CWE, and the characterization of the other four documents) match the provided context exactly.",
+        "usage": {
+          "input_tokens": 3004,
+          "output_tokens": 833
+        },
+        "judge_usage": {
+          "input_tokens": 2902,
+          "output_tokens": 72
+        },
+        "cited_ids": [
+          "CVE-2007-2921",
+          "CVE-2008-0078",
+          "CVE-2010-3106",
+          "CVE-2011-4185",
+          "CVE-2013-1035"
+        ],
+        "retrieved_ids": [
+          "CVE-2007-2921",
+          "CVE-2008-0078",
+          "CVE-2008-2431",
+          "CVE-2008-2436",
+          "CVE-2010-3106",
+          "CVE-2011-4185",
+          "CVE-2013-1035"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2007-2921"
+      },
+      {
+        "id": "CVE-2024-35266",
+        "question": "Is there a known spoofing flaw affecting on-premises Azure DevOps Server that Microsoft has patched?",
+        "expected": "grounded",
+        "answer": "## Short answer\n\nYes \u2014 the retrieved records describe five distinct spoofing vulnerabilities in Microsoft Azure DevOps Server. Only one of them (CVE-2019-0996) carries any statement in its record about a fix. Note also that the records identify the products by name (\"Azure DevOps Server\" and specific versions); none of them uses the term \"on-premises,\" so that characterization is not something the indexed text confirms or denies.\n\n## The vulnerabilities\n\n| CVE | Description in record | Severity / CVSS base | CVSS vector | CWE |\n|---|---|---|---|---|\n| CVE-2020-1327 | \"A spoofing vulnerability exists in Microsoft Azure DevOps Server when it fails to properly handle web requests, aka 'Azure DevOps Server HTML Injection Vulnerability'.\" | MEDIUM, 6.1 (CVSS 3.1) | CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N | CWE-79 |\n| CVE-2019-0869 | Same wording: spoofing vulnerability, fails to properly handle web requests, aka 'Azure DevOps Server HTML Injection Vulnerability'. | MEDIUM, 6.1 (CVSS 3.0) | CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N | CWE-79 |\n| CVE-2019-0857 | \"A spoofing vulnerability that could allow a security feature bypass exists in when Azure DevOps Server does not properly sanitize user provided input, aka 'Azure DevOps Server Spoofing Vulnerability'.\" | MEDIUM, 6.5 (CVSS 3.0) | CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N | CWE-116 |\n| CVE-2019-0996 | Spoofing vulnerability when Azure DevOps Server \"improperly handles requests to authorize applications, resulting in a cross-site request forgery.\" Record states an attacker who exploited it \"could bypass OAuth protections and register an application on behalf of the targeted user.\" | MEDIUM, 6.5 (CVSS 3.0) | CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N | CWE-352 |\n| CVE-2023-21569 | \"Azure DevOps Server Spoofing Vulnerability\" (no further description in the record) | MEDIUM, 5.5 (CVSS 3.1) | CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:L | CWE-94 |\n\n## Vendor and affected products\n\nAll five records list the vendor as Microsoft / microsoft.\n\n- **CVE-2020-1327:** Azure DevOps Server, Azure DevOps Server 2019, Azure DevOps Server 2019 Update 1.1, azure devops server\n- **CVE-2019-0869:** Azure DevOps Server, azure devops server\n- **CVE-2019-0857:** Azure DevOps Server, azure devops server\n- **CVE-2019-0996:** Azure DevOps Server 2019, azure devops server\n- **CVE-2023-21569:** Azure DevOps Server 2020.1.2, Azure DevOps Server 2022, Azure DevOps Server 2022.0.1, azure devops server\n\n## On the \"patched by Microsoft\" part of the question\n\nOnly the CVE-2019-0996 record contains a remediation statement: *\"The update addresses the vulnerability by modifying how Azure DevOps Server protects application registration requests.\"* That is the whole of what the record says about a fix \u2014 no KB number, build, or version.\n\nThe other four records carry no patch or update information. The corpus does not carry vendor patch instructions generally, so patch availability and deployment guidance for CVE-2020-1327, CVE-2019-0869, CVE-2019-0857, and CVE-2023-21569 is not something these records answer.\n\n## Exploitation status\n\nNone of the five is listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n\nEPSS scores (predicted probability of exploitation activity in the next 30 days, scored 2026-08-13 \u2014 a model prediction, not observed activity):\n\n- CVE-2019-0857 \u2014 0.03858 (89.213th percentile)\n- CVE-2019-0869 \u2014 0.01955 (78.47th percentile)\n- CVE-2020-1327 \u2014 0.0182 (76.794th percentile)\n- CVE-2019-0996 \u2014 0.0157 (73.143rd percentile)\n- CVE-2023-21569 \u2014 0.00684 (49.374th percentile)",
+        "grade": "grounded",
+        "judge_reason": "All CVE descriptions, CVSS scores/vectors, CWEs, affected products, KEV status, and EPSS values match the provided documents, and unavailable patch details are correctly flagged as absent.",
+        "usage": {
+          "input_tokens": 3222,
+          "output_tokens": 1875
+        },
+        "judge_usage": {
+          "input_tokens": 4050,
+          "output_tokens": 240
+        },
+        "cited_ids": [
+          "CVE-2019-0857",
+          "CVE-2019-0869",
+          "CVE-2019-0996",
+          "CVE-2020-1327",
+          "CVE-2023-21569"
+        ],
+        "retrieved_ids": [
+          "CVE-2019-0857",
+          "CVE-2019-0869",
+          "CVE-2019-0996",
+          "CVE-2020-1327",
+          "CVE-2023-21569"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2024-35266"
+      },
+      {
+        "id": "CVE-2019-9133",
+        "question": "KMPlayer subtitle file parsing integer underflow causing out-of-bounds read/write when opening a crafted media file?",
+        "expected": "grounded",
+        "answer": "# CVE-2019-9133 \u2014 KMPlayer subtitle parsing integer underflow\n\n## Matching record\n\n**CVE-2019-9133** is the record that directly matches the question.\n\n**Description (as stated):** When processing subtitles format media file, KMPlayer version 2018.12.24.14 or lower doesn't check object size correctly, which leads to integer underflow then to memory out-of-bound read/write. An attacker can exploit this issue by enticing an unsuspecting user to open a malicious file.\n\n## Severity\n\n- **MEDIUM**, CVSS 3.1 base score **5.5**\n- Vector: `CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H` \u2014 Attack Vector: Local; Attack Complexity: Low; Privileges Required: None; User Interaction: Required; Scope: Unchanged; Confidentiality: None; Integrity: None; Availability: High\n\n## Affected vendors and products\n\n- **Vendors:** Pandora.tv, kmplayer, microsoft, fedoraproject\n- **Products:** KMPlayer, kmplayer, windows, fedora\n- **Version scope stated in the description:** KMPlayer 2018.12.24.14 or lower\n\n## Weaknesses\n\n- **CWE-191**\n- **CWE-190**\n\n(Reported as identifiers only; the record does not carry weakness titles.)\n\n## Exploitation status\n\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (catalog version 2026.08.11).\n- **EPSS:** 0.01714 predicted probability of exploitation activity in the next 30 days, 0.75339 percentile (scored 2026-08-13). This is a model prediction, not observed activity.\n\n## Publication\n\nPublished 2019-04-09T18:29:01.017.\n\n---\n\n**Note on the rest of the retrieved set:** the other four records (CVE-2022-2869 in libtiff's tiffcrop, CVE-2026-23951 in SumatraPDF, CVE-2026-19389 in GStreamer gst-plugins-ugly asfdemux, CVE-2026-6385 in FFmpeg) also involve integer overflow/underflow leading to out-of-bounds access in file/media parsing, but none of them concern KMPlayer or subtitle-format handling in KMPlayer. The corpus carries no patch or remediation information for CVE-2019-9133.",
+        "grade": "grounded",
+        "judge_reason": "All details (description, CVSS, vendors, CWEs, EPSS, KEV status, publication date) match Document 1, and the closing comparison of the other records is accurate and appropriately qualified.",
+        "usage": {
+          "input_tokens": 3571,
+          "output_tokens": 819
+        },
+        "judge_usage": {
+          "input_tokens": 3574,
+          "output_tokens": 193
+        },
+        "cited_ids": [
+          "CVE-2019-9133",
+          "CVE-2022-2869",
+          "CVE-2026-19389",
+          "CVE-2026-23951",
+          "CVE-2026-6385"
+        ],
+        "retrieved_ids": [
+          "CVE-2019-9133",
+          "CVE-2022-2869",
+          "CVE-2026-19389",
+          "CVE-2026-23951",
+          "CVE-2026-6385"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2019-9133"
+      },
+      {
+        "id": "CVE-2017-12170",
+        "question": "Fedora pure-ftpd package update bug that discards existing config and reverts the daemon to insecure defaults?",
+        "expected": "grounded",
+        "answer": "## Matching Record: CVE-2017-12170\n\n**Description (as recorded):** Downstream version 1.0.46-1 of pure-ftpd as shipped in Fedora was vulnerable to a packaging error due to which the original configuration was ignored after update and the service started running with default configuration. The record states this has security implications because of overriding security-related configuration, and that the issue does not affect the upstream version of pure-ftpd.\n\n**Severity and score:**\n- CRITICAL \u2014 CVSS 3.0 base score 9.8\n- Vector: `CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H` (network attack vector, low attack complexity, no privileges required, no user interaction, unchanged scope, high confidentiality/integrity/availability impact)\n\n**Affected vendors:** Red Hat, Inc.; pureftpd; fedoraproject\n**Affected products:** pure-ftpd, fedora\n\n**Weakness type:** The record for CVE-2017-12170 carries no CWE identifier.\n\n**Published:** 2017-09-21\n\n**Exploitation status:**\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- EPSS: 0.01517 predicted probability of exploitation activity in the next 30 days, 0.72261 percentile (scored 2026-08-13)\n\n---\n\n### Notes on scope\n\nCVE-2017-12170 is the only record in the retrieved set describing a packaging/configuration-override defect. The other indexed Pure-FTPd entries are distinct code-level issues in version 1.0.49 and are not the packaging bug asked about:\n\n| CVE | Summary as recorded | Severity / CVSS | CWE |\n|---|---|---|---|\n| CVE-2020-9274 | Uninitialized pointer in the diraliases linked list; `*lookup_alias(const char alias)` / `print_aliases(void)` fail to correctly detect the end of the linked list; related to `init_aliases` in diraliases.c | HIGH / 7.5 | CWE-824 |\n| CVE-2020-9365 | Out-of-bounds read in the `pure_strcmp` function in utils.c | HIGH / 7.5 | CWE-125 |\n| CVE-2019-20176 | Stack exhaustion in the `listdir` function in ls.c | HIGH / 7.5 | CWE-400 |\n\nNone of these three are listed in the CISA KEV catalog (version 2026.08.11).\n\nThe corpus carries no vendor patch or remediation instructions for CVE-2017-12170, and no ATT&CK mappings.",
+        "grade": "grounded",
+        "judge_reason": "All claims\u2014description, CVSS vector interpretation, vendors/products, absence of CWE, publication date, KEV/EPSS status, and the comparison table\u2014match the provided documents.",
+        "usage": {
+          "input_tokens": 3095,
+          "output_tokens": 928
+        },
+        "judge_usage": {
+          "input_tokens": 3177,
+          "output_tokens": 76
+        },
+        "cited_ids": [
+          "CVE-2017-12170",
+          "CVE-2019-20176",
+          "CVE-2020-9274",
+          "CVE-2020-9365"
+        ],
+        "retrieved_ids": [
+          "CVE-2017-12170",
+          "CVE-2017-9271",
+          "CVE-2019-20176",
+          "CVE-2020-9274",
+          "CVE-2020-9365"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2017-12170"
+      },
+      {
+        "id": "CVE-2017-17526",
+        "question": "Which Giac computer algebra system flaw allows argument injection through unvalidated URLs passed to the BROWSER environment variable?",
+        "expected": "grounded",
+        "answer": "## CVE-2017-17526 \u2014 Giac\n\n**Description (as stated in the record):** `Input.cc` in Bernard Parisse Giac 1.2.3.57 does not validate strings before launching the program specified by the `BROWSER` environment variable, which might allow remote attackers to conduct argument-injection attacks via a crafted URL.\n\n**Severity and scoring:**\n- Severity: HIGH\n- CVSS 3.0 base score: 8.8\n- CVSS vector: `CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H` \u2014 attack vector Network, attack complexity Low, privileges required None, user interaction Required, scope Unchanged, confidentiality/integrity/availability impacts all High\n\n**Affected vendor and product:**\n- Vendor: giac project\n- Product: giac\n- Version cited in the description: Giac 1.2.3.57\n\n**Weakness identifier:** CWE-74\n\n**Exploitation status:**\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (catalog version 2026.08.11)\n- EPSS: 0.01221 predicted probability of exploitation activity in the next 30 days, 0.6599 percentile (scored 2026-08-13)\n\n**Published:** 2017-12-14T16:29:00.837\n\n---\n\n### Related records in the retrieved context\n\nThe same `BROWSER` environment variable pattern appears in four other indexed CVEs, none of which affect Giac:\n\n| CVE | Product / component | Severity | CVSS base | CWE |\n|---|---|---|---|---|\n| CVE-2017-17521 | FontForge through 20170731, `uiutil.c` | HIGH | 8.8 (CVSS 3.0) | CWE-74 |\n| CVE-2017-17517 | Sylpheed through 3.6, `libsylph/utils.c` | HIGH | 8.8 (CVSS 3.0) | CWE-74 |\n| CVE-2017-17530 | Geomview 1.9.5, `common/help.c` | HIGH | 8.8 (CVSS 3.1) | CWE-74 |\n| CVE-2018-10992 | LilyPond 2.19.80, `lilypond-invoke-editor` | CRITICAL | 9.8 (CVSS 3.0) | CWE-88 |\n\nNotes carried in those records: CVE-2017-17521 is stated to be a different vulnerability than CVE-2017-17534; CVE-2017-17530 is disputed by a third party \"because no untrusted input can be used for the injection\"; CVE-2018-10992 is noted as existing because of an incomplete fix for CVE-2017-17523. All four are likewise not listed in the CISA KEV catalog (version 2026.08.11).\n\nThe corpus carries no patch or remediation information for CVE-2017-17526.",
+        "grade": "grounded",
+        "judge_reason": "Every claim \u2014 descriptions, scores, vectors, CWEs, EPSS, KEV status, and notes \u2014 matches the provided CVE records, and the absence of patch info is accurately characterized.",
+        "usage": {
+          "input_tokens": 3140,
+          "output_tokens": 983
+        },
+        "judge_usage": {
+          "input_tokens": 3289,
+          "output_tokens": 131
+        },
+        "cited_ids": [
+          "CVE-2017-17517",
+          "CVE-2017-17521",
+          "CVE-2017-17523",
+          "CVE-2017-17526",
+          "CVE-2017-17530",
+          "CVE-2017-17534",
+          "CVE-2018-10992"
+        ],
+        "retrieved_ids": [
+          "CVE-2017-17517",
+          "CVE-2017-17521",
+          "CVE-2017-17523",
+          "CVE-2017-17526",
+          "CVE-2017-17530",
+          "CVE-2017-17534",
+          "CVE-2018-10992"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2017-17526"
+      },
+      {
+        "id": "CVE-2022-34618",
+        "question": "Is there a persistent XSS in Mealie's recipe description field allowing script injection in beta 1.0.0 releases?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nYes. The context contains one record matching that description exactly.\n\n### CVE-2022-34618 \u2014 the match\n\n- **Description:** \"A stored cross-site scripting (XSS) vulnerability in Mealie 1.0.0beta3 allows attackers to execute arbitrary web scripts or HTML via a crafted payload injected into the recipe description text field.\"\n- **Affected version:** Mealie 1.0.0beta3 \u2014 the record names this single beta build; it does not speak to other 1.0.0 beta releases.\n- **Vendor / product:** mealie project / mealie\n- **Severity:** MEDIUM, CVSS 3.1 base score 5.4\n- **CVSS vector:** CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N\n- **Weakness:** CWE-79\n- **Published:** 2022-08-02\n- **Exploitation:** not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.00927 predicted probability of exploitation activity in the next 30 days, 0.57338 percentile (scored 2026-08-13)\n\n## Other Mealie stored-XSS records in the context (different fields/versions)\n\n| CVE | Version | Injection point | Severity / CVSS 3.1 | CWE |\n|---|---|---|---|---|\n| CVE-2022-34619 | Mealie v0.5.5 | Shopping Lists item names text field | MEDIUM / 5.4 (AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N) | CWE-79 |\n| CVE-2025-56795 | Mealie 3.0.1 and earlier | \"note\" and \"text\" fields of the `/api/recipes/{recipe_name}` endpoint, rendered in the frontend without proper escaping | CRITICAL / 9.0 (AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:H) | CWE-79 |\n| CVE-2025-70297 | Mealie 3.3.1 | Recipe asset upload and media serving component; uploaded SVG served as image/svg+xml | MEDIUM / 6.1 (AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N) | CWE-79 |\n\nAll three are likewise **not listed** in the CISA KEV catalog (version 2026.08.11). EPSS values: CVE-2022-34619 \u2014 0.00947 (0.58019 percentile); CVE-2025-56795 \u2014 0.0034 (0.26849 percentile); CVE-2025-70297 \u2014 0.00183 (0.08063 percentile), all scored 2026-08-13.\n\n## Not relevant to Mealie\n\nCVE-2024-39310 also appears in the retrieved set but concerns the **Basil** recipe theme for WordPress (vendor XjSv), not Mealie.\n\n## Limits of these records\n\n- Only CVE-2022-34618 names the **recipe description text field**, and only for **1.0.0beta3**. No record in the context covers other 1.0.0 beta builds or states a fixed version for Mealie.\n- The corpus carries no MITRE ATT&CK mappings and no vendor patch instructions for the Mealie entries. (CVE-2024-39310's own text mentions a 2.0.5 patch, but that is the WordPress theme, not Mealie.)",
+        "grade": "grounded",
+        "judge_reason": "All claims\u2014CVE details, versions, severities, EPSS, KEV status, and the note that CVE-2024-39310 concerns the Basil WordPress theme\u2014match the context accurately, and the stated limits are correct.",
+        "usage": {
+          "input_tokens": 3248,
+          "output_tokens": 1276
+        },
+        "judge_usage": {
+          "input_tokens": 3615,
+          "output_tokens": 88
+        },
+        "cited_ids": [
+          "CVE-2022-34618",
+          "CVE-2022-34619",
+          "CVE-2024-39310",
+          "CVE-2025-56795",
+          "CVE-2025-70297"
+        ],
+        "retrieved_ids": [
+          "CVE-2022-34618",
+          "CVE-2022-34619",
+          "CVE-2024-39310",
+          "CVE-2025-56795",
+          "CVE-2025-70297"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2022-34618"
+      },
+      {
+        "id": "CVE-2025-35050",
+        "question": "Is there an unauthenticated .NET deserialization RCE in Newforma Info Exchange's remoting endpoint running as NetworkService?",
+        "expected": "grounded",
+        "answer": "## Yes \u2014 CVE-2025-35050\n\nThe retrieved context contains a record matching this description directly.\n\n### CVE-2025-35050\n\n**Description (as recorded):** Newforma Info Exchange (NIX) accepts serialized .NET data via the `/remoteweb/remote.rem` endpoint, allowing a remote, unauthenticated attacker to execute arbitrary code with `NT AUTHORITY\\NetworkService` privileges. The record further states that the vulnerable endpoint is used by Newforma Project Center Server (NPCS), so a compromised NIX system can be used to attack an associated NPCS system.\n\n**Mitigation (as stated in the record):** The record itself carries a mitigation statement \u2014 restrict network access to the `/remoteweb/remote.rem` endpoint, for example using the IIS URL Rewrite Module. No vendor patch instructions are present in the corpus.\n\n**Severity:** CRITICAL \u2014 CVSS 4.0 base score 9.3\n**CVSS vector:** `CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N`\nReading the stated components: network attack vector, low attack complexity, no attack requirements, no privileges required, no user interaction; high confidentiality, integrity, and availability impact to the vulnerable system; no subsequent-system impact.\n\n**Affected vendors:** Newforma, newforma\n**Affected products:** Project Center, project center\n\n**Weaknesses:** CWE-306, CWE-502 (identifiers as recorded)\n\n**Published:** 2025-10-09\n\n**Exploitation status:**\n- Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n- EPSS: 0.00861 predicted probability of exploitation activity in the next 30 days, 0.55316 percentile (scored 2026-08-13). This is a model prediction, not an observation of activity.\n\n### Note on related records\n\nThe retrieved set contains four other CWE-502 records involving .NET remoting or deserialization \u2014 CVE-2025-34153 (Hyland OnBase), CVE-2025-27816 (Arctera InfoScale), CVE-2026-25550 and CVE-2026-25551 (Seagull Software BarTender). None of these concern Newforma products, and only CVE-2025-35050 matches the `NT AUTHORITY\\NetworkService` context described in your question.",
+        "grade": "grounded",
+        "judge_reason": "All details\u2014description, mitigation, severity, vector interpretation, CWEs, dates, EPSS, and comparison to the other four records\u2014accurately reflect the provided context.",
+        "usage": {
+          "input_tokens": 4336,
+          "output_tokens": 856
+        },
+        "judge_usage": {
+          "input_tokens": 4348,
+          "output_tokens": 170
+        },
+        "cited_ids": [
+          "CVE-2025-27816",
+          "CVE-2025-34153",
+          "CVE-2025-35050",
+          "CVE-2026-25550",
+          "CVE-2026-25551"
+        ],
+        "retrieved_ids": [
+          "CVE-2025-27816",
+          "CVE-2025-34153",
+          "CVE-2025-35050",
+          "CVE-2026-25550",
+          "CVE-2026-25551"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2025-35050"
+      },
+      {
+        "id": "CVE-2024-20721",
+        "question": "Which input validation flaw in the Edge browser's built-in Acrobat Reader PDF component lets a crafted file crash the app?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nTwo records in the retrieved set describe the Edge-embedded Acrobat Reader component: **CVE-2024-20721** and **CVE-2024-20709**. Both carry identical descriptions.\n\n### CVE-2024-20721\n- **Description (as recorded):** Acrobat Reader T5 (MSFT Edge) versions 120.0.2210.91 and earlier are affected by an Improper Input Validation vulnerability. An unauthenticated attacker could leverage this vulnerability to achieve an application denial-of-service in the context of the current user. Exploitation of this issue requires user interaction in that a victim must open a malicious file.\n- **Severity / score:** MEDIUM, CVSS 3.1 base 5.5\n- **Vector:** CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H \u2014 local attack vector, low attack complexity, no privileges required, user interaction required, unchanged scope, no confidentiality or integrity impact, high availability impact\n- **CWE:** CWE-20\n- **Published:** 2024-01-15\n- **Affected vendors:** Adobe, adobe, microsoft\n- **Affected products:** Acrobat for Edge, acrobat, edge chromium\n- **Exploitation:** not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.0072 predicted probability of exploitation activity in the next 30 days, 0.50669 percentile (scored 2026-08-13)\n\n### CVE-2024-20709\n- **Description (as recorded):** Identical wording \u2014 Acrobat Reader T5 (MSFT Edge) versions 120.0.2210.91 and earlier, Improper Input Validation, unauthenticated attacker could achieve an application denial-of-service in the context of the current user; requires user interaction in that a victim must open a malicious file.\n- **Severity / score:** MEDIUM, CVSS 3.1 base 5.5\n- **Vector:** CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H\n- **CWE:** CWE-20\n- **Published:** 2024-01-15\n- **Affected vendors:** Adobe, adobe, microsoft\n- **Affected products:** Acrobat for Edge, acrobat, edge chromium\n- **Exploitation:** not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.006 predicted probability of exploitation activity in the next 30 days, 0.45691 percentile (scored 2026-08-13)\n\n### Scope note\n\nThe retrieved context does not distinguish these two entries by any technical detail \u2014 the vulnerability text is word-for-word the same. It offers no basis for saying which one is \"the\" flaw, so both are reported.\n\nThree other records in the set are CWE-20 issues in Acrobat Reader but are **not** scoped to the Edge component (their product lists cover Acrobat Reader / acrobat_dc / acrobat_reader_dc, and macOS or Windows, rather than edge chromium):\n- **CVE-2024-20733** \u2014 MEDIUM, CVSS 3.1 base 5.5, denial-of-service via application crash, Acrobat Reader 20.005.30539, 23.008.20470 and earlier\n- **CVE-2020-24427** \u2014 LOW, CVSS 3.1 base 3.3, disclosure of sensitive memory when decoding a crafted codec\n- **CVE-2024-34098** \u2014 HIGH, CVSS 3.1 base 7.8, arbitrary code execution in the context of the current user\n\nThe corpus carries no MITRE ATT&CK mappings and no vendor patch instructions for any of these entries.",
+        "grade": "grounded",
+        "judge_reason": "All details (descriptions, scores, vectors, CWEs, dates, vendors, products, EPSS, KEV status) match the documents, and the vector interpretation and absence of ATT&CK/patch data are accurate to the context.",
+        "usage": {
+          "input_tokens": 3492,
+          "output_tokens": 1370
+        },
+        "judge_usage": {
+          "input_tokens": 3973,
+          "output_tokens": 92
+        },
+        "cited_ids": [
+          "CVE-2020-24427",
+          "CVE-2024-20709",
+          "CVE-2024-20721",
+          "CVE-2024-20733",
+          "CVE-2024-34098"
+        ],
+        "retrieved_ids": [
+          "CVE-2020-24427",
+          "CVE-2024-20709",
+          "CVE-2024-20721",
+          "CVE-2024-20733",
+          "CVE-2024-34098"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2024-20721"
+      },
+      {
+        "id": "CVE-2022-36475",
+        "question": "Is there a stack buffer overflow in the MAC address list handling function on H3C B5 Mini routers?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nYes. The retrieved records include one entry matching a MAC-list handling function: **CVE-2022-36477**.\n\n### CVE-2022-36477\n\n- **Description (verbatim):** \"H3C B5 Mini B5MiniV100R005 was discovered to contain a stack overflow via the function AddWlanMacList.\"\n- **Severity:** HIGH \u2014 CVSS 3.1 base score **7.8**\n- **CVSS vector:** `CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H` \u2014 Attack Vector: Local; Attack Complexity: Low; Privileges Required: Low; User Interaction: None; Scope: Unchanged; Confidentiality/Integrity/Availability: High\n- **Affected vendor:** h3c\n- **Affected products:** b5 mini firmware, b5 mini\n- **Affected version cited in the description:** B5MiniV100R005\n- **CWE:** CWE-787\n- **Published:** 2022-08-25\n- **Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.00352 predicted probability of exploitation activity in the next 30 days, 0.28167 percentile (scored 2026-08-13)\n\n## Related records in the same set\n\nThe retrieved context contains four additional stack overflow CVEs against the same product and version (H3C B5 Mini B5MiniV100R005), each rated HIGH with a CVSS 3.1 base score of 7.8, the same vector string, CWE-787, published 2022-08-25, and none listed in the CISA KEV catalog (version 2026.08.11):\n\n| CVE | Function |\n|---|---|\n| CVE-2022-36468 | Asp_SetTimingtimeWifiAndLed |\n| CVE-2022-36469 | SetAPWifiorLedInfoById |\n| CVE-2022-36470 | SetAP5GWifiById |\n| CVE-2022-36472 | SetMobileAPInfoById |\n\n## Limits of these records\n\nThe records state the affected function name and nothing further about how the overflow is reached. The corpus carries no MITRE ATT&CK mappings and no vendor patch instructions for these CVEs.",
+        "grade": "grounded",
+        "judge_reason": "All details for CVE-2022-36477 and the four related CVEs, including scores, vectors, CWE, dates, KEV/EPSS status, match the provided documents, and the stated limitations reflect what the context omits.",
+        "usage": {
+          "input_tokens": 2910,
+          "output_tokens": 814
+        },
+        "judge_usage": {
+          "input_tokens": 2879,
+          "output_tokens": 152
+        },
+        "cited_ids": [
+          "CVE-2022-36468",
+          "CVE-2022-36469",
+          "CVE-2022-36470",
+          "CVE-2022-36472",
+          "CVE-2022-36477"
+        ],
+        "retrieved_ids": [
+          "CVE-2022-36468",
+          "CVE-2022-36469",
+          "CVE-2022-36470",
+          "CVE-2022-36472",
+          "CVE-2022-36477"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2022-36475"
+      },
+      {
+        "id": "CVE-2021-0173",
+        "question": "Which Intel PROSet/Wireless and Killer Wi-Fi firmware flaw lets a nearby unauthenticated attacker cause a denial of service?",
+        "expected": "grounded",
+        "answer": "## Summary\n\nThe retrieved context contains **five** CVEs matching this description \u2014 all Intel PROSet/Wireless WiFi and Killer WiFi issues that \"may allow an unauthenticated user to potentially enable denial of service via adjacent access.\" No single record is the answer; they are listed below.\n\nAll five carry an identical severity rating and CVSS vector:\n\n- **Severity:** MEDIUM, **CVSS 3.1 base score 6.5**\n- **Vector:** `CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` \u2014 attack vector Adjacent, attack complexity Low, no privileges required, no user interaction, scope Unchanged, no confidentiality or integrity impact, High availability impact.\n\n## The vulnerabilities\n\n| CVE | Description as stated | CWE | Published |\n|---|---|---|---|\n| **CVE-2021-0063** | Improper input validation **in firmware** for some Intel(R) PROSet/Wireless WiFi and Killer(TM) WiFi in Windows 10 | CWE-20 | 2021-11-17 |\n| **CVE-2021-23168** | Out of bounds read for some Intel(R) PROSet/Wireless WiFi and Killer(TM) WiFi products | CWE-125 | 2022-08-18 |\n| **CVE-2021-44545** | Improper input validation for some Intel(R) PROSet/Wireless WiFi and Killer(TM) WiFi products | CWE-20 | 2022-08-18 |\n| **CVE-2021-0179** | Improper Use of Validation Framework in **software** for Intel(R) PROSet/Wireless Wi-Fi and Killer(TM) Wi-Fi in Windows 10 and 11 | CWE-20 | 2022-02-09 |\n| **CVE-2022-36351** | Improper input validation in some Intel(R) PROSet/Wireless WiFi and Killer(TM) WiFi **software** | CWE-20 | 2023-08-11 |\n\nIf the question is specifically scoped to **firmware**, CVE-2021-0063 is the record that states \"in firmware\" explicitly; CVE-2021-23168 and CVE-2021-44545 list firmware components among affected products, while CVE-2021-0179 and CVE-2022-36351 are described as software.\n\n## Affected vendors and products\n\n- **CVE-2021-0063** \u2014 vendor: intel. Products listed: Intel(R) PROSet/Wireless WiFi and Killer(TM) WiFi in Windows 10; ax210 firmware, ax210, ax201 firmware, ax201, ax200 firmware, ax200, ac 9560 firmware.\n- **CVE-2021-23168** \u2014 vendor: intel. Products listed: wireless-ac 9560 firmware, wireless-ac 9560, dual band wireless-ac 3165 firmware, dual band wireless-ac 3165, dual band wireless-ac 3168 firmware, dual band wireless-ac 3168, wireless-ac 9462 firmware.\n- **CVE-2021-44545** \u2014 vendor: intel. Products listed: killer ac 1550 firmware, killer ac 1550, killer wi-fi 6 ax1650 firmware, killer wi-fi 6 ax1650, killer wi-fi 6e ax1690 firmware, killer wi-fi 6e ax1690, killer wi-fi 6e ax1675 firmware.\n- **CVE-2021-0179** \u2014 vendor: intel. Products listed: amt ac 8260 firmware, amt ac 8260, amt ac 8265 firmware, amt ac 8265, amt ac 9260 firmware, amt ac 9260, amt ac 9560 firmware.\n- **CVE-2022-36351** \u2014 vendors: intel, fedoraproject, debian. Products listed: killer, proset/wireless wifi, uefi firmware, killer wi-fi 6 ax1650, killer wi-fi 6e ax1675, killer wi-fi 6e ax1690, wi-fi 6 ax101.\n\nProduct lists appear truncated in the source records.\n\n## Weakness identifiers\n\n- CWE-125: CVE-2021-23168\n- CWE-20: CVE-2021-0063, CVE-2021-44545, CVE-2021-0179, CVE-2022-36351\n\n## Exploitation status\n\n**None** of the five is listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n\nEPSS predicted probability of exploitation activity in the next 30 days (scored 2026-08-13):\n\n- CVE-2022-36351 \u2014 0.00613 (46.281 percentile)\n- CVE-2021-44545 \u2014 0.0047 (38.485 percentile)\n- CVE-2021-0179 \u2014 0.00379 (30.849 percentile)\n- CVE-2021-0063 \u2014 0.00374 (30.384 percentile)\n- CVE-2021-23168 \u2014 0.00354 (28.369 percentile)\n\n## Not covered\n\nThe retrieved records give no exploitation mechanics beyond \"via adjacent access,\" and the corpus carries no vendor patch instructions or MITRE ATT&CK mappings.",
+        "grade": "grounded",
+        "judge_reason": "All CVE descriptions, CWEs, dates, CVSS vectors, product lists, KEV status, and EPSS values match the provided documents, with percentile values merely rescaled and speculative points appropriately hedged.",
+        "usage": {
+          "input_tokens": 3596,
+          "output_tokens": 2085
+        },
+        "judge_usage": {
+          "input_tokens": 4532,
+          "output_tokens": 371
+        },
+        "cited_ids": [
+          "CVE-2021-0063",
+          "CVE-2021-0179",
+          "CVE-2021-23168",
+          "CVE-2021-44545",
+          "CVE-2022-36351"
+        ],
+        "retrieved_ids": [
+          "CVE-2021-0063",
+          "CVE-2021-0179",
+          "CVE-2021-23168",
+          "CVE-2021-44545",
+          "CVE-2022-36351"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2021-0173"
+      },
+      {
+        "id": "CVE-2025-64012",
+        "question": "Is there an InvoicePlane flaw where viewing an invoice doesn't check whether the requesting user owns it?",
+        "expected": "grounded",
+        "answer": "## Answer: Yes \u2014 CVE-2025-64012\n\n**CVE-2025-64012** matches the described behavior directly.\n\n| Field | Value |\n|---|---|\n| CVE ID | CVE-2025-64012 |\n| Description | \"InvoicePlane commit debb446c is vulnerable to Incorrect Access Control. The invoices/view handler fails to verify ownership before returning invoice data.\" |\n| Severity | MEDIUM, CVSS 3.1 base score 4.3 |\n| CVSS vector | CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N |\n| Affected vendor / product | invoiceplane / invoiceplane |\n| CWE | CWE-639 |\n| Published | 2025-12-16T16:15:59.177 |\n\n**Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS gives a predicted probability of 0.00294 of exploitation activity in the next 30 days (0.2179 percentile, scored 2026-08-13) \u2014 a model prediction, not observed activity.\n\nThe affected version is identified in the record only as commit `debb446c`. The record states no fixed version.\n\nReading the vector components as given: attack vector network, attack complexity low, privileges required low, user interaction none, scope unchanged, confidentiality impact low, no integrity or availability impact.\n\n### A related but distinct record\n\nThe context also contains **CVE-2026-28685**, which describes a conceptually similar ownership/authorization gap on an invoice read path \u2014 but in a **different product**. It concerns Kimai (vendor and product: kimai), where \"GET /api/invoices/{id}\" only checks the role-based view_invoice permission but does not verify the requesting user has access to the invoice's customer; any user with ROLE_TEAMLEAD can read all invoices in the system. It is MEDIUM, CVSS 3.1 base score 6.5, CWE-285, affecting versions prior to 2.51.0 and patched in 2.51.0. It is not listed in the CISA KEV catalog (version 2026.08.11); EPSS 0.00399 (0.33005 percentile, scored 2026-08-13).\n\nIf your question is specifically about InvoicePlane, CVE-2025-64012 is the applicable record. The other InvoicePlane entries in this context (CVE-2026-26281, CVE-2026-26270, CVE-2026-24744) are all CWE-79 stored cross-site scripting issues, not ownership-check failures.",
+        "grade": "grounded",
+        "judge_reason": "Every claim\u2014CVE IDs, descriptions, CVSS scores/vectors, CWEs, EPSS values, KEV status, and the product distinctions\u2014matches the provided documents exactly.",
+        "usage": {
+          "input_tokens": 3424,
+          "output_tokens": 918
+        },
+        "judge_usage": {
+          "input_tokens": 3474,
+          "output_tokens": 144
+        },
+        "cited_ids": [
+          "CVE-2025-64012",
+          "CVE-2026-24744",
+          "CVE-2026-26270",
+          "CVE-2026-26281",
+          "CVE-2026-28685"
+        ],
+        "retrieved_ids": [
+          "CVE-2025-64012",
+          "CVE-2026-24744",
+          "CVE-2026-26270",
+          "CVE-2026-26281",
+          "CVE-2026-28685"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2025-64012"
+      },
+      {
+        "id": "CVE-2022-21876",
+        "question": "What is the Windows kernel-mode driver flaw that lets a local user leak memory contents?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nThe retrieved context does **not** contain a Windows kernel-mode driver flaw described as leaking memory contents to a local user. The two Windows kernel-mode driver records in the corpus describe privilege escalation / memory corruption, and the two records describing memory leaks or reading kernel memory are Linux kernel issues, not Windows. Below is what the records actually say, so the distinction is clear.\n\n---\n\n## Windows kernel-mode driver records in the context\n\n**CVE-2010-1895**\n- Description: The Windows kernel-mode drivers in win32k.sys in Microsoft Windows XP SP2 and SP3, and Windows Server 2003 SP2, do not properly perform memory allocation before copying user-mode data to kernel mode, which allows local users to **gain privileges** via a crafted application, aka \"Win32k Pool Overflow Vulnerability.\"\n- Severity: HIGH, CVSS 2.0 base score 7.2 (vector `AV:L/AC:L/Au:N/C:C/I:C/A:C`)\n- Vendor: microsoft. Products: windows 2003 server, windows server 2003, windows xp\n- Weakness: CWE-264\n- Exploitation: not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS 0.01591 predicted probability of exploitation activity in the next 30 days, 0.73451 percentile (scored 2026-08-13)\n\n**CVE-2015-1768**\n- Description: win32k.sys in the kernel-mode drivers in Microsoft Windows Server 2003 SP2 and R2 SP2 allows local users to **gain privileges or cause a denial of service (memory corruption)** via a crafted application, aka \"Win32k Memory Corruption Elevation of Privilege Vulnerability.\"\n- Severity: HIGH, CVSS 2.0 base score 7.2 (vector `AV:L/AC:L/Au:N/C:C/I:C/A:C`)\n- Vendor: microsoft. Products: windows 2003 server, windows server 2003\n- Weakness: CWE-119\n- Exploitation: not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS 0.02028, 0.79283 percentile (scored 2026-08-13)\n\nNeither record states an information-disclosure or memory-read impact.\n\n---\n\n## Records in the context that do describe memory leaks / kernel memory reads (Linux, not Windows)\n\n**CVE-2022-0854** \u2014 A memory leak flaw in the Linux kernel's DMA subsystem, in the way a user calls `DMA_FROM_DEVICE`; allows a local user to read random memory from the kernel space.\n- MEDIUM, CVSS 3.1 base 5.5, vector `CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N`\n- Vendors: linux, debian. Products: Kernel, linux kernel, debian linux\n- Weaknesses: CWE-401, CWE-200\n- Not listed in the CISA KEV catalog (version 2026.08.11). EPSS 0.00462, 0.37958 percentile (scored 2026-08-13)\n\n**CVE-2022-0382** \u2014 An information leak flaw due to uninitialized memory in the Linux kernel's TIPC protocol subsystem, in the way a user sends a TIPC datagram to one or more destinations; allows a local user to read some kernel memory. Limited to no more than 7 bytes, and the user cannot control what is read. Affects Linux kernel versions prior to 5.17-rc1.\n- MEDIUM, CVSS 3.1 base 5.5, vector `CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N`\n- Vendor: linux. Products: kernel, linux kernel\n- Weakness: CWE-909\n- Not listed in the CISA KEV catalog (version 2026.08.11). EPSS 0.00385, 0.31546 percentile (scored 2026-08-13)\n\n**CVE-2021-4135** \u2014 A memory leak vulnerability in the Linux kernel's eBPF for the Simulated networking device driver, in the way a user uses BPF for the device such that function `nsim_map_alloc_elem` is called. A local user could use this flaw to get unauthorized access to some data.\n- MEDIUM, CVSS 3.1 base 5.5, vector `CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N`\n- Vendor: linux. Products: kernel, linux kernel\n- Weaknesses: CWE-401, CWE-200\n- Not listed in the CISA KEV catalog (version 2026.08.11). EPSS 0.00231, 0.14085 percentile (scored 2026-08-13)\n\n---\n\n## Summary\n\nIf the question is specifically about **Windows** kernel-mode drivers, the indexed data covers only two win32k.sys privilege-escalation/memory-corruption issues (CVE-2010-1895, CVE-2015-1768) and does not cover a Windows memory-disclosure flaw. If the interest is in **kernel memory leakage to a local user**, the context supports that only for the Linux kernel entries above.",
+        "grade": "grounded",
+        "judge_reason": "All CVE details, severities, EPSS values, and impact characterizations accurately reflect the provided documents, and the answer correctly notes the absence of a Windows memory-disclosure record.",
+        "usage": {
+          "input_tokens": 3178,
+          "output_tokens": 1988
+        },
+        "judge_usage": {
+          "input_tokens": 4191,
+          "output_tokens": 344
+        },
+        "cited_ids": [
+          "CVE-2010-1895",
+          "CVE-2015-1768",
+          "CVE-2021-4135",
+          "CVE-2022-0382",
+          "CVE-2022-0854"
+        ],
+        "retrieved_ids": [
+          "CVE-2010-1895",
+          "CVE-2015-1768",
+          "CVE-2021-4135",
+          "CVE-2022-0382",
+          "CVE-2022-0854"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2022-21876"
+      },
+      {
+        "id": "CVE-2021-38963",
+        "question": "Is there a formula injection flaw in IBM Aspera Console 3.4.x allowing code execution via exported spreadsheet files?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nYes \u2014 the retrieved context contains one such record for IBM Aspera Console: **CVE-2021-38963**.\n\n## CVE-2021-38963\n\n| Field | Value |\n|---|---|\n| Severity | HIGH, CVSS 3.1 base score 8.0 |\n| CVSS vector | CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:H |\n| CWE | CWE-1236 |\n| Published | 2024-09-25 |\n| Affected vendors | IBM, ibm, linux, microsoft |\n| Affected products | Aspera Console, aspera console, linux kernel, windows |\n| Exploitation | Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11) |\n| EPSS | 0.00602 predicted probability of exploitation activity in the next 30 days, 0.45744 percentile (scored 2026-08-13) |\n\nThe record states: IBM Aspera Console 3.4.0 through 3.4.4 could allow a remote authenticated attacker to execute arbitrary code on the system, caused by a CSV injection vulnerability. By persuading a victim to open a specially crafted file, an attacker could exploit this vulnerability to execute arbitrary code on the system.\n\n**One qualification on scope:** the record describes this as a *CSV injection* vulnerability and refers to \"a specially crafted file.\" It does not state that the flaw resides in an export function or that the file is a product-generated spreadsheet export. That framing in your question is not supported by this record.\n\n## Other CWE-1236 records in the context (not IBM)\n\nTwo further records carry CWE-1236 but affect different products, and should not be conflated with the Aspera Console issue:\n\n- **CVE-2025-67851** \u2014 moodle. HIGH, CVSS 3.1 base 7.8 (CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H). Described as a formula injection vulnerability occurring when data fields are exported without proper escaping; a remote attacker providing malicious data that is exported and opened in a spreadsheet allows arbitrary formulas to execute. Not in the CISA KEV catalog (v2026.08.11); EPSS 0.00251 (0.16652 percentile).\n- **CVE-2021-46363** \u2014 magnolia-cms / magnolia cms, v6.2.3 and below. HIGH, CVSS 3.1 base 7.8 (CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H). An issue in the Export function allowing Formula Injection attacks via crafted CSV/XLS files, which may result in arbitrary code execution when the exported files are opened with Microsoft Excel. Not in the CISA KEV catalog (v2026.08.11); EPSS 0.01874 (0.775 percentile).\n\n## Other IBM Aspera Console records in the context (different weakness types)\n\n- **CVE-2022-43840** \u2014 Aspera Console 3.4.0 through 3.4.4, XPath injection, CWE-643. MEDIUM, CVSS 3.1 base 4.3.\n- **CVE-2022-43842** \u2014 Aspera Console 3.4.0 through 3.4.2, SQL injection, CWE-89. CRITICAL, CVSS 3.1 base 9.1.\n\nNeither is a formula/CSV injection issue.",
+        "grade": "grounded",
+        "judge_reason": "All CVE details, scores, vectors, EPSS values, and product/vendor listings match the context, and the answer correctly notes the export-function framing is absent from the IBM record.",
+        "usage": {
+          "input_tokens": 3212,
+          "output_tokens": 1404
+        },
+        "judge_usage": {
+          "input_tokens": 3575,
+          "output_tokens": 74
+        },
+        "cited_ids": [
+          "CVE-2021-38963",
+          "CVE-2021-46363",
+          "CVE-2022-43840",
+          "CVE-2022-43842",
+          "CVE-2025-67851"
+        ],
+        "retrieved_ids": [
+          "CVE-2021-38963",
+          "CVE-2021-46363",
+          "CVE-2022-43840",
+          "CVE-2022-43842",
+          "CVE-2025-67851"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2021-38963"
+      },
+      {
+        "id": "CVE-2025-6225",
+        "question": "Which building automation controller from Kieback&Peter allows OS command execution through its web login page before version 9.40.02?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\n**CVE-2025-6225** \u2014 the Kieback&Peter **Neutrino-GLT** product.\n\n## Record details\n\n| Field | Value |\n|---|---|\n| CVE | CVE-2025-6225 |\n| Vendor | Kieback&Peter |\n| Product | Neutrino-GLT |\n| Severity | MEDIUM \u2014 CVSS 4.0 base score 6.9 |\n| CVSS vector | CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:L/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X |\n| CWE | CWE-78 |\n| Published | 2026-01-07T14:15:54.657 |\n| Exploitation | Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11) |\n| EPSS | 0.00983 predicted probability of exploitation activity in the next 30 days; 0.5919 percentile (scored 2026-08-13) |\n\n## What the description states\n\nNeutrino-GLT is used for building management. Its web component **\"SM70 PHWEB\"** is vulnerable to shell command injection via the login form. The record states that injected commands would execute with low privileges. The vulnerability has been fixed in version **9.40.02**.\n\n## Related record from the same vendor (different issue)\n\n**CVE-2026-4293** covers Kieback & Peter **DDC building controllers** \u2014 DDC4002, DDC4100, DDC4200, DDC4200-L, DDC4400, DDC4002e, DDC4200e, DDC4400e \u2014 and is a cross-site scripting issue (CWE-79), rated MEDIUM with a CVSS 3.1 base score of 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N). It is not listed in the CISA KEV catalog (version 2026.08.11); EPSS 0.00271, 0.19243 percentile (scored 2026-08-13). This is **not** the login-page command execution issue and carries no reference to version 9.40.02.\n\n## Note on remediation\n\nThe record names 9.40.02 as the fixed version, which is reported above. Beyond that, this corpus carries no vendor patch instructions.",
+        "grade": "grounded",
+        "judge_reason": "All details about CVE-2025-6225 and CVE-2026-4293 match the context exactly, and the remediation note correctly states no further patch instructions are present.",
+        "usage": {
+          "input_tokens": 3268,
+          "output_tokens": 1066
+        },
+        "judge_usage": {
+          "input_tokens": 3340,
+          "output_tokens": 69
+        },
+        "cited_ids": [
+          "CVE-2025-6225",
+          "CVE-2026-4293"
+        ],
+        "retrieved_ids": [
+          "CVE-2015-7901",
+          "CVE-2016-2278",
+          "CVE-2022-44877",
+          "CVE-2025-6225",
+          "CVE-2026-4293"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2025-6225"
+      },
+      {
+        "id": "CVE-2022-21649",
+        "question": "Convos web chat stored XSS via unescaped quotes in auto-linked URLs allowing autofocus/onfocus attribute injection?",
+        "expected": "grounded",
+        "answer": "## Direct match: CVE-2022-21649\n\nThis is the record that matches the described behavior.\n\n**Description (as stated in the record):** Convos is an open source multi-user chat that runs in a web browser. Characters starting with `https://` in the chat window create an `<a>` tag. A stored XSS vulnerability using `onfocus` and `autofocus` occurs because escaping exists for `<` or `>` but escaping for double quotes does not exist. Through this vulnerability, an attacker is capable of executing malicious scripts. Users are advised to update as soon as possible.\n\n| Field | Value |\n|---|---|\n| CVE | CVE-2022-21649 |\n| Severity | MEDIUM, CVSS 3.1 base score 5.4 |\n| CVSS vector | CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N |\n| Vendors | convos-chat, convos |\n| Product | convos |\n| Weakness | CWE-79 |\n| Published | 2022-01-04 |\n| Exploitation | Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11) |\n| EPSS | 0.00932 predicted probability of exploitation activity in the next 30 days, 0.57554 percentile (scored 2026-08-13) |\n\nReading the vector components as given: network attack vector, low attack complexity, low privileges required, user interaction required, changed scope, low confidentiality and integrity impact, no availability impact.\n\n## Other Convos records in the retrieved set\n\n**CVE-2022-21650** \u2014 A distinct Convos stored XSS. Per the record: SVG extension cannot be used in Convos' chat window, but a file with an `.html` extension can be uploaded; uploading an SVG file with an html extension bypasses the upload filter, causing stored XSS. The XSS attack is triggered upon a user viewing the file. MEDIUM, CVSS 3.1 base 5.4, vector CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N. Vendors convos-chat, convos; product convos; CWE-79. Not listed in the CISA KEV catalog (version 2026.08.11). EPSS 0.00831 (0.54359 percentile, scored 2026-08-13). Note this is a file-upload issue, **not** the quote-escaping/auto-link issue.\n\n**CVE-2021-42584** \u2014 \"A Stored Cross Site Scripting (XSS) issue exists in Convos-Chat before 6.32.\" The record carries no further technical detail, so it cannot be confirmed as the auto-link/quote-escaping issue. MEDIUM, CVSS 3.1 base 5.4, vector CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N. Vendor convos; product convos; CWE-79. Not listed in the CISA KEV catalog (version 2026.08.11). EPSS 0.0073 (0.51021 percentile, scored 2026-08-13).\n\n## Related by technique, different product\n\n**CVE-2026-6427** \u2014 Not Convos, but the retrieved text describes a comparable quote-boundary outcome. The a3 Lazy Load plugin for WordPress, all versions up to and including 2.7.6, is vulnerable to stored XSS due to a regex bug in the `_filter_videos()` method that breaks HTML attribute quoting when processing crafted `<video>` elements, combined with unescaped output in `admin/views/form-data.php`. The record states this shifts the HTML5 parser's quote boundary, promoting attacker-controlled text from inside a quoted attribute value into standalone event-handler attributes (`autofocus`, `onfocus`). MEDIUM, CVSS 3.1 base 6.4, vector CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:N. Vendor a3rev; product a3 Lazy Load; CWE-79. Not listed in the CISA KEV catalog (version 2026.08.11). EPSS 0.00291 (0.21472 percentile, scored 2026-08-13).\n\n## Not covered\n\n- The retrieved records do not identify a fixed Convos version for CVE-2022-21649 or CVE-2022-21650; CVE-2021-42584 states only \"before 6.32\" as the affected range.\n- The corpus carries no MITRE ATT&CK mappings and no vendor patch instructions. Beyond the record's own statement that \"Users are advised to update as soon as possible,\" no remediation detail is present.\n- CVE-2025-22292 (Felipe Peixoto, Powerful Auto Chat, stored XSS, MEDIUM CVSS 3.1 base 6.5, CWE-79) appears in the retrieved set but is unrelated to Convos and carries no quote-escaping or attribute-injection detail.",
+        "grade": "grounded",
+        "judge_reason": "All stated details (descriptions, CVSS vectors, scores, vendors, CWEs, EPSS, KEV status) match the provided records, and gaps are correctly flagged as not covered.",
+        "usage": {
+          "input_tokens": 3397,
+          "output_tokens": 1776
+        },
+        "judge_usage": {
+          "input_tokens": 4260,
+          "output_tokens": 193
+        },
+        "cited_ids": [
+          "CVE-2021-42584",
+          "CVE-2022-21649",
+          "CVE-2022-21650",
+          "CVE-2025-22292",
+          "CVE-2026-6427"
+        ],
+        "retrieved_ids": [
+          "CVE-2021-42584",
+          "CVE-2022-21649",
+          "CVE-2022-21650",
+          "CVE-2025-22292",
+          "CVE-2026-6427"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2022-21649"
+      },
+      {
+        "id": "CVE-2025-14614",
+        "question": "Is there a temporary file handling flaw in Intel/Altera Quartus Prime Standard Edition FPGA design software?",
+        "expected": "grounded",
+        "answer": "## Short answer\n\nYes. **CVE-2025-14614** is the record in the retrieved context that describes a temporary file handling flaw affecting Quartus Prime Standard.\n\n---\n\n## CVE-2025-14614 \u2014 the direct match\n\n| Field | Value |\n|---|---|\n| Description | \"Insecure Temporary File vulnerability in Altera Quartus Prime Standard **Installer (SFX)** on Windows, Altera Quartus Prime Lite **Installer (SFX)** on Windows allows Explore for Predictable Temporary File Names.\" |\n| Affected versions | Quartus Prime Standard: from 23.1 through 24.1; Quartus Prime Lite: from 23.1 through 24.1 |\n| Severity | MEDIUM, CVSS 4.0 base score 5.4 |\n| CVSS vector | `CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:A/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N` |\n| CWE | CWE-377 |\n| Vendors listed | Altera, intel, microsoft |\n| Products listed | Quartus Prime Standard, Quartus Prime Lite, quartus prime, windows |\n| Published | 2026-01-07T12:16:55.467 |\n| Exploitation | Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11) |\n| EPSS | 0.00094 predicted probability of exploitation activity in the next 30 days; 0.00686 percentile (scored 2026-08-13) |\n\nNote that the flaw is attributed specifically to the **Installer (SFX)** component on Windows, not to the design software runtime, and that the same CVE also covers Quartus Prime Lite.\n\n---\n\n## Companion record \u2014 same weakness class, different edition\n\n**CVE-2025-14612** \u2014 \"Insecure Temporary File vulnerability in Altera Quartus Prime Pro **Installer (SFX)** on Windows allows : Use of Predictable File Names.\" Affects Quartus Prime **Pro** from 24.1 through 25.1.1 \u2014 *not* Standard Edition. MEDIUM, CVSS 4.0 base 5.4, same vector as above. CWE-377. Not listed in the CISA KEV catalog (version 2026.08.11); EPSS 0.00094 (0.00687 percentile, scored 2026-08-13).\n\n---\n\n## Other Quartus Prime Standard records in context (different weakness)\n\nFor completeness, the context contains one other Quartus Prime Standard entry, but it is **not** a temporary file issue:\n\n- **CVE-2025-13664** \u2014 \"A potential security vulnerability in Quartus\u00ae Prime Standard Edition Design Software may allow escalation of privilege.\" MEDIUM, CVSS 4.0 base 5.4, vector `CVSS:4.0/AV:L/AC:H/AT:P/PR:L/UI:A/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N`. CWE-**427**. Vendors: Altera, intel, microsoft. Not in the CISA KEV catalog (version 2026.08.11); EPSS 0.00107 (0.01312 percentile).\n\nThe remaining records \u2014 CVE-2025-13668 (Quartus Prime Pro, CWE-427) and CVE-2022-34157 (Intel FPGA SDK for OpenCL with Quartus Prime Pro Edition, CVSS 3.1 base 7.8) \u2014 concern Pro Edition products and do not describe temporary file handling.\n\n---\n\n## Limits of these records\n\nThe retrieved entries do not describe exploitation mechanics, attacker prerequisites, or remediation beyond the affected-version ranges quoted. The corpus carries no vendor patch instructions and no MITRE ATT&CK mappings.",
+        "grade": "grounded",
+        "judge_reason": "Every stated detail\u2014descriptions, CWEs, CVSS scores/vectors, versions, EPSS, and KEV status\u2014matches the provided CVE records, and the comparisons drawn are accurate.",
+        "usage": {
+          "input_tokens": 3691,
+          "output_tokens": 1431
+        },
+        "judge_usage": {
+          "input_tokens": 4177,
+          "output_tokens": 199
+        },
+        "cited_ids": [
+          "CVE-2022-34157",
+          "CVE-2025-13664",
+          "CVE-2025-13668",
+          "CVE-2025-14612",
+          "CVE-2025-14614"
+        ],
+        "retrieved_ids": [
+          "CVE-2022-34157",
+          "CVE-2025-13664",
+          "CVE-2025-13668",
+          "CVE-2025-14612",
+          "CVE-2025-14614"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2025-14614"
+      },
+      {
+        "id": "CVE-2021-0645",
+        "question": "Android 11 flaw letting an app access private app folders on external storage via the documents provider?",
+        "expected": "grounded",
+        "answer": "## Closest match: CVE-2021-0645\n\n**Description (as recorded):** In `shouldBlockFromTree` of `ExternalStorageProvider.java`, there is a possible permissions bypass. This could lead to local escalation of privilege, allowing an app to read private app directories in external storage, which should be restricted in Android 11, with no additional execution privileges needed. User interaction is needed for exploitation. Product: Android. Versions: Android-11. Android ID: A-157320644.\n\n| Field | Value |\n|---|---|\n| Severity | HIGH, CVSS 3.1 base score 7.8 |\n| CVSS vector | CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H |\n| CWE | CWE-863 |\n| Vendor / product | google / Android |\n| Published | 2021-08-17 |\n| Exploitation | Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11) |\n| EPSS | 0.0033 predicted probability of exploitation activity in the next 30 days, 0.2569 percentile (scored 2026-08-13) |\n\nThis is the record that matches all three elements of your question: Android 11, private app directories in external storage, and a provider component in the external-storage documents provider path.\n\n## Also in scope: CVE-2020-0479 (DocumentsProvider.java)\n\nIf the \"documents provider\" element of your question refers specifically to `DocumentsProvider.java`, this is the relevant record:\n\n**Description (as recorded):** In `callUnchecked` of `DocumentsProvider.java`, there is a possible permissions bypass. This could lead to local escalation of privilege allowing a malicious app to access files available to the DocumentProvider without user permission, with no additional execution privileges needed. User interaction is needed for exploitation. Product: Android. Versions: Android-11. Android ID: A-157294893.\n\n| Field | Value |\n|---|---|\n| Severity | HIGH, CVSS 3.1 base score 7.8 |\n| CVSS vector | CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H |\n| CWE | CWE-863 |\n| Vendor / product | google / Android |\n| Published | 2020-12-15 |\n| Exploitation | Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11) |\n| EPSS | 0.00393 predicted probability of exploitation activity in the next 30 days, 0.32349 percentile (scored 2026-08-13) |\n\nNote the scope difference as stated: this record describes access to \"files available to the DocumentProvider,\" not specifically private app directories in external storage.\n\n## Adjacent Android 11 external-storage records in the retrieved set\n\nThese involve external storage private directories on Android 11 but are not documents-provider components:\n\n- **CVE-2021-39697** \u2014 `checkFileUriDestination` of `DownloadProvider.java`; a possible way to bypass external storage private directories protection due to a missing permission check. Android-11, Android-12 (A-200813547). HIGH, CVSS 3.1 base 7.8, vector CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H. CWE-862. google / Android. Not in the CISA KEV catalog (2026.08.11). EPSS 0.00128, 0.02836 percentile.\n- **CVE-2021-0486** \u2014 `onPackageAddedInternal` of `PermissionManagerService.java`; possible access to external storage due to a permissions bypass. Android-10, Android-11 (A-171430330). HIGH, CVSS 3.1 base 7.8, vector CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H. CWE-276. google / Android. Not in the CISA KEV catalog (2026.08.11). EPSS 0.00109, 0.01401 percentile.\n- **CVE-2023-35670** \u2014 `computeValuesFromData` of `FileUtils.java`; a possible way to insert files to other apps' external private directories due to a path traversal error. HIGH, CVSS 3.1 base 7.8, vector CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H. CWE-22. Google/google / Android. Not in the CISA KEV catalog (2026.08.11). EPSS 0.00096, 0.0083 percentile. The record does not state affected Android versions.\n\n## Not covered\n\nThe retrieved records carry no patch or Android Security Bulletin remediation instructions, and no MITRE ATT&CK mappings.",
+        "grade": "grounded",
+        "judge_reason": "All CVE identifiers, descriptions, CVSS vectors, CWEs, dates, KEV status, and EPSS values match the context, and caveats about missing data are correctly stated.",
+        "usage": {
+          "input_tokens": 3162,
+          "output_tokens": 1792
+        },
+        "judge_usage": {
+          "input_tokens": 3978,
+          "output_tokens": 333
+        },
+        "cited_ids": [
+          "CVE-2020-0479",
+          "CVE-2021-0486",
+          "CVE-2021-0645",
+          "CVE-2021-39697",
+          "CVE-2023-35670"
+        ],
+        "retrieved_ids": [
+          "CVE-2020-0479",
+          "CVE-2021-0486",
+          "CVE-2021-0645",
+          "CVE-2021-39697",
+          "CVE-2023-35670"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2021-0645"
+      },
+      {
+        "id": "CVE-2021-40113",
+        "question": "Are there unauthenticated flaws in Cisco PON optical network terminal switches allowing hardcoded Telnet logins and command injection?",
+        "expected": "grounded",
+        "answer": "# Cisco Catalyst PON Series ONT \u2014 Unauthenticated Web Management Interface Vulnerabilities\n\nYes. The retrieved context contains three CVEs covering multiple vulnerabilities in the web-based management interface of the Cisco Catalyst Passive Optical Network (PON) Series Switches Optical Network Terminal (ONT).\n\n## Shared description\n\nAll three records carry identical descriptive text: the vulnerabilities \"could allow an unauthenticated, remote attacker to perform the following actions: Log in with a default credential if the Telnet protocol is enabled; Perform command injection; Modify the configuration.\" The records refer readers to the Details section of the underlying advisory, which is not included in the corpus.\n\nNote that the records state **default credential**, not \"hardcoded\" credentials \u2014 the latter term does not appear in the retrieved text.\n\n## The CVEs\n\n| CVE ID | Severity | CVSS 3.1 base | Vector | CWE(s) |\n|---|---|---|---|---|\n| CVE-2021-34795 | CRITICAL | 9.8 | CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H | CWE-1188, CWE-284 |\n| CVE-2021-40113 | CRITICAL | 9.8 | CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H | CWE-78, CWE-284 |\n| CVE-2021-40112 | HIGH | 7.5 | CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N | CWE-284 |\n\nAll three vectors read attack vector Network, attack complexity Low, privileges required None, user interaction None, scope Unchanged. CVE-2021-34795 and CVE-2021-40113 carry High confidentiality, integrity, and availability impact; CVE-2021-40112 carries no confidentiality impact, High integrity impact, and no availability impact.\n\nAll three were published 2021-11-04.\n\n## Affected vendors and products\n\nIdentical across all three records:\n\n- **Vendors:** Cisco, cisco\n- **Products:** Cisco Catalyst PON Series; catalyst pon switch cgp-ont-1p firmware; catalyst pon switch cgp-ont-1p; catalyst pon switch cgp-ont-4p firmware; catalyst pon switch cgp-ont-4p; catalyst pon switch cgp-ont-4pvc firmware; catalyst pon switch cgp-ont-4pvc; catalyst pon switch cgp-ont-4tvcw firmware\n\n## Exploitation status\n\nNone of the three are listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11).\n\nEPSS scores (scored 2026-08-13), predicted probability of exploitation activity in the next 30 days:\n\n- CVE-2021-40113 \u2014 0.04631 (90.882nd percentile)\n- CVE-2021-34795 \u2014 0.01745 (75.757th percentile)\n- CVE-2021-40112 \u2014 0.01386 (69.777th percentile)\n\n## Scope note\n\nThe records do not attribute individual behaviors (default-credential login vs. command injection vs. configuration modification) to specific CVE IDs \u2014 each of the three carries the same combined description. The CWE assignments differ between them, but the records provide only the identifiers.\n\nTwo other Cisco records appear in the retrieved set \u2014 CVE-2017-3878 and CVE-2017-3879, both MEDIUM, CVSS 3.0 base 5.3, CWE-119, affecting Cisco Nexus 9000 Series Switches running Cisco NX-OS Software. These concern denial of service in remote login functionality and are unrelated to the PON ONT products in question.\n\nThe corpus carries no vendor patch instructions for the PON Series CVEs.",
+        "grade": "grounded",
+        "judge_reason": "All severities, vectors, CWEs, EPSS values, products, dates, and exploitation statuses match the context, and unsupported details are explicitly flagged as absent.",
+        "usage": {
+          "input_tokens": 4456,
+          "output_tokens": 1330
+        },
+        "judge_usage": {
+          "input_tokens": 4965,
+          "output_tokens": 283
+        },
+        "cited_ids": [
+          "CVE-2017-3878",
+          "CVE-2017-3879",
+          "CVE-2021-34795",
+          "CVE-2021-40112",
+          "CVE-2021-40113"
+        ],
+        "retrieved_ids": [
+          "CVE-2017-3878",
+          "CVE-2017-3879",
+          "CVE-2021-34795",
+          "CVE-2021-40112",
+          "CVE-2021-40113"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2021-40113"
+      },
+      {
+        "id": "CVE-2010-5053",
+        "question": "Which Joomla XOBBIX extension version has SQL injection through the product ID parameter in product description views?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nThe retrieved context contains **no record for a Joomla extension named \"XOBBIX.\"** No document mentions that vendor or product name, so the indexed data does not answer the question as asked.\n\n## Closest match in the retrieved context\n\nIf the query was aimed at a Joomla component with SQL injection through a product ID parameter, the only record fitting that description is:\n\n**CVE-2017-20261**\n- **Description:** Joomla! Component Bargain Product VM3 1.0 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the `product_id` parameter. Attackers can supply crafted SQL statements in GET requests to the **brainy** and **alice** views to extract sensitive database information.\n- **Affected vendor:** Weborange\n- **Affected product:** Bargain Product VM3 (version 1.0)\n- **Severity:** HIGH \u2014 CVSS 4.0 base score 8.8\n- **CVSS vector:** CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:L/VA:N/SC:N/SI:N/SA:N\n- **CWE:** CWE-89\n- **Exploitation:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.00449 predicted probability of exploitation activity in the next 30 days, 0.37118 percentile (scored 2026-08-13)\n- **Published:** 2026-06-19\n\nNote that the record names the affected views as \"brainy\" and \"alice,\" not \"product description views.\"\n\n## Other Joomla SQL injection records in the retrieved set\n\nAll four are CWE-89, CVSS 3.0 base score 9.8 (CRITICAL), vector CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H, published 2017-12-27, and none is listed in the CISA KEV catalog (version 2026.08.11):\n\n| CVE | Product / Vendor | Injection point |\n|---|---|---|\n| CVE-2017-17875 | JEXTN FAQ Pro 4.0.0 / jextn | `id` parameter in a `view=category` action |\n| CVE-2017-17872 | JEXTN Video Gallery 3.0.5 / jextn | `id` parameter in a `view=category` action |\n| CVE-2017-17871 | JEXTN Question And Answer 3.1.0 / jextn | `an` parameter in a `view=tags` action, or the `ques-srch` parameter |\n| CVE-2017-17870 | JBuildozer 1.4.1 / jbuildozer | `appid` parameter in an `entriessearch` action |\n\nEPSS scores (scored 2026-08-13): CVE-2017-17875 \u2014 0.02652 (0.84282 percentile); CVE-2017-17872 \u2014 0.02652 (0.84285); CVE-2017-17871 \u2014 0.02652 (0.84285); CVE-2017-17870 \u2014 0.03001 (0.86157).\n\nNone of these four involves a product ID parameter or a product description view.",
+        "grade": "grounded",
+        "judge_reason": "All CVE details, scores, and the noted absence of any 'XOBBIX' record match the provided documents exactly.",
+        "usage": {
+          "input_tokens": 3099,
+          "output_tokens": 1148
+        },
+        "judge_usage": {
+          "input_tokens": 3367,
+          "output_tokens": 120
+        },
+        "cited_ids": [
+          "CVE-2017-17870",
+          "CVE-2017-17871",
+          "CVE-2017-17872",
+          "CVE-2017-17875",
+          "CVE-2017-20261"
+        ],
+        "retrieved_ids": [
+          "CVE-2017-17870",
+          "CVE-2017-17871",
+          "CVE-2017-17872",
+          "CVE-2017-17875",
+          "CVE-2017-20261"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2010-5053"
+      },
+      {
+        "id": "CVE-2026-23462",
+        "question": "What is the recently patched Linux kernel vulnerability with no details provided beyond the fix announcement?",
+        "expected": "grounded",
+        "answer": "## Direct answer to the question as asked\n\nNone of the five retrieved records is a bare fix announcement with no detail. Every one carries at least a short upstream commit description of what was fixed. So the question, as phrased, does not map onto a single record in the indexed data. Below are the two records that come closest, followed by the full contents of what was retrieved so you can judge.\n\n### Closest candidates\n\n**Most recently published, and the only record with no CWE assignment \u2014 CVE-2026-45932**\n- Published: 2026-05-27\n- Severity: HIGH, CVSS 3.1 base score 7.3\n- Vector: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:H/A:H\n- Affected vendors: Linux, linux. Affected products: Linux, linux kernel\n- CWE: none carried in the record\n- Description as given: \"bpf: Fix tcx/netkit detach permissions when prog fd isn't given.\" The record states the commit fixes a security issue where BPF_PROG_DETACH on tcx or netkit devices could be executed by any user when no program fd was provided, bypassing permission checks, and that the fix adds a capability check for CAP_NET_ADMIN or CAP_SYS_ADMIN in this case.\n- Exploitation: not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- EPSS: 0.00134 (0.03305 percentile), scored 2026-08-13\n\n**Shortest description in the set \u2014 CVE-2022-48741**\n- Published: 2024-06-20\n- Severity: MEDIUM, CVSS 3.1 base score 5.5\n- Vector: CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H\n- Affected vendors: Linux, linux. Affected products: Linux, linux kernel\n- CWE: CWE-476\n- Description as given: \"ovl: fix NULL pointer dereference in copy up warning. This patch is fixing a NULL pointer dereference to get a recently introduced warning message working.\" That is the whole of the detail in the record.\n- Exploitation: not listed in the CISA KEV catalog (version 2026.08.11)\n- EPSS: 0.00222 (0.12857 percentile), scored 2026-08-13\n\n### Remaining retrieved records, for completeness\n\n| CVE | Severity / CVSS 3.1 base | Vector | CWE | Subject line in record |\n|---|---|---|---|---|\n| CVE-2021-47475 | HIGH / 7.8 | AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H | CWE-787 | comedi: vmk80xx: fix transfer-buffer overflows |\n| CVE-2022-50333 | HIGH / 7.1 | AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:H | CWE-125 | fs: jfs: fix shift-out-of-bounds in dbDiscardAG |\n| CVE-2022-50479 | MEDIUM / 5.5 | AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H | CWE-401 | drm/amd: fix potential memory leak |\n\nAll three list affected vendors Linux, linux and affected products Linux, linux kernel. All three are recorded as not listed in the CISA KEV catalog (version 2026.08.11). EPSS scores, all dated 2026-08-13: CVE-2021-47475 at 0.00259 (0.17564 percentile), CVE-2022-50333 at 0.00159 (0.05488 percentile), CVE-2022-50479 at 0.00128 (0.02811 percentile).\n\n### Notes on interpretation\n\n- No record in this set is listed in the CISA Known Exploited Vulnerabilities catalog as of version 2026.08.11. EPSS figures are model predictions of exploitation activity in the next 30 days, not observations.\n- If you can narrow \"recently patched\" to a publication date range or a subsystem, I can point at the specific record. As it stands, the retrieved context does not identify a Linux kernel entry that withholds detail beyond the fix announcement.",
+        "grade": "grounded",
+        "judge_reason": "All stated CVE details, dates, scores, vectors, CWEs, and KEV/EPSS statements match the provided documents exactly, and comparative claims (most recent, no CWE, shortest description) hold within the given set.",
+        "usage": {
+          "input_tokens": 3420,
+          "output_tokens": 1799
+        },
+        "judge_usage": {
+          "input_tokens": 4053,
+          "output_tokens": 235
+        },
+        "cited_ids": [
+          "CVE-2021-47475",
+          "CVE-2022-48741",
+          "CVE-2022-50333",
+          "CVE-2022-50479",
+          "CVE-2026-45932"
+        ],
+        "retrieved_ids": [
+          "CVE-2021-47475",
+          "CVE-2022-48741",
+          "CVE-2022-50333",
+          "CVE-2022-50479",
+          "CVE-2026-45932"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2026-23462"
+      },
+      {
+        "id": "CVE-2023-3625",
+        "question": "Is there an arbitrary file upload flaw in Suncreate flood warning monitoring system's UploadFile.ashx duty handler?",
+        "expected": "grounded",
+        "answer": "# Answer: Yes \u2014 CVE-2023-3625\n\nThe retrieved context confirms an unrestricted upload flaw in the `/Duty/AjaxHandle/Write/UploadFile.ashx` file of the Suncreate Mountain Flood Disaster Prevention Monitoring and Early Warning System.\n\n## Primary match\n\n**CVE-2023-3625**\n- **Affected file/component:** `/Duty/AjaxHandle/Write/UploadFile.ashx`, component \"Duty Write-UploadFile\"\n- **Description per the record:** A vulnerability classified as critical was found in Suncreate Mountain Flood Disaster Prevention Monitoring and Early Warning System up to 20230706. Manipulation of the argument `Filedata` leads to unrestricted upload. The attack can be initiated remotely. The exploit has been disclosed to the public and may be used. Identifier VDB-233578. The record notes the vendor was contacted early about this disclosure but did not respond in any way.\n- **Severity:** CRITICAL, CVSS 3.1 base score 9.8\n- **CVSS vector:** CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H\n- **CWE:** CWE-434\n- **Vendors:** Suncreate, istrong\n- **Products:** Mountain Flood Disaster Prevention Monitoring and Early Warning System / mountain flood disaster prevention monitoring and early warning system\n- **Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS 0.00957 predicted probability of exploitation activity in the next 30 days, 0.58334 percentile (scored 2026-08-13)\n- **Published:** 2023-07-11T18:15:20.903\n\n## Related Suncreate Duty-module upload issues in the same context\n\nTwo additional records cover distinct handler paths in the same product, both also CWE-434, both CRITICAL / CVSS 3.1 base 9.8 with vector CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H, both citing manipulation of the argument `Filedata`, remote initiation, public exploit disclosure, and no vendor response:\n\n| CVE | File | Version affected | VDB ID | EPSS |\n|---|---|---|---|---|\n| CVE-2023-3623 | `/Duty/AjaxHandle/UploadHandler.ashx` (component: Duty Module) | up to 20230704 | VDB-233576 | 0.00909 (0.56789 pct) |\n| CVE-2023-3626 | `/Duty/AjaxHandle/UpLoadFloodPlanFile.ashx` (component: UpLoadFloodPlanFile) | up to 20230706 | VDB-233579 | 0.00957 (0.58334 pct) |\n\nBoth are likewise not listed in the CISA KEV catalog (version 2026.08.11).\n\n## Note on scope\n\nThe context also contains CVE-2023-3802 and CVE-2023-3804, which are unrestricted upload issues (CWE-434) in the **Chengdu / cdwanjiang** Flash Flood Disaster Monitoring and Warning System 2.0 \u2014 a different vendor and product, and not responsive to a question about Suncreate's `UploadFile.ashx`.\n\nThe corpus carries no MITRE ATT&CK mappings and no vendor patch instructions for these entries.",
+        "grade": "grounded",
+        "judge_reason": "Every detail\u2014CVE IDs, file paths, arguments, VDB IDs, CVSS scores/vectors, EPSS values, KEV status, and vendor/product distinctions\u2014matches the provided documents.",
+        "usage": {
+          "input_tokens": 3867,
+          "output_tokens": 1194
+        },
+        "judge_usage": {
+          "input_tokens": 4241,
+          "output_tokens": 243
+        },
+        "cited_ids": [
+          "CVE-2023-3623",
+          "CVE-2023-3625",
+          "CVE-2023-3626",
+          "CVE-2023-3802",
+          "CVE-2023-3804"
+        ],
+        "retrieved_ids": [
+          "CVE-2023-3623",
+          "CVE-2023-3625",
+          "CVE-2023-3626",
+          "CVE-2023-3802",
+          "CVE-2023-3804"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2023-3625"
+      },
+      {
+        "id": "CVE-2020-13825",
+        "question": "Which i-doit 1.14.2 parameters like viewMode, objID, or catgID allow reflected script injection by remote attackers?",
+        "expected": "grounded",
+        "answer": "## Direct answer: CVE-2020-13825\n\nThe retrieved context identifies a single record covering i-doit 1.14.2 and the named parameters.\n\n**CVE-2020-13825**\n- **Description (as recorded):** \"A cross-site scripting (XSS) vulnerability in i-doit 1.14.2 allows remote attackers to inject arbitrary web script or HTML via the viewMode, tvMode, tvType, objID, catgID, objTypeID, or editMode parameter.\"\n- **Affected parameters (full list from the record):** `viewMode`, `tvMode`, `tvType`, `objID`, `catgID`, `objTypeID`, `editMode`\n- **Severity:** MEDIUM \u2014 CVSS 3.1 base score 6.1\n- **CVSS vector:** `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N`\n- **Vendor / product:** i-doit / i-doit\n- **Weakness:** CWE-79\n- **Published:** 2020-08-20\n- **Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- **EPSS:** 0.00806 predicted probability of exploitation activity in the next 30 days, 0.53575 percentile (scored 2026-08-13)\n\nOne qualification on terminology: the record describes this as a \"cross-site scripting (XSS) vulnerability\" and does not use the word \"reflected.\" The context does not classify the injection variant for this CVE.\n\n## Other i-doit 1.14.2 record in the context\n\n**CVE-2020-13826** also affects i-doit 1.14.2, but concerns a different parameter and weakness class:\n- **Description:** \"A CSV injection (aka Excel Macro Injection or Formula Injection) issue in i-doit 1.14.2 allows an attacker to execute arbitrary commands via a Title parameter that is mishandled in a CSV export.\"\n- **Severity:** HIGH \u2014 CVSS 3.1 base score 8.8\n- **CVSS vector:** `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H`\n- **Weakness:** CWE-1236\n- **Exploitation status:** Not listed in the CISA KEV catalog (version 2026.08.11)\n- **EPSS:** 0.01499, 0.71934 percentile (scored 2026-08-13)\n\n## Scope note\n\nOther i-doit records in the context concern different versions and parameters, and so do not answer the 1.14.2 question:\n\n- **CVE-2023-34830** \u2014 i-doit Open v24, reflected XSS via the `timeout` parameter on the login page. MEDIUM, CVSS 3.1 base 5.4, CWE-79. (This is the only record in the context that explicitly says \"reflected,\" but it is not version 1.14.2.)\n- **CVE-2014-1237** \u2014 synetics i-doit pro before 1.2.4, XSS via the `call` parameter. MEDIUM, CVSS 2.0 base 4.3, CWE-79.\n- **CVE-2014-1597** \u2014 synetics i-doit pro before 1.2.5 and i-doit open, SQL injection via the `objID` parameter to the default URI. HIGH, CVSS 2.0 base 7.5, CWE-89. Note this involves `objID` as well, but as a SQL injection vector in earlier versions, not script injection in 1.14.2.",
+        "grade": "grounded",
+        "judge_reason": "Every stated detail\u2014descriptions, CVSS scores/vectors, CWEs, EPSS values, KEV status, and version distinctions\u2014matches the provided CVE records exactly.",
+        "usage": {
+          "input_tokens": 2963,
+          "output_tokens": 1254
+        },
+        "judge_usage": {
+          "input_tokens": 3329,
+          "output_tokens": 106
+        },
+        "cited_ids": [
+          "CVE-2014-1237",
+          "CVE-2014-1597",
+          "CVE-2020-13825",
+          "CVE-2020-13826",
+          "CVE-2023-34830"
+        ],
+        "retrieved_ids": [
+          "CVE-2014-1237",
+          "CVE-2014-1597",
+          "CVE-2020-13825",
+          "CVE-2020-13826",
+          "CVE-2023-34830"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2020-13825"
+      },
+      {
+        "id": "CVE-2021-32202",
+        "question": "Is there a stored XSS in CS-Cart 4.11 triggered by pasting content into the blog post description field?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nThe indexed context contains one CS-Cart record matching this description \u2014 **CVE-2021-32202** \u2014 but note a wording distinction: the record describes it as **\"copy-paste XSS\"**, not as stored XSS. The record's exact statement is:\n\n> \"In CS-Cart version 4.11.1, it is possible to induce copy-paste XSS by manipulating the 'post description' filed in the blog post creation page.\"\n\nSo the field (\"post description\") and the location (blog post creation page) match your question; the classification as *stored* XSS is not something the record asserts.\n\n## CVE-2021-32202 details\n\n| Attribute | Value from record |\n|---|---|\n| Affected version | CS-Cart 4.11.1 |\n| Severity | MEDIUM |\n| CVSS 3.1 base score | 6.1 |\n| CVSS vector | CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N |\n| CWE | CWE-79 |\n| Affected vendor | cs-cart |\n| Affected product | cs-cart |\n| Published | 2021-09-14 |\n\n**Vector components** (as given): network attack vector, low attack complexity, no privileges required, user interaction required, scope changed, low confidentiality impact, low integrity impact, no availability impact.\n\n**Exploitation status:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS is 0.00649 predicted probability of exploitation activity in the next 30 days, 0.47945 percentile (scored 2026-08-13).\n\n## Scope note\n\nThe retrieved context carries no other CS-Cart records. The remaining documents concern blog-post XSS issues in unrelated products \u2014 ERPNEXT (CVE-2025-56379), FlatPress (CVE-2025-25460), Mezzanine CMS (CVE-2025-6050), and flaskBlog (CVE-2025-55735) \u2014 and say nothing about CS-Cart. The context also does not indicate whether any fixed CS-Cart version exists; the corpus carries no vendor patch instructions.",
+        "grade": "grounded",
+        "judge_reason": "Every claim\u2014CVE-2021-32202 details, CVSS vector breakdown, EPSS/KEV status, and the note that other documents concern unrelated products\u2014matches the provided context.",
+        "usage": {
+          "input_tokens": 3532,
+          "output_tokens": 835
+        },
+        "judge_usage": {
+          "input_tokens": 3434,
+          "output_tokens": 106
+        },
+        "cited_ids": [
+          "CVE-2021-32202",
+          "CVE-2025-25460",
+          "CVE-2025-55735",
+          "CVE-2025-56379",
+          "CVE-2025-6050"
+        ],
+        "retrieved_ids": [
+          "CVE-2021-32202",
+          "CVE-2025-25460",
+          "CVE-2025-55735",
+          "CVE-2025-56379",
+          "CVE-2025-6050"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2021-32202"
+      },
+      {
+        "id": "CVE-2015-9467",
+        "question": "Which WordPress broken link manager plugin versions allow SQL injection through the url parameter in its delete or edit URL functions?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nTwo records in the retrieved context describe SQL injection via the `url` parameter in the WordPress broken link manager plugin's delete/edit URL functionality.\n\n### CVE-2015-9467\n- **Description:** The broken-link-manager plugin **before 0.5.0** for WordPress has `wpslDelURL` or `wpslEditURL` SQL injection via the `url` parameter.\n- **Severity:** CRITICAL \u2014 CVSS 3.1 base score 9.8\n- **CVSS vector:** `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H`\n- **Vendor / product:** k-78 / broken link manager\n- **Weakness:** CWE-89\n- **Exploitation:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS 0.0239 (82.467th percentile), scored 2026-08-13.\n- **Published:** 2019-10-10\n\n### CVE-2021-24550\n- **Description:** The Broken Link Manager WordPress plugin **through 0.6.5** does not sanitise, validate or escape the `url` GET parameter before using it in a SQL statement when retrieving an URL to edit, leading to an authenticated SQL injection issue.\n- **Severity:** HIGH \u2014 CVSS 3.1 base score 7.2\n- **CVSS vector:** `CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H`\n- **Vendor / product:** Unknown, broken link manager project / Broken Link Manager, broken link manager\n- **Weakness:** CWE-89\n- **Exploitation:** Not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11). EPSS 0.01578 (73.262nd percentile), scored 2026-08-13.\n- **Published:** 2021-08-23\n\n## Version summary\n\n| CVE | Affected versions | Function/parameter as stated |\n|---|---|---|\n| CVE-2015-9467 | before 0.5.0 | `wpslDelURL` or `wpslEditURL`, `url` parameter |\n| CVE-2021-24550 | through 0.6.5 | `url` GET parameter, used when retrieving an URL to edit |\n\n## Related record that does not match the question\n\n**CVE-2015-9468** also concerns the broken-link-manager plugin (k-78, version 0.4.5) and a `delURL` action, but the record describes XSS via the **`page`** parameter, not SQL injection via `url`. It carries CWE-79, MEDIUM severity, CVSS 3.1 base score 6.1 (`CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N`), is not listed in the CISA KEV catalog (version 2026.08.11), and has EPSS 0.00985 (59.261st percentile).\n\nThe other two SQL injection records in the context (CVE-2025-1264, AIOSEO Broken Link Checker, `orderBy` parameter; CVE-2025-10002, ClickWhale, `export_csv()`) concern different products and parameters and fall outside the scope of this question.\n\nThe corpus does not carry vendor patch instructions for any of these records.",
+        "grade": "grounded",
+        "judge_reason": "All CVE details, scores, vectors, EPSS values, and distinctions cited match the provided documents exactly, with no added external facts.",
+        "usage": {
+          "input_tokens": 3286,
+          "output_tokens": 1307
+        },
+        "judge_usage": {
+          "input_tokens": 3610,
+          "output_tokens": 237
+        },
+        "cited_ids": [
+          "CVE-2015-9467",
+          "CVE-2015-9468",
+          "CVE-2021-24550",
+          "CVE-2025-10002",
+          "CVE-2025-1264"
+        ],
+        "retrieved_ids": [
+          "CVE-2015-9467",
+          "CVE-2015-9468",
+          "CVE-2021-24550",
+          "CVE-2025-10002",
+          "CVE-2025-1264"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2015-9467"
+      },
+      {
+        "id": "CVE-2024-27668",
+        "question": "Is there a stored XSS flaw in the custom blocks feature of Flusity CMS 2.33?",
+        "expected": "grounded",
+        "answer": "## Direct answer\n\nThe context documents an XSS vulnerability in the \"Custom Blocks\" feature of Flusity-CMS v2.33, but **the record does not characterize it as *stored*** XSS \u2014 it says only \"Cross Site Scripting (XSS).\"\n\n## Primary match\n\n**CVE-2024-27668**\n- Description: \"Flusity-CMS v2.33 is affected by: Cross Site Scripting (XSS) in 'Custom Blocks.'\"\n- Severity: MEDIUM, CVSS 3.1 base score 6.1\n- CVSS vector: `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N`\n- Affected vendor / product: flusity / flusity\n- Weakness: CWE-79\n- Published: 2024-03-04\n- Exploitation: not listed in the CISA Known Exploited Vulnerabilities catalog (version 2026.08.11)\n- EPSS: 0.00413 predicted probability of exploitation activity in the next 30 days (0.34245 percentile, scored 2026-08-13)\n\n## Related Flusity records in the context\n\n**CVE-2023-5793** \u2014 also involves a custom-block code path, but is **not** tied to version 2.33. The record states the issue affects \"the function loadCustomBlocCreateForm of the file /core/tools/customblock.php of the component Dashboard,\" where \"the manipulation of the argument customblock_place leads to cross site scripting.\" It notes: \"This product does not use versioning. This is why information about affected and unaffected releases are unavailable.\" The record adds that \"the exploit has been disclosed to the public and may be used,\" that the patch is named `81252bc764e1de2422e79e36194bba1289e7a0a5`, and that the associated identifier is VDB-243599.\n- Severity: MEDIUM, CVSS 3.1 base score 5.4\n- Vector: `CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N`\n- Vendor / products: flusity / CMS, flusity\n- Weakness: CWE-79\n- Exploitation: not listed in the CISA KEV catalog (version 2026.08.11); EPSS 0.00434 (0.35998 percentile)\n\n**CVE-2024-27680** \u2014 same product and version (Flusity-CMS v2.33) but a different component: the \"Contact form,\" not Custom Blocks. MEDIUM, CVSS 3.1 base 6.1, vector `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N`, CWE-79, not in the CISA KEV catalog (version 2026.08.11), EPSS 0.00404.\n\n## Records that are *not* Flusity, despite similar wording\n\n- **CVE-2025-46457** \u2014 \"Wp Custom CMS Block\" by Ahsanullah Akanda, versions \"from n/a through <= 2.1.\" The record does mention Stored XSS (\"Cross-Site Request Forgery (CSRF) vulnerability \u2026 allows Stored XSS\"), but this is a WordPress plugin, not Flusity CMS. HIGH, CVSS 3.1 base 7.1, CWE-352.\n- **CVE-2024-3180** \u2014 Concrete CMS \"Stored XSS in blocks of type file,\" version 9 below 9.2.8 and previous versions below 8.5.16. Different vendor and product. MEDIUM, CVSS 3.1 base 4.8, CWE-79.\n\n## Caveat\n\nThe word \"stored\" appears in the retrieved context only for CVE-2025-46457 and CVE-2024-3180, neither of which concerns Flusity. Whether CVE-2024-27668 is stored or reflected is not stated in the indexed data.",
+        "grade": "grounded",
+        "judge_reason": "All CVE details, scores, vectors, EPSS values, and the distinction that only CVE-2025-46457 and CVE-2024-3180 mention stored XSS match the context; the WordPress plugin characterization follows from the 'wp-custom-cms-block' naming in the record.",
+        "usage": {
+          "input_tokens": 3283,
+          "output_tokens": 1543
+        },
+        "judge_usage": {
+          "input_tokens": 3761,
+          "output_tokens": 340
+        },
+        "cited_ids": [
+          "CVE-2023-5793",
+          "CVE-2024-27668",
+          "CVE-2024-27680",
+          "CVE-2024-3180",
+          "CVE-2025-46457"
+        ],
+        "retrieved_ids": [
+          "CVE-2023-5793",
+          "CVE-2024-27668",
+          "CVE-2024-27680",
+          "CVE-2024-3180",
+          "CVE-2025-46457"
+        ],
+        "invalid_citations": [],
+        "target_cve": "CVE-2024-27668"
+      }
+    ],
+    "unanswerable": [],
+    "calibration_corrupted": [],
+    "calibration_verbatim": []
+  }
+}

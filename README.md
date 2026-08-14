@@ -1034,6 +1034,33 @@ I will not attribute any CVE ID to it."*
 retrieved.** Zero invented identifiers. This is a mechanical check, not a
 judgement, and it is the strongest claim in this section.
 
+**Provider refusals — an availability characteristic, not an error.** The API can
+decline a request outright: HTTP 200, `stop_reason: "refusal"`, no content. The
+user asked a legitimate vulnerability question and got nothing back. Any security
+tool built on a commercial model inherits this, and
+[experiments/refusals.py](experiments/refusals.py) measures it. Three
+observations at different points in the pipeline, deliberately **not** pooled —
+writing a question about a privilege escalation is not the same request as
+answering one:
+
+| Stage | Refused | Rate |
+|---|---:|---:|
+| Generating an analyst question from a CVE record | 8 / 200 | 0.040 |
+| Answering, baseline prompt | 2 / 38 | 0.053 |
+| Answering, current prompt | 6 / 62 | 0.097 |
+
+The refused CVE IDs are named in the artifact. `stop_reason` is now recorded on
+every call in the [API ledger](src/api_ledger.py), so this keeps counting as the
+project grows rather than needing to be reconstructed.
+
+This metric exists because it was nearly deleted. The first run recorded the
+placeholder string as though it were an answer, the judge read *"The model
+declined to answer this query"* and graded it **abstained**, and the resulting
+0.111 "false abstention rate" described a system refusing questions it had never
+been asked. Excluding those from groundedness was the right correction. Throwing
+them away would have been the wrong one — on 2 of 38 generation attempts the
+system returns nothing, and that is a real property of it.
+
 **Groundedness — judged, on 16 answerable questions.**
 
 | Grade | Rate | 95% interval (Wilson) |
@@ -1160,8 +1187,8 @@ at exactly [0, 0], which is not a claim any 16 observations can support.
 
 **What a larger sample would buy, and why there is a ceiling.** The evaluation set
 holds one question per CVE from a 200-CVE sample pinned in Phase 2 and committed
-not to be redrawn; 192 generated successfully and 35 are now spent as a
-development set. **157 held-out questions is the whole of what exists** — a
+not to be redrawn; 192 generated successfully and 38 are now spent as a
+development set. **154 held-out questions is the whole of what exists** — a
 constraint of the sampling design, not of budget. At that size the unsupported
 interval narrows from ±20.7 to ±7.2 points.
 
@@ -1177,7 +1204,7 @@ reach for is how often the two configs disagree about whether the *target* CVE i
 in the top five, which is 0.109 — and on that basis the comparison looks nearly
 free and well powered, because a marginal difference cannot exceed the rate at
 which the arms differ. The two configs agree about where the target is and
-disagree about almost everything else around it. Power at n=157 therefore runs
+disagree about almost everything else around it. Power at n=154 therefore runs
 from 1.00 down to 0.38 for a 10-point difference depending on which discordance
 rate turns out to apply, and the run measures which.
 
@@ -1226,10 +1253,10 @@ Planned, in order:
       fields into the prompt and removing the instruction to prioritise
       actionable recommendations. 5 of 5 development failures fixed with no cost
       to decline behaviour; the held-out measurement is the entry below
-- [ ] **Held-out answer-quality measurement** — 157 questions, `hybrid_rerank`
+- [ ] **Held-out answer-quality measurement** — 154 questions, `hybrid_rerank`
       against `bm25`. The comparison is the point: every retrieval conclusion in
       this project rests on Recall@1 proxying answer quality, and nothing has
-      tested that. Sized in [experiments/power.py](experiments/power.py); 157 is
+      tested that. Sized in [experiments/power.py](experiments/power.py); 154 is
       the entire held-out set the pinned sample allows, so the interval it buys
       (±7.2 points on the unsupported rate) is a ceiling rather than a choice
 - [ ] **A CWE catalogue join** — the model is currently forbidden from expanding

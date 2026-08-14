@@ -327,6 +327,74 @@ class TestResultsPathIsAlwaysExplicit:
         assert any("default=str(RESULTS_PATH)" in u for u in uses)
 
 
+class TestRefusalAggregation:
+    """
+    Denominators. Both of the ones this file started with were wrong, in
+    opposite directions: the per-run rate counted calibration records, which
+    involve no generation call at all, and the ledger rate counted every call
+    ever made against refusals only observable since `stop_reason` was recorded.
+    """
+
+    def _module(self):
+        import refusals
+        return refusals
+
+    def test_calibration_records_are_not_generation_attempts(self, tmp_path,
+                                                             monkeypatch):
+        refusals = self._module()
+        (tmp_path / "answer_quality_x.json").write_text(json.dumps({
+            "records": {
+                "answerable": [{"id": "a", "answer": "real"},
+                               {"id": "b", "answer": aq.REFUSAL_PLACEHOLDER}],
+                "unanswerable": [{"id": "c", "answer": "real"}],
+                "calibration_corrupted": [{"id": f"k{i}", "answer": "x"}
+                                          for i in range(20)],
+            }}), encoding="utf-8")
+        monkeypatch.setattr(refusals, "RESULTS_DIR", tmp_path)
+        run = refusals.from_answer_runs()[0]
+        assert run["attempted"] == 3      # not 23
+        assert run["refused"] == 1
+
+    def test_a_copied_results_file_is_not_a_second_observation(self, tmp_path,
+                                                               monkeypatch):
+        refusals = self._module()
+        payload = json.dumps({"records": {"answerable": [
+            {"id": "a", "answer": aq.REFUSAL_PLACEHOLDER}]}})
+        for name in ("answer_quality.json", "answer_quality_prompt_v1.json"):
+            (tmp_path / name).write_text(payload, encoding="utf-8")
+        monkeypatch.setattr(refusals, "RESULTS_DIR", tmp_path)
+        assert len(refusals.from_answer_runs()) == 1
+
+    def test_named_and_embedded_refusals_are_not_double_counted(self, tmp_path,
+                                                                monkeypatch):
+        """The harness names refusals in generation_failures now and used to
+        persist them as records. A file holding both must not count twice."""
+        refusals = self._module()
+        (tmp_path / "answer_quality_y.json").write_text(json.dumps({
+            "generation_failures": ["b"],
+            "records": {"answerable": [
+                {"id": "a", "answer": "real"},
+                {"id": "b", "answer": aq.REFUSAL_PLACEHOLDER}]},
+        }), encoding="utf-8")
+        monkeypatch.setattr(refusals, "RESULTS_DIR", tmp_path)
+        run = refusals.from_answer_runs()[0]
+        assert run["refused"] == 1
+        assert run["attempted"] == 2
+
+    def test_ledger_rate_is_over_calls_that_recorded_a_stop_reason(self,
+                                                                   tmp_path):
+        import api_ledger
+        path = tmp_path / "ledger.jsonl"
+        rows = ([{"model": "m", "purpose": "p"}] * 10          # before the field
+                + [{"model": "m", "purpose": "p", "stop_reason": "end_turn"}] * 9
+                + [{"model": "m", "purpose": "p", "stop_reason": "refusal"}])
+        path.write_text("\n".join(json.dumps(r) for r in rows), encoding="utf-8")
+        totals = api_ledger.summarize(path)["totals"]
+        assert totals["calls"] == 20
+        assert totals["calls_with_stop_reason"] == 10
+        assert totals["refusals"] == 1      # 1 in 10, not 1 in 20
+
+
 class TestCommittedArtifactsAgree:
     """The published numbers must be what summarize() produces today."""
 

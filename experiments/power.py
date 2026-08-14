@@ -62,8 +62,10 @@ TARGET_POWER = 0.80
 # CVE from the 200-CVE sample pinned in Phase 2; 192 generated successfully and
 # 35 have been spent developing the prompt. Buying a larger sample would mean
 # redrawing a sample this project committed not to redraw, so this is a hard
-# ceiling rather than a budget line.
-HELD_OUT_CEILING = 157
+# ceiling rather than a budget line. 38 questions appear across the two
+# development runs, not 35: the two the API refused in the baseline are held out
+# too, because they were seen and their exclusion is not a reason to reuse them.
+HELD_OUT_CEILING = 154
 
 # The generator is given this many documents. Retrieval differences deeper than
 # this are invisible to the answer, which is the whole point of measuring

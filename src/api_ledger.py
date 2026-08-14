@@ -100,16 +100,23 @@ def summarize(
     """Totals by model and purpose. Prices are per million tokens, if supplied."""
     by_model: Dict[str, Dict[str, int]] = {}
     by_purpose: Dict[str, Dict[str, int]] = {}
-    totals = {"calls": 0, "input_tokens": 0, "output_tokens": 0, "refusals": 0}
+    totals = {"calls": 0, "input_tokens": 0, "output_tokens": 0,
+              "refusals": 0, "calls_with_stop_reason": 0}
     refusals_by_purpose: Dict[str, int] = {}
 
     for entry in read(ledger_path):
         tokens_in = entry.get("input_tokens") or 0
         tokens_out = entry.get("output_tokens") or 0
-        if entry.get("stop_reason") == "refusal":
-            totals["refusals"] += 1
-            key = entry.get("purpose", "?")
-            refusals_by_purpose[key] = refusals_by_purpose.get(key, 0) + 1
+        # Entries written before stop_reason was recorded lack the key
+        # entirely. They are counted as calls but not as observations of
+        # refusal behaviour, so the rate is over the calls where it was
+        # actually looked at rather than over all of history.
+        if "stop_reason" in entry:
+            totals["calls_with_stop_reason"] += 1
+            if entry["stop_reason"] == "refusal":
+                totals["refusals"] += 1
+                key = entry.get("purpose", "?")
+                refusals_by_purpose[key] = refusals_by_purpose.get(key, 0) + 1
         totals["calls"] += 1
         totals["input_tokens"] += tokens_in
         totals["output_tokens"] += tokens_out
@@ -152,10 +159,11 @@ def main() -> None:
     summary = summarize(Path(args.ledger), args.in_price, args.out_price)
     t = summary["totals"]
     print(f"{t['calls']:,} calls | {t['input_tokens']:,} in | {t['output_tokens']:,} out")
-    if t["refusals"]:
-        rate = t["refusals"] / t["calls"]
+    if t["calls_with_stop_reason"]:
+        rate = t["refusals"] / t["calls_with_stop_reason"]
         print(f"{t['refusals']} refused by a safety classifier "
-              f"({rate:.1%} of calls): "
+              f"({rate:.1%} of {t['calls_with_stop_reason']:,} calls with a "
+              f"recorded stop_reason): "
               + ", ".join(f"{k} {v}" for k, v in
                           sorted(summary["refusals_by_purpose"].items())))
     print()

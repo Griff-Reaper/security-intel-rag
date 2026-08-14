@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-14T14:53:59+00:00",
+  "generated_at": "2026-08-14T16:55:55+00:00",
   "document_layout": {
     "version": 2,
     "fingerprint": "ffb8c1393e249003",
@@ -97,18 +97,18 @@
         "width": 0.4108
       }
     },
-    "n_157": {
+    "n_154": {
       "unsupported": {
-        "point": 0.2803,
-        "low": 0.2159,
-        "high": 0.3551,
-        "width": 0.1392
+        "point": 0.2792,
+        "low": 0.2144,
+        "high": 0.3548,
+        "width": 0.1404
       },
       "grounded": {
-        "point": 0.6115,
-        "low": 0.5334,
-        "high": 0.6842,
-        "width": 0.1508
+        "point": 0.6104,
+        "low": 0.5316,
+        "high": 0.6838,
+        "width": 0.1523
       }
     },
     "note": "held-out ceiling is 174: paraphrased_eval.json carries one question per CVE from a 200-CVE sample pinned in Phase 2, 192 of which generated successfully, 18 spent as a development set. Rates are held at the observed values to isolate the effect of sample size."
@@ -175,7 +175,7 @@
     "note": "different_document_set_rate is the share of questions where the two configs build different prompts, and is the discordance rate an answer-quality comparison is actually exposed to. target_indicator_discordance is the weaker measure taken from ranks_by_cve, kept here so the two can be compared."
   },
   "planned_comparison": {
-    "held_out_ceiling": 157,
+    "held_out_ceiling": 154,
     "held_out_note": "paraphrased_eval.json carries one question per CVE from a 200-CVE sample pinned in Phase 2 and committed not to be redrawn. 192 generated; the remainder is the entire held-out set that exists, so sample size here is not a budget decision.",
     "grade_discordance": "unknown until measured; power reported across a range",
     "upper_bound_on_discordance": 0.9896,
@@ -183,15 +183,15 @@
     "power_grid": {
       "grade_discordance_0.10": {
         "delta_0.050": {
-          "power_at_n_157": 0.4265,
+          "power_at_n_154": 0.4173,
           "n_for_80_percent": 337
         },
         "delta_0.075": {
-          "power_at_n_157": 0.8434,
+          "power_at_n_154": 0.8345,
           "n_for_80_percent": 144
         },
         "delta_0.100": {
-          "power_at_n_157": 0.9989,
+          "power_at_n_154": 0.9986,
           "n_for_80_percent": 78
         },
         "delta_0.150": {
@@ -200,55 +200,55 @@
       },
       "grade_discordance_0.20": {
         "delta_0.050": {
-          "power_at_n_157": 0.2255,
+          "power_at_n_154": 0.2206,
           "n_for_80_percent": 658
         },
         "delta_0.075": {
-          "power_at_n_157": 0.4884,
+          "power_at_n_154": 0.4791,
           "n_for_80_percent": 294
         },
         "delta_0.100": {
-          "power_at_n_157": 0.768,
+          "power_at_n_154": 0.7586,
           "n_for_80_percent": 168
         },
         "delta_0.150": {
-          "power_at_n_157": 0.9935,
+          "power_at_n_154": 0.9926,
           "n_for_80_percent": 72
         }
       },
       "grade_discordance_0.30": {
         "delta_0.050": {
-          "power_at_n_157": 0.171,
+          "power_at_n_154": 0.1679,
           "n_for_80_percent": 975
         },
         "delta_0.075": {
-          "power_at_n_157": 0.3548,
+          "power_at_n_154": 0.348,
           "n_for_80_percent": 438
         },
         "delta_0.100": {
-          "power_at_n_157": 0.587,
+          "power_at_n_154": 0.5775,
           "n_for_80_percent": 249
         },
         "delta_0.150": {
-          "power_at_n_157": 0.9286,
+          "power_at_n_154": 0.9234,
           "n_for_80_percent": 112
         }
       },
       "grade_discordance_0.50": {
         "delta_0.050": {
-          "power_at_n_157": 0.1179,
+          "power_at_n_154": 0.1163,
           "n_for_80_percent": 1606
         },
         "delta_0.075": {
-          "power_at_n_157": 0.2273,
+          "power_at_n_154": 0.2234,
           "n_for_80_percent": 720
         },
         "delta_0.100": {
-          "power_at_n_157": 0.3819,
+          "power_at_n_154": 0.3753,
           "n_for_80_percent": 408
         },
         "delta_0.150": {
-          "power_at_n_157": 0.7298,
+          "power_at_n_154": 0.7211,
           "n_for_80_percent": 183
         }
       }

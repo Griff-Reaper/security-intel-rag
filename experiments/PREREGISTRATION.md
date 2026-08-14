@@ -28,9 +28,17 @@ held-out paraphrased questions.
 
 ## Design
 
-- **Questions:** the 157 items of `experiments/samples/paraphrased_eval.json`
-  not used to develop the prompt fix. Held-out set is fixed by exclusion against
-  `experiments/results/answer_quality_prompt_v2.json`, not resampled.
+- **Questions:** the items of `experiments/samples/paraphrased_eval.json` not
+  used to develop the prompt fix. The held-out set is defined **by exclusion**
+  against the development runs, not by a count and not by resampling, so it is
+  identical across configs and cannot drift.
+
+  *Post-hoc note, added after the run began and before any result was read:*
+  the exclusion yields **154**, not the 157 stated elsewhere in this document.
+  192 minus 38, not 192 minus 35 — the two questions the API refused in the
+  baseline were seen and are held out too, and one further question appears in
+  the baseline only. The definition is what governs; the count was arithmetic
+  and it was three off.
 - **Configs:** `hybrid_rerank + direct_id` (current default) and
   `bm25 + direct_id`. Both with `N_RETRIEVED = 5`, the same generation prompt,
   and the same judge (`claude-opus-5`), which passed two-sided calibration.
@@ -85,6 +93,11 @@ published as inconclusive, with the interval stated next to it.
 question per CVE from a 200-CVE sample pinned in Phase 2 and committed not to be
 redrawn; 192 generated successfully and 35 were spent developing the prompt fix.
 More money does not buy more questions.
+
+*(The counts in this paragraph are left as originally committed. They are three
+off — see the note under **Design**. Correcting them in place would quietly
+rewrite a document whose whole purpose is to be unrewritable; the argument is
+unaffected, since 154 is no more purchasable than 157.)*
 
 One option would raise n without touching that commitment: generating a **second
 question per CVE** from the same 200. It is deliberately not being used here.

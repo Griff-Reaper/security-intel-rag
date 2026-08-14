@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-08-14T16:53:40+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "what_this_measures": "the rate at which a safety classifier declines a legitimate vulnerability question, returning HTTP 200 with stop_reason 'refusal' and no content",
+  "why_it_is_not_one_rate": "the three stages ask the model to do different things and are not pooled; a refusal while writing a question about a privilege escalation is not the same event as a refusal while answering one",
+  "eval_construction": {
+    "stage": "generating an analyst question from a CVE record",
+    "attempted": 200,
+    "refused": 8,
+    "rate": 0.04,
+    "cve_ids": [
+      "CVE-2003-1233",
+      "CVE-2010-0114",
+      "CVE-2016-10024",
+      "CVE-2017-12341",
+      "CVE-2019-7727",
+      "CVE-2020-15009",
+      "CVE-2025-63888",
+      "CVE-2026-15509"
+    ]
+  },
+  "answer_runs": [
+    {
+      "run": "answer_quality.json",
+      "retrieval": null,
+      "stage": "answering a question against retrieved context",
+      "attempted": 38,
+      "refused": 2,
+      "rate": 0.0526,
+      "cve_ids": [
+        "CVE-2004-1873",
+        "CVE-2016-2442"
+      ]
+    },
+    {
+      "run": "answer_quality_holdout_hybrid_rerank.json",
+      "retrieval": null,
+      "stage": "answering a question against retrieved context",
+      "attempted": 20,
+      "refused": 0,
+      "rate": 0.0,
+      "cve_ids": []
+    },
+    {
+      "run": "answer_quality_prompt_v2.json",
+      "retrieval": "hybrid_rerank + direct_id",
+      "stage": "answering a question against retrieved context",
+      "attempted": 62,
+      "refused": 6,
+      "rate": 0.0968,
+      "cve_ids": [
+        "CVE-2002-1466",
+        "CVE-2004-1873",
+        "CVE-2016-2442",
+        "CVE-2019-0183",
+        "out-of-scope-02",
+        "out-of-scope-07"
+      ]
+    }
+  ],
+  "ledger": {
+    "stage": "every API call in the project",
+    "attempted": 41,
+    "refused": 1,
+    "rate": 0.0244,
+    "total_calls_ever": 208,
+    "by_purpose": {
+      "query:answer": 1
+    },
+    "caveat": "the denominator is calls with a recorded stop_reason, not all calls: the field was added partway through the project and earlier entries lack it. The per-run figures above cover those."
+  }
+}
