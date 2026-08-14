@@ -1,0 +1,149 @@
+{
+  "generated_at": "2026-08-14T00:53:58+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "purpose": "questions the corpus cannot answer; the system should decline",
+  "verification": "fabricated names searched against the lexical index; any with matches were discarded",
+  "discarded_names": [],
+  "items": [
+    {
+      "id": "fabricated-00",
+      "kind": "fabricated_product",
+      "question": "What is the remote code execution vulnerability in Zyphergate Mailhub 4.2?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-01",
+      "kind": "fabricated_product",
+      "question": "Which versions of Nordvale EdgeProxy are affected by the authentication bypass?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-02",
+      "kind": "fabricated_product",
+      "question": "How severe is the SQL injection in Kestrelix's VaultSync platform?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-03",
+      "kind": "fabricated_product",
+      "question": "What is the remote code execution vulnerability in Obsidianware FleetPilot 4.2?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-04",
+      "kind": "fabricated_product",
+      "question": "Which versions of Tarnhelm SecureBridge are affected by the authentication bypass?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-05",
+      "kind": "fabricated_product",
+      "question": "How severe is the SQL injection in Vellichor's DataForge platform?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-06",
+      "kind": "fabricated_product",
+      "question": "What is the remote code execution vulnerability in Quillfeather AuthGate 4.2?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-07",
+      "kind": "fabricated_product",
+      "question": "Which versions of Marrowstone NetPulse are affected by the authentication bypass?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-08",
+      "kind": "fabricated_product",
+      "question": "How severe is the SQL injection in Ashgrove's CipherDesk platform?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-09",
+      "kind": "fabricated_product",
+      "question": "What is the remote code execution vulnerability in Halcyonix StreamGuard 4.2?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-10",
+      "kind": "fabricated_product",
+      "question": "Which versions of Brackenfell LogVault are affected by the authentication bypass?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "fabricated-11",
+      "kind": "fabricated_product",
+      "question": "How severe is the SQL injection in Duskwind's APIShield platform?",
+      "why_unanswerable": "vendor and product do not appear in the corpus (verified: zero lexical matches)"
+    },
+    {
+      "id": "out-of-scope-00",
+      "kind": "out_of_scope",
+      "question": "Which threat actor group has been observed exploiting CVE-1999-1575 in the wild?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-01",
+      "kind": "out_of_scope",
+      "question": "What are the exact vendor patch steps to remediate CVE-2000-0740?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-02",
+      "kind": "out_of_scope",
+      "question": "Is there public exploit code available for CVE-2002-0068, and where is it hosted?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-03",
+      "kind": "out_of_scope",
+      "question": "How many organisations were breached through CVE-2001-0978?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-04",
+      "kind": "out_of_scope",
+      "question": "What did the vendor's incident post-mortem for CVE-1999-0450 conclude?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-05",
+      "kind": "out_of_scope",
+      "question": "Which threat actor group has been observed exploiting CVE-1999-1163 in the wild?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-06",
+      "kind": "out_of_scope",
+      "question": "What are the exact vendor patch steps to remediate CVE-2000-0105?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-07",
+      "kind": "out_of_scope",
+      "question": "Is there public exploit code available for CVE-1999-0943, and where is it hosted?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-08",
+      "kind": "out_of_scope",
+      "question": "How many organisations were breached through CVE-2002-0539?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    },
+    {
+      "id": "out-of-scope-09",
+      "kind": "out_of_scope",
+      "question": "What did the vendor's incident post-mortem for CVE-2001-0778 conclude?",
+      "why_unanswerable": "NVD records do not carry attribution, patch procedure, exploit availability or breach counts"
+    }
+  ]
+}

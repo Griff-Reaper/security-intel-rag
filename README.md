@@ -19,7 +19,9 @@
 > committed set of 192 paraphrased analyst-style questions built to remove that
 > advantage. Exploitation signals from CISA KEV and FIRST EPSS are joined in as
 > filterable metadata. **End-to-end answer quality — groundedness and refusal
-> behaviour — is still unmeasured**; see [Roadmap](#-roadmap).
+> behaviour — is still unmeasured**: the harness is built and committed but the
+> run is incomplete, and no answer-quality figure is quoted as a result. See
+> [Roadmap](#-roadmap).
 
 ## 🎯 Problem Statement
 
@@ -581,6 +583,7 @@ security-intel-rag/
 │   ├── crossref_identifiers.py  # Splits ID lookup by cross-reference
 │   ├── build_eval_set.py        # Generates the paraphrased eval set
 │   ├── paraphrased_queries.py   # The paraphrased ablation + paired tests
+│   ├── answer_quality.py        # Groundedness, abstention, citation validity
 │   ├── samples/                 # Pinned evaluation and dev samples
 │   └── results/                 # Committed JSON output of the above
 │
@@ -854,6 +857,18 @@ significantly worse on any of them.** Product + version — "log4j 2.14.1" — i
 also the shape an analyst types most, and it is the row this project has treated
 as the interesting one since Phase 2.
 
+**On multiple comparisons.** That is a selected result from a family of 12
+`hybrid + rerank` vs `bm25` tests (four query shapes × three depths), so the
+lowest p-value in the family is exactly the number a reader should be
+suspicious of. A Bonferroni correction over 12 tests puts the threshold at
+0.05/12 ≈ **0.004**. The Recall@1 result (p = 0.013) **does not survive that
+correction** and should be read as suggestive only. The claim rests on the
+Recall@10 result at **p = 0.0001**, which clears the corrected threshold by a
+factor of forty. Every p-value in the family is in
+[identifier_paired_tests.json](experiments/results/identifier_paired_tests.json)
+and [paraphrased_paired_tests.json](experiments/results/paraphrased_paired_tests.json),
+so the correction can be recomputed rather than taken on trust.
+
 So the default stays, on the narrow grounds that it wins where it wins and does
 not lose elsewhere — not on the grounds that it is more sophisticated. The cost
 is real and the alternative is one environment variable away:
@@ -994,6 +1009,67 @@ Breaking ties on document ID is not the neutral choice — it is a coin flip tha
 discarded a quarter of the lexical arm's accuracy. The shipped tie-break prefers
 the lexical arm and is labelled in the source as the arm weighting it is.
 
+### Answer quality: harness built, measurement incomplete
+
+[experiments/answer_quality.py](experiments/answer_quality.py) evaluates what a
+user actually receives rather than what retrieval returns. **The run is
+unfinished — the Anthropic API credit balance was exhausted partway through — so
+the numbers below are preliminary and are labelled as such rather than promoted
+into a result.**
+
+Three measurements of deliberately different kinds:
+
+1. **Citation validity — deterministic, no judge.** Every CVE ID in the answer
+   text is checked against the IDs actually retrieved. An ID that was not in the
+   context was invented, whatever the prose says.
+2. **Groundedness — judged.** Whether each claim follows from the context is not
+   mechanically checkable, so a model grades it.
+3. **Abstention — judged, on questions built to be unanswerable.** 22 questions:
+   12 about products verified by search to be absent from the corpus, and 10
+   about real CVEs asking for things NVD records do not contain (attribution,
+   patch procedure, exploit availability).
+
+**The judge is calibrated, not trusted.** A judge that approves everything scores
+a perfect system. So real answers are corrupted — a fabricated CVE ID, an
+invented CVSS score, an unsupported exploitation claim — and graded alongside the
+genuine ones. The rate at which the judge catches those is the number that makes
+the groundedness rate mean anything.
+
+| | Planned | Completed |
+|---|---:|---:|
+| Answerable questions | 40 | **16** |
+| Unanswerable questions | 22 | **0** |
+| Judge calibration answers | 12 | **0** |
+
+Preliminary, from 16 graded answers:
+
+| Measure | Value | Status |
+|---|---:|---|
+| Citation validity (14 answers naming a CVE) | **1.000** | deterministic — no judge involved |
+| Grounded | 0.625 | **uncalibrated — do not cite** |
+| Unsupported | 0.250 | **uncalibrated — do not cite** |
+
+Only the first line is a finding. **No answer named a CVE that was not in its
+retrieved context**, which is a judge-free check on the citation mechanism — but
+14 answers is a small sample and the corresponding rate for a system without
+metadata-derived citations is unknown.
+
+The groundedness figures are reported here for completeness and are **not usable
+as evidence**: with zero calibration answers graded, there is no measurement of
+whether the judge can detect an unsupported claim at all. Quoting 0.625 as a
+groundedness result would be exactly the kind of unsubstantiated number this
+project removes elsewhere.
+
+One suggestive pattern worth chasing when the run completes: of the four answers
+graded unsupported, the judge's stated reason on several was that an "Analyst
+Notes" section added exploitation mechanics not present in the context. The
+prompt asks for actionable recommendations, and that instruction may be pulling
+the model past what the retrieved documents support. If that survives a
+calibrated judge, it is a prompt defect rather than a retrieval one.
+
+To finish: `python experiments/answer_quality.py --run` (resumable; it skips
+what is already graded and does not record API failures as answers).
+
 ### Still not measured
 
 End-to-end answer quality, groundedness, refusal behaviour on unanswerable
@@ -1026,9 +1102,13 @@ Planned, in order:
       same pinned CVEs, with leakage measured against the copied-sentence
       control and paired significance tests. Verdict: the dense arm does not
       earn its place on this workload
-- [ ] **Answer-quality evaluation** — groundedness judging and refusal rate on
-      unanswerable questions. The paraphrased set is the foundation for both;
-      neither is built, and no answer-quality number is quoted anywhere
+- [ ] **Answer-quality evaluation** — harness built and committed
+      ([answer_quality.py](experiments/answer_quality.py)): deterministic
+      citation validity, judged groundedness, abstention on 22 verified
+      unanswerable questions, and a corrupted-answer set to calibrate the judge.
+      **The run is incomplete** — API credits were exhausted after 16 of 78
+      planned gradings — so no groundedness or refusal figure is quoted as a
+      result. Resumable
 - [ ] **Interface and packaging** — abstention below a relevance floor, and a
       Dockerfile plus compose file
 
