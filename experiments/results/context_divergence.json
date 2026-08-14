@@ -1,0 +1,1565 @@
+{
+  "generated_at": "2026-08-14T14:37:39+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "modes": [
+    "hybrid_rerank",
+    "bm25"
+  ],
+  "depth": 5,
+  "queries": 192,
+  "eval_set": "experiments\\samples\\paraphrased_eval.json",
+  "identical_document_set": 2,
+  "identical_document_set_rate": 0.0104,
+  "identical_document_order": 0,
+  "identical_document_order_rate": 0.0,
+  "different_document_set_rate": 0.9896,
+  "mean_overlap_of_5": 2.219,
+  "target_indicator_discordance": 0.1094,
+  "note": "different_document_set_rate is the share of questions where the two configs build different prompts, and is the discordance rate an answer-quality comparison is actually exposed to. target_indicator_discordance is the weaker measure taken from ranks_by_cve, kept here so the two can be compared.",
+  "records": [
+    {
+      "cve_id": "CVE-2007-5622",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2008-6468",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-24973",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-34819",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-15617",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-37597",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-5955",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-1491",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2019-17008",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2006-5926",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-36374",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-17526",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-71559",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-24718",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2022-29843",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-12170",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-14582",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-7537",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2018-12198",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2007-1458",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-0645",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-13825",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2016-1855",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2024-26787",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2025-30152",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-15829",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-25970",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-8009",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-15125",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2008-4789",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-33513",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2026-21012",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2019-10719",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-1576",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-23291",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-34031",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-6822",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2016-0712",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-3189",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-3073",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-43312",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2014-4006",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-35205",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2013-3443",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-26496",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-61458",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-55627",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2008-3529",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-18612",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2022-36475",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2024-22159",
+      "identical_set": true,
+      "identical_order": false,
+      "overlap": 5,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-49281",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2009-2299",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-39073",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-12174",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-27739",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-38963",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-36950",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-4907",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-42986",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-21649",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-41610",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-48967",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2010-4661",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-35009",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-11650",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-10251",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2012-2530",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2023-48010",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-4381",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-21876",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2017-3757",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-35050",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-31106",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-15178",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-3625",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2019-9133",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-3195",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-21839",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2020-8967",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-44082",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-6032",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-34866",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-43791",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2012-2604",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-1158",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-24748",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-16084",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-10111",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-29907",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-29656",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-18667",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2017-1000444",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-22252",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-23178",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-5444",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-25699",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2007-5265",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-27846",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-1294",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-6477",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2024-56497",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2019-0183",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2026-14045",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2013-0542",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2014-2339",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-2552",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-47693",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2025-58479",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-27668",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2009-2073",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2003-1190",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-48178",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-40985",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2008-2593",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-53264",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-44144",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2007-2921",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2019-10960",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2014-9635",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2014-2461",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-14614",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-54989",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-0985",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2006-6812",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-22556",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-35266",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2024-13356",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2026-58371",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-25227",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2021-0173",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2026-60226",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2014-3478",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-8813",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2018-5234",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-22466",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-24368",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-41723",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-20721",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-38845",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2002-1466",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-50248",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2010-5053",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2018-13768",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2026-23462",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2025-6225",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2019-3684",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-48859",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-21308",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-40622",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-12636",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2016-2442",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-0065",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2015-9467",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-45549",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2021-32202",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-21639",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2016-5499",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-46991",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2025-64012",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-61224",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2023-37280",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2023-37925",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-22417",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-68501",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-34677",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2014-6013",
+      "identical_set": true,
+      "identical_order": false,
+      "overlap": 5,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2006-0489",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2011-2323",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2012-5905",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-36935",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2019-16252",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2021-1674",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2022-34618",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-40113",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2014-9795",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-53323",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2008-6810",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2015-3969",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-23452",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2021-26706",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-35672",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2024-26117",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2014-0067",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2020-35827",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2025-27109",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2022-49325",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 1,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2024-45577",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2026-7089",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 0,
+      "target_in_both": false,
+      "target_in_neither": true
+    },
+    {
+      "cve_id": "CVE-2014-1323",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 4,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2019-11936",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 3,
+      "target_in_both": true,
+      "target_in_neither": false
+    },
+    {
+      "cve_id": "CVE-2004-1873",
+      "identical_set": false,
+      "identical_order": false,
+      "overlap": 2,
+      "target_in_both": true,
+      "target_in_neither": false
+    }
+  ]
+}

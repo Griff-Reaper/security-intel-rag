@@ -38,9 +38,11 @@ DEFAULT_LEXICAL_DB = str(PROJECT_ROOT / "chroma_db" / "lexical.sqlite3")
 # so the weaker, faster configurations stay reachable without a code change.
 DEFAULT_RETRIEVAL_MODE = "hybrid_rerank"
 
+import api_ledger
 import claude_client
 import filters as filters_mod
 import lexical_index as LX
+import provenance
 import retrieval as retrieval_mod
 from embeddings import EmbeddingService
 from prompts import (
@@ -139,6 +141,11 @@ class SecurityRAG:
                 )
         routing = " + direct CVE-ID routing" if self.direct_id else ""
         print(f"[OK] Retrieval: {self.retrieval_mode}{routing}")
+
+        # Which KEV catalog and EPSS run the index carries. Read once; answers
+        # that mention exploitation status quote the snapshot rather than
+        # implying the claim is current as of the question being asked.
+        self.enrichment_snapshot = provenance.enrichment_snapshot()
 
     def _retriever(self, filters: Optional[Dict[str, Any]]):
         """Get a retriever for this filter spec, reusing the last one if it matches.
@@ -266,7 +273,8 @@ class SecurityRAG:
         # Step 2: Format the context for Claude
         formatted_context = format_context_documents(
             context_results["documents"],
-            context_results["metadatas"]
+            context_results["metadatas"],
+            enrichment=self.enrichment_snapshot
         )
         
         # Step 3: Get appropriate prompt template
@@ -291,6 +299,8 @@ class SecurityRAG:
                     {"role": "user", "content": user_prompt}
                 ]
             )
+
+            api_ledger.record(response, self.model, "query:answer")
 
             # Safety classifiers can decline a request: HTTP 200 with
             # stop_reason "refusal" and empty/partial content. Check before

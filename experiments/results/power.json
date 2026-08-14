@@ -1,0 +1,257 @@
+{
+  "generated_at": "2026-08-14T14:53:59+00:00",
+  "document_layout": {
+    "version": 2,
+    "fingerprint": "ffb8c1393e249003",
+    "max_vendors_in_text": 6,
+    "max_products_in_text": 8,
+    "max_vendors_in_metadata": 25,
+    "max_products_in_metadata": 40,
+    "list_delimiter": "|"
+  },
+  "alpha": 0.05,
+  "target_power": 0.8,
+  "generation_depth": 5,
+  "published_intervals": {
+    "answerable.grounded": {
+      "count": 11,
+      "n": 16,
+      "wald": {
+        "point": 0.6875,
+        "standard_error": 0.1159,
+        "half_width_95": 0.2271,
+        "low": 0.4604,
+        "high": 0.9146
+      },
+      "wilson": {
+        "point": 0.6875,
+        "low": 0.444,
+        "high": 0.8584,
+        "width": 0.4143
+      }
+    },
+    "answerable.unsupported": {
+      "count": 5,
+      "n": 16,
+      "wald": {
+        "point": 0.3125,
+        "standard_error": 0.1159,
+        "half_width_95": 0.2271,
+        "low": 0.0854,
+        "high": 0.5396
+      },
+      "wilson": {
+        "point": 0.3125,
+        "low": 0.1416,
+        "high": 0.556,
+        "width": 0.4143
+      }
+    },
+    "answerable.abstained": {
+      "count": 0,
+      "n": 16,
+      "wald": {
+        "point": 0.0,
+        "standard_error": 0.0,
+        "half_width_95": 0.0,
+        "low": 0.0,
+        "high": 0.0
+      },
+      "wilson": {
+        "point": 0.0,
+        "low": 0.0,
+        "high": 0.1936,
+        "width": 0.1936
+      }
+    },
+    "unanswerable.abstained": {
+      "count": 8,
+      "n": 20,
+      "wald": {
+        "point": 0.4,
+        "standard_error": 0.1095,
+        "half_width_95": 0.2147,
+        "low": 0.1853,
+        "high": 0.6147
+      },
+      "wilson": {
+        "point": 0.4,
+        "low": 0.2188,
+        "high": 0.6134,
+        "width": 0.3946
+      }
+    }
+  },
+  "projected_intervals": {
+    "n_18": {
+      "unsupported": {
+        "point": 0.2778,
+        "low": 0.125,
+        "high": 0.5087,
+        "width": 0.3837
+      },
+      "grounded": {
+        "point": 0.6111,
+        "low": 0.3862,
+        "high": 0.797,
+        "width": 0.4108
+      }
+    },
+    "n_157": {
+      "unsupported": {
+        "point": 0.2803,
+        "low": 0.2159,
+        "high": 0.3551,
+        "width": 0.1392
+      },
+      "grounded": {
+        "point": 0.6115,
+        "low": 0.5334,
+        "high": 0.6842,
+        "width": 0.1508
+      }
+    },
+    "note": "held-out ceiling is 174: paraphrased_eval.json carries one question per CVE from a 200-CVE sample pinned in Phase 2, 192 of which generated successfully, 18 spent as a development set. Rates are held at the observed values to isolate the effect of sample size."
+  },
+  "retrieval_discordance_hybrid_rerank_vs_bm25": {
+    "depth_1": {
+      "queries": 192,
+      "hybrid_rerank_wins": 26,
+      "bm25_wins": 23,
+      "discordant": 49,
+      "discordance_rate": 0.2552,
+      "observed_marginal_difference": 0.0156
+    },
+    "depth_3": {
+      "queries": 192,
+      "hybrid_rerank_wins": 16,
+      "bm25_wins": 14,
+      "discordant": 30,
+      "discordance_rate": 0.1562,
+      "observed_marginal_difference": 0.0104
+    },
+    "depth_5": {
+      "queries": 192,
+      "hybrid_rerank_wins": 11,
+      "bm25_wins": 10,
+      "discordant": 21,
+      "discordance_rate": 0.1094,
+      "observed_marginal_difference": 0.0052
+    },
+    "depth_10": {
+      "queries": 192,
+      "hybrid_rerank_wins": 9,
+      "bm25_wins": 5,
+      "discordant": 14,
+      "discordance_rate": 0.0729,
+      "observed_marginal_difference": 0.0208
+    }
+  },
+  "context_divergence": {
+    "generated_at": "2026-08-14T14:37:39+00:00",
+    "document_layout": {
+      "version": 2,
+      "fingerprint": "ffb8c1393e249003",
+      "max_vendors_in_text": 6,
+      "max_products_in_text": 8,
+      "max_vendors_in_metadata": 25,
+      "max_products_in_metadata": 40,
+      "list_delimiter": "|"
+    },
+    "modes": [
+      "hybrid_rerank",
+      "bm25"
+    ],
+    "depth": 5,
+    "queries": 192,
+    "eval_set": "experiments\\samples\\paraphrased_eval.json",
+    "identical_document_set": 2,
+    "identical_document_set_rate": 0.0104,
+    "identical_document_order": 0,
+    "identical_document_order_rate": 0.0,
+    "different_document_set_rate": 0.9896,
+    "mean_overlap_of_5": 2.219,
+    "target_indicator_discordance": 0.1094,
+    "note": "different_document_set_rate is the share of questions where the two configs build different prompts, and is the discordance rate an answer-quality comparison is actually exposed to. target_indicator_discordance is the weaker measure taken from ranks_by_cve, kept here so the two can be compared."
+  },
+  "planned_comparison": {
+    "held_out_ceiling": 157,
+    "held_out_note": "paraphrased_eval.json carries one question per CVE from a 200-CVE sample pinned in Phase 2 and committed not to be redrawn. 192 generated; the remainder is the entire held-out set that exists, so sample size here is not a budget decision.",
+    "grade_discordance": "unknown until measured; power reported across a range",
+    "upper_bound_on_discordance": 0.9896,
+    "why_not_a_point_estimate": "The target-indicator discordance of 0.1094 was used as a proxy and is wrong for this purpose: the configs agree about the target and disagree about the rest of the prompt on 0.9896 of questions, with a mean overlap of 2.219 of 5 documents. Grade discordance lies somewhere below the latter and cannot be derived from either.",
+    "power_grid": {
+      "grade_discordance_0.10": {
+        "delta_0.050": {
+          "power_at_n_157": 0.4265,
+          "n_for_80_percent": 337
+        },
+        "delta_0.075": {
+          "power_at_n_157": 0.8434,
+          "n_for_80_percent": 144
+        },
+        "delta_0.100": {
+          "power_at_n_157": 0.9989,
+          "n_for_80_percent": 78
+        },
+        "delta_0.150": {
+          "impossible_at_this_discordance": true
+        }
+      },
+      "grade_discordance_0.20": {
+        "delta_0.050": {
+          "power_at_n_157": 0.2255,
+          "n_for_80_percent": 658
+        },
+        "delta_0.075": {
+          "power_at_n_157": 0.4884,
+          "n_for_80_percent": 294
+        },
+        "delta_0.100": {
+          "power_at_n_157": 0.768,
+          "n_for_80_percent": 168
+        },
+        "delta_0.150": {
+          "power_at_n_157": 0.9935,
+          "n_for_80_percent": 72
+        }
+      },
+      "grade_discordance_0.30": {
+        "delta_0.050": {
+          "power_at_n_157": 0.171,
+          "n_for_80_percent": 975
+        },
+        "delta_0.075": {
+          "power_at_n_157": 0.3548,
+          "n_for_80_percent": 438
+        },
+        "delta_0.100": {
+          "power_at_n_157": 0.587,
+          "n_for_80_percent": 249
+        },
+        "delta_0.150": {
+          "power_at_n_157": 0.9286,
+          "n_for_80_percent": 112
+        }
+      },
+      "grade_discordance_0.50": {
+        "delta_0.050": {
+          "power_at_n_157": 0.1179,
+          "n_for_80_percent": 1606
+        },
+        "delta_0.075": {
+          "power_at_n_157": 0.2273,
+          "n_for_80_percent": 720
+        },
+        "delta_0.100": {
+          "power_at_n_157": 0.3819,
+          "n_for_80_percent": 408
+        },
+        "delta_0.150": {
+          "power_at_n_157": 0.7298,
+          "n_for_80_percent": 183
+        }
+      }
+    }
+  }
+}

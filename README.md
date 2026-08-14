@@ -1034,23 +1034,65 @@ I will not attribute any CVE ID to it."*
 retrieved.** Zero invented identifiers. This is a mechanical check, not a
 judgement, and it is the strongest claim in this section.
 
-**Groundedness — judged, on 18 answerable questions.**
+**Groundedness — judged, on 16 answerable questions.**
 
-| Grade | Rate |
-|---|---:|
-| Grounded | 0.611 |
-| Unsupported | 0.278 |
-| Abstained | 0.111 |
+| Grade | Rate | 95% interval (Wilson) |
+|---|---:|---|
+| Grounded | 0.688 | [0.444, 0.858] |
+| Unsupported | 0.312 | [0.142, 0.556] |
+| False abstention | 0.000 | [0.000, 0.194] |
 
-The 27.8% is a real defect and it has a single cause. Every unsupported answer
-was correct about the CVE and then added an "Analyst Notes" section carrying
-material the context does not have: **CWE titles** (expanding `CWE-121` to
+Two provider refusals are excluded. The API can decline a request outright —
+HTTP 200, `stop_reason: "refusal"`, no content — and `query.py` substitutes a
+placeholder string. An earlier version of this table counted those placeholders
+as answers, where the judge read *"The model declined to answer this query"* and
+graded it **abstained**. That produced a reported false-abstention rate of 0.111
+describing a system refusing questions it had never been asked. The rate is 0.000;
+provider refusals are now excluded from every denominator and named in the
+artifact.
+
+The 31% unsupported rate was a real defect with a single cause. Every unsupported
+answer was correct about the CVE and then added an "Analyst Notes" section
+carrying material the context did not have: **CWE titles** (expanding `CWE-121` to
 "Stack-based Buffer Overflow"), **CVSS vector reasoning** ("the 6.8 reflects a
-user-interaction requirement"), and generic exploitation mechanics. The prompt
-asks for actionable recommendations, and the model supplies them from training
-knowledge. Two of those are fixable in the pipeline rather than the model:
-`cvss_vector` is in the stored metadata but is *not* passed into the context, and
-CWE titles are not in the corpus at all.
+user-interaction requirement"), and invented exploitation mechanics ("plant
+`C:\Program.exe` to gain SYSTEM at service start"). The system prompt opened by
+asserting deep knowledge of exploitation and then asked for actionable
+recommendations. Priming for expertise and asking for actionability is an
+instruction to fill gaps from memory.
+
+**The fix, and what it measured.** Two changes, both in the pipeline rather than
+the model:
+
+1. **Show what was already indexed.** `cvss_vector` was in the stored metadata
+   and was never passed into the prompt. Asked why something scored 6.8, the
+   model had the number without the reasoning behind it and supplied the
+   reasoning from training knowledge — which a groundedness judge correctly
+   marks unsupported, three times in sixteen questions. `AV:N/AC:M/Au:N/C:P/I:P/A:P`
+   states the access complexity outright. KEV and EPSS were withheld the same way,
+   and the prompt still told the model the corpus carried no exploitation status —
+   false since Phase 3, and an instruction to refuse answerable questions.
+2. **Stop asking for elaboration.** The system prompt no longer requests
+   actionable recommendations, forbids expanding CWE identifiers into weakness
+   titles, and permits reading a CVSS vector while forbidding inference from a
+   bare score. Because tightening a prompt can buy groundedness with refusals,
+   the harness now reports **false abstention** as its own number beside correct
+   decline, and the fix is checked against both.
+
+Development signal, on the 16 questions the defect was diagnosed from
+(`--compare`):
+
+| | Before | After |
+|---|---:|---:|
+| Grounded | 11 / 16 | **16 / 16** |
+| Correct decline, unanswerable (decline judge) | 18 / 18 | 18 / 18 |
+
+All five failures fixed, no regressions, and no cost on the decline side. **This
+is not a result.** These are the questions the change was developed against, and
+five discordant pairs cannot reach significance under an exact McNemar test at
+any split — the tool says so in its own output rather than leaving it to be
+noticed. The reportable number is the held-out measurement, which has not been
+run.
 
 ### The judge is an instrument, and it was wrong twice
 
@@ -1083,17 +1125,64 @@ Two separate faults were found by chasing that number instead of publishing it:
 Neither fault was in the system under test. Both would have shipped as findings.
 
 **Cost, measured rather than estimated.** Every call's token usage is recorded:
-**1,067 input / 659 output tokens per answered question** at 5 retrieved
-documents. Judging is the cheap half. The judge model is selectable
-(`--judge-model`); a smaller model was tried and rejected — it passed recall at
-100% but produced false positives on real answers, which is exactly what the
-precision half of the calibration is for.
+**3,340 input / 964 output tokens per answered question** at 5 retrieved
+documents, and 3,475 / 147 per groundedness judgement — so judging is about a
+third of the bill, not the rounding error it was previously reported as. Those
+figures come from [src/api_ledger.py](src/api_ledger.py), an append-only JSONL
+record written at every call site. It exists because the first run could not
+account for its own spend: usage was stored on the record being graded, so each
+re-grading pass overwrote the previous one's, and the eval-set generator stored
+nothing at all. The published cost was roughly a third of what actually
+disappeared, which is worse than not measuring it, because it looked
+authoritative. Prices are not stored — token counts do not go stale and rates do
+— so costing a run means passing them in: `python src/api_ledger.py --in-price 5
+--out-price 25`.
 
-**Limits.** 18 answerable questions is a small sample: the 0.611 grounded rate
-carries roughly ±11 points of sampling error, and the run is capped by API
-budget rather than by design. The judge and the system under test are the same
-model family, which is a known bias in LLM-as-judge setups and is not controlled
-for here.
+The judge model is selectable (`--judge-model`); a smaller model was tried and
+rejected — it passed recall at 100% but produced false positives on real answers,
+which is exactly what the precision half of the calibration is for.
+
+**Limits.** Sixteen questions is a very small sample and the intervals in the
+table above say so. Read the unsupported bracket in words: **somewhere between
+one answer in seven and rather more than half overreaches.** That is very nearly
+no information. The point estimate is not the finding; the width is, and a
+narrower gloss on the same interval would be the quiet overstatement this project
+removes elsewhere.
+
+Two notes on how those are computed, from
+[experiments/power.py](experiments/power.py). The standard error of the grounded
+rate is ±11.6 points and the 95% Wilson interval is ±20.7 — different
+quantities, and quoting the smaller one unlabelled overstates the precision by
+nearly half. The
+intervals are Wilson rather than the textbook normal approximation, which at this
+sample size runs off the end of the scale: it puts the false-abstention interval
+at exactly [0, 0], which is not a claim any 16 observations can support.
+
+**What a larger sample would buy, and why there is a ceiling.** The evaluation set
+holds one question per CVE from a 200-CVE sample pinned in Phase 2 and committed
+not to be redrawn; 192 generated successfully and 35 are now spent as a
+development set. **157 held-out questions is the whole of what exists** — a
+constraint of the sampling design, not of budget. At that size the unsupported
+interval narrows from ±20.7 to ±7.2 points.
+
+Whether that is enough to compare two retrieval configurations depends on how
+often they produce *different grades*, which cannot be known before running. It
+is bounded above by how often they produce different prompts, and
+[experiments/context_divergence.py](experiments/context_divergence.py) measures
+that at **0.990** — the two configs hand the generator a different set of five
+documents on 190 of 192 questions, overlapping on 2.2 documents out of 5.
+
+That measurement replaced a proxy that was badly wrong. The obvious number to
+reach for is how often the two configs disagree about whether the *target* CVE is
+in the top five, which is 0.109 — and on that basis the comparison looks nearly
+free and well powered, because a marginal difference cannot exceed the rate at
+which the arms differ. The two configs agree about where the target is and
+disagree about almost everything else around it. Power at n=157 therefore runs
+from 1.00 down to 0.38 for a 10-point difference depending on which discordance
+rate turns out to apply, and the run measures which.
+
+The judge and the system under test are the same model family, which is a known
+bias in LLM-as-judge setups and is not controlled for here.
 
 ### Still not measured
 
@@ -1131,13 +1220,24 @@ Planned, in order:
       invented CVE IDs across 50 answers), abstention on 22 verified
       unanswerable questions (20/20 declined, 0 fabricated), and judged
       groundedness with two-sided judge calibration
-- [ ] **Ground the analyst notes** — 27.8% of answers add CWE titles and CVSS
-      vector reasoning the context does not carry. `cvss_vector` is already in
-      the metadata and simply is not passed into the prompt; CWE titles are not
-      in the corpus at all. The cheapest remaining correctness win
-- [ ] **Larger answer-quality sample** — 18 answerable questions is ±11 points
-      of sampling error, and the judge shares a model family with the system
-      under test
+- [x] **Ground the analyst notes** — the 31% unsupported rate was answers adding
+      CWE titles, CVSS vector reasoning and exploitation mechanics the context
+      did not carry. Fixed by passing the indexed `cvss_vector`, KEV and EPSS
+      fields into the prompt and removing the instruction to prioritise
+      actionable recommendations. 5 of 5 development failures fixed with no cost
+      to decline behaviour; the held-out measurement is the entry below
+- [ ] **Held-out answer-quality measurement** — 157 questions, `hybrid_rerank`
+      against `bm25`. The comparison is the point: every retrieval conclusion in
+      this project rests on Recall@1 proxying answer quality, and nothing has
+      tested that. Sized in [experiments/power.py](experiments/power.py); 157 is
+      the entire held-out set the pinned sample allows, so the interval it buys
+      (±7.2 points on the unsupported rate) is a ceiling rather than a choice
+- [ ] **A CWE catalogue join** — the model is currently forbidden from expanding
+      `CWE-121` to "Stack-based Buffer Overflow" because the corpus carries the
+      identifier and not the title. Grounding the title would be more useful
+      than suppressing it
+- [ ] **A judge outside the model family** — the judge and the system under test
+      are both Claude, a known bias in LLM-as-judge setups, uncontrolled here
 - [ ] **Interface and packaging** — abstention below a relevance floor, and a
       Dockerfile plus compose file
 

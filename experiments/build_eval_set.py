@@ -61,6 +61,7 @@ from dotenv import load_dotenv
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+import api_ledger  # noqa: E402
 import claude_client  # noqa: E402
 import provenance  # noqa: E402
 
@@ -180,6 +181,9 @@ def generate_one(client, model: str, description: str, attempts: int = 3) -> Dic
             time.sleep(1.5 * (attempt + 1))
             continue
 
+        # Logged before any early return: a refusal still costs tokens, and the
+        # first run's accounting missed exactly this kind of call.
+        api_ledger.record(response, model, "build_eval_set:generate")
         # Safety classifiers can decline: HTTP 200, stop_reason "refusal", and
         # content that must not be indexed into. Retrying will not help.
         if response.stop_reason == "refusal":

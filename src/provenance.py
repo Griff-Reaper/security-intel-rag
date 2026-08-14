@@ -90,6 +90,27 @@ def recorded_layout(manifest_path: Path = MANIFEST_PATH) -> Optional[Dict[str, A
     return read_manifest(manifest_path).get("document_layout")
 
 
+def enrichment_snapshot(manifest_path: Path = MANIFEST_PATH) -> Dict[str, Any]:
+    """
+    Which KEV catalog and EPSS scoring run the index was enriched from.
+
+    Answers that report exploitation status are making a dated claim - "not
+    listed in KEV" is only true as of a catalog version - so the version travels
+    with the fact into the prompt rather than being assumed current. Absent keys
+    are normal on an index built before enrichment ran; callers render without
+    the qualifier rather than inventing one.
+    """
+    block = read_manifest(manifest_path).get("exploitation") or {}
+    snapshot = {}
+    catalog = (block.get("kev") or {}).get("catalog_version")
+    if catalog:
+        snapshot["kev_catalog"] = catalog
+    scored = (block.get("epss") or {}).get("score_date")
+    if scored:
+        snapshot["epss_date"] = scored[:10]
+    return snapshot
+
+
 def require_layout_match(manifest_path: Path = MANIFEST_PATH) -> Dict[str, Any]:
     """
     Fail unless the live layout matches the one the index was built with.
